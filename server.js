@@ -373,12 +373,6 @@ async function canEditByOwnership(user, record, db = pool) {
     // legacy (owner_group_id 未設定) → 開發中先不擋，避免舊資料無法操作
     if (!ownerGroupId) return true;
 
-    // 全部可編輯群組：任何登入使用者皆可編輯
-    try {
-        const gRes = await db.query("SELECT allow_all_edit FROM groups WHERE id = $1 LIMIT 1", [ownerGroupId]);
-        if (gRes.rows.length > 0 && gRes.rows[0].allow_all_edit === true) return true;
-    } catch (e) {}
-
     const gids = await getUserGroupIds(user.id, db);
     return gids.includes(ownerGroupId);
 }
@@ -547,13 +541,10 @@ async function initDB() {
                     id SERIAL PRIMARY KEY,
                     name TEXT UNIQUE NOT NULL,
                     is_admin_group BOOLEAN DEFAULT false,
-                    allow_all_edit BOOLEAN DEFAULT false,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )`);
                 // 向後兼容：舊資料庫可能沒有 is_admin_group
                 try { await client.query(`ALTER TABLE groups ADD COLUMN IF NOT EXISTS is_admin_group BOOLEAN DEFAULT false`); } catch (e) {}
-                // 全部可編輯群組（年度定檢等參與人員眾多時使用）
-                try { await client.query(`ALTER TABLE groups ADD COLUMN IF NOT EXISTS allow_all_edit BOOLEAN DEFAULT false`); } catch (e) {}
                 // 確保「系統管理群組」唯一（只允許一個 true）
                 try {
                     await client.query(`
@@ -1758,7 +1749,7 @@ app.post('/api/issues/import', requireAuth, requireAdminOrManager, verifyCsrf, a
 // --- Groups API ---
 app.get('/api/groups', requireAuth, requireAdminOrManager, async (req, res) => {
     try {
-        const r = await pool.query("SELECT id, name, is_admin_group, COALESCE(allow_all_edit, false) AS allow_all_edit FROM groups ORDER BY is_admin_group DESC, name ASC, id ASC");
+        const r = await pool.query("SELECT id, name, is_admin_group FROM groups ORDER BY is_admin_group DESC, name ASC, id ASC");
         res.json({ data: r.rows || [] });
     } catch (e) {
         handleApiError(e, req, res, 'Get groups error');
@@ -1811,10 +1802,9 @@ app.get('/api/users/lookup', requireAuth, requireAdminOrManager, async (req, res
 
 app.post('/api/groups', requireAuth, requireAdmin, verifyCsrf, async (req, res) => {
     const name = String(req.body?.name || '').trim();
-    const allowAllEdit = req.body?.allow_all_edit === true || req.body?.allowAllEdit === true;
     if (!name) return res.status(400).json({ error: '群組名稱為必填' });
     try {
-        const r = await pool.query("INSERT INTO groups (name, allow_all_edit) VALUES ($1, $2) RETURNING id, name, allow_all_edit", [name, allowAllEdit]);
+        const r = await pool.query("INSERT INTO groups (name) VALUES ($1) RETURNING id, name", [name]);
         logAction(req.session.user.username, 'CREATE_GROUP', `新增群組：${name}`, req).catch(() => {});
         res.json({ success: true, group: r.rows[0] });
     } catch (e) {
@@ -1825,11 +1815,10 @@ app.post('/api/groups', requireAuth, requireAdmin, verifyCsrf, async (req, res) 
 app.put('/api/groups/:id', requireAuth, requireAdmin, verifyCsrf, async (req, res) => {
     const id = parseInt(req.params.id, 10);
     const name = String(req.body?.name || '').trim();
-    const allowAllEdit = req.body?.allow_all_edit === true || req.body?.allowAllEdit === true;
     if (!id) return res.status(400).json({ error: 'Invalid id' });
     if (!name) return res.status(400).json({ error: '群組名稱為必填' });
     try {
-        await pool.query("UPDATE groups SET name = $1, allow_all_edit = $2 WHERE id = $3", [name, allowAllEdit, id]);
+        await pool.query("UPDATE groups SET name = $1 WHERE id = $2", [name, id]);
         logAction(req.session.user.username, 'UPDATE_GROUP', `更新群組：ID ${id} → ${name}`, req).catch(() => {});
         res.json({ success: true });
     } catch (e) {
@@ -1837,20 +1826,36 @@ app.put('/api/groups/:id', requireAuth, requireAdmin, verifyCsrf, async (req, re
     }
 });
 
-// --- 管理員重置使用者密碼 ---
+// --- 一鍵將所有使用者加入群組 ---
+app.post('/api/groups/:id/add-all-users', requireAuth, requireAdmin, verifyCsrf, async (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    if (!id || !Number.isFinite(id)) return res.status(400).json({ error: 'Invalid group id' });
+    try {
+        const gRes = await pool.query("SELECT id, name FROM groups WHERE id = $1 AND COALESCE(is_admin_group, false) = false", [id]);
+        if (gRes.rows.length === 0) return res.status(404).json({ error: '找不到該群組或不可操作' });
+        const userIds = (await pool.query("SELECT id FROM users")).rows.map(r => r.id);
+        await pool.query(
+            "INSERT INTO user_groups (user_id, group_id) SELECT id, $1 FROM users ON CONFLICT (user_id, group_id) DO NOTHING",
+            [id]
+        );
+        logAction(req.session.user.username, 'ADD_ALL_TO_GROUP', `將所有使用者加入群組：${gRes.rows[0].name}，共 ${userIds.length} 人`, req).catch(() => {});
+        res.json({ success: true, count: userIds.length });
+    } catch (e) {
+        handleApiError(e, req, res, 'Add all users to group error');
+    }
+});
+
+// --- 管理員重置使用者密碼為初始密碼 Aa123456 ---
 app.post('/api/admin/users/:id/reset-password', requireAuth, requireAdmin, verifyCsrf, async (req, res) => {
     const id = parseInt(req.params.id, 10);
-    const { password } = req.body;
     if (!id || !Number.isFinite(id)) return res.status(400).json({ error: 'Invalid user id' });
-    if (!password || typeof password !== 'string') return res.status(400).json({ error: '密碼為必填' });
-    const passwordValidation = validatePassword(password);
-    if (!passwordValidation.valid) return res.status(400).json({ error: passwordValidation.message });
+    const defaultPassword = 'Aa123456';
     try {
         const uRes = await pool.query("SELECT id, username, name FROM users WHERE id = $1", [id]);
         if (uRes.rows.length === 0) return res.status(404).json({ error: '找不到該使用者' });
-        const hash = bcrypt.hashSync(password, 10);
+        const hash = bcrypt.hashSync(defaultPassword, 10);
         await pool.query("UPDATE users SET password = $1, must_change_password = $2 WHERE id = $3", [hash, true, id]);
-        logAction(req.session.user.username, 'RESET_PASSWORD', `管理員重置密碼：${uRes.rows[0].username}`, req).catch(() => {});
+        logAction(req.session.user.username, 'RESET_PASSWORD', `管理員重置密碼為初始密碼：${uRes.rows[0].username}`, req).catch(() => {});
         res.json({ success: true });
     } catch (e) {
         handleApiError(e, req, res, 'Reset password error');

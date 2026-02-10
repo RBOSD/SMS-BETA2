@@ -77,15 +77,11 @@
             <div style="margin-top:12px; border:1px solid var(--border); border-radius:12px; background:#ffffff; padding:12px;">
                 <div style="font-weight:800; color:#334155; font-size:13px; margin-bottom:8px;">新增群組</div>
                 <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                    <input id="newGroupName" class="filter-input" placeholder="例如：工務組 / 運務組 / 審查組" style="flex:1; min-width:220px;" autocomplete="off">
-                    <label style="display:flex; align-items:center; gap:6px; font-size:13px; color:#475569; cursor:pointer; white-space:nowrap;">
-                        <input type="checkbox" id="newGroupAllowAllEdit" style="width:16px; height:16px;">
-                        全部可編輯
-                    </label>
+                    <input id="newGroupName" class="filter-input" placeholder="例如：工務組 / 年度定檢全員" style="flex:1; min-width:220px;" autocomplete="off">
                     <button class="btn btn-primary btn-sm" onclick="createGroupAdmin()">➕ 建立</button>
                 </div>
                 <div style="margin-top:8px; font-size:12px; color:#64748b; line-height:1.5;">
-                    建立後可點選群組進入管理成員。勾選「全部可編輯」適用於年度定檢等參與人員眾多之情況。
+                    建立後可點選群組進入管理成員。若需「所有人可編輯」的計畫，可建立大群組（如「年度定檢全員」）並點「一鍵加入所有人」。
                 </div>
             </div>
             <div id="groupsFolderList" style="margin-top:12px; border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#ffffff;">
@@ -109,6 +105,7 @@
                 <div style="padding:12px;">
                     <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px;">
                         <input id="groupUserSearch" class="filter-input" placeholder="搜尋使用者（姓名/帳號）..." style="flex:1; min-width:200px;" autocomplete="off" oninput="renderSelectedGroupMembers()">
+                        <button class="btn btn-primary btn-sm" onclick="addAllUsersToSelectedGroup()" title="將所有使用者加入此群組（可建立全員群組供年度定檢等使用）">➕ 一鍵加入所有人</button>
                     </div>
                     <div id="groupMembersBody" style="max-height: var(--group-members-max, 320px); overflow:auto; border:1px solid var(--border); border-radius:10px; padding:8px; background:#f8fafc;">
                         <div style="padding:8px; color:#64748b; font-size:13px;">請先選擇群組</div>
