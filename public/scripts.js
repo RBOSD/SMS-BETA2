@@ -2467,11 +2467,11 @@ if (dashboard) {
                 if (forceDisabled) sel.disabled = true;
             };
 
-            fill('importOwnerGroup', false);
-            fill('createOwnerGroup', false);
+            // 適用群組：預設空白，強制使用者選擇
+            fill('importOwnerGroup', false, false);
+            fill('createOwnerGroup', false, false);
             // 行程群組跟隨計畫（先塞入可選群組，之後會被計畫選擇覆蓋並 disabled）
             fill('scheduleOwnerGroup', true);
-            // 檢查計畫的群組：預設空白，強制使用者選擇（不可預設全員可編輯）
             fill('planOwnerGroup', false, false);
         }
 
