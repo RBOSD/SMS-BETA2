@@ -2359,6 +2359,29 @@ if (dashboard) {
             openRenameGroupModal(adminSelectedGroupId);
         }
 
+        async function deleteSelectedGroup() {
+            if (!adminSelectedGroupId) return showToast('請先選擇群組', 'error');
+            const groups = Array.isArray(cachedGroupsForModal) ? cachedGroupsForModal : [];
+            const g = groups.find(x => parseInt(x.id, 10) === parseInt(adminSelectedGroupId, 10));
+            const gname = g ? (g.name || `群組 ${adminSelectedGroupId}`) : adminSelectedGroupId;
+            if (g && (g.is_admin_group === true || g.isAdminGroup === true)) {
+                return showToast('無法刪除系統管理群組', 'error');
+            }
+            const confirmed = await showConfirmModal(`確定要刪除群組「${escapeHtml(gname)}」嗎？\n\n此操作無法復原，且會一併移除該群組下所有成員的隸屬關係。`, '確定刪除', '取消');
+            if (!confirmed) return;
+            try {
+                const res = await apiFetch(`/api/groups/${adminSelectedGroupId}`, { method: 'DELETE' });
+                const j = await res.json().catch(() => ({}));
+                if (!res.ok) return showToast(j.error || '刪除失敗', 'error');
+                showToast('刪除成功', 'success');
+                cachedGroupsForModal = null;
+                adminSelectedGroupId = null;
+                await loadGroupsAdmin();
+            } catch (e) {
+                showToast('刪除失敗：' + (e.message || 'error'), 'error');
+            }
+        }
+
         async function renderSelectedGroupMembers() {
             const box = document.getElementById('groupMembersBody');
             const nameEl = document.getElementById('selectedGroupName');
@@ -2367,8 +2390,14 @@ if (dashboard) {
             const gid = adminSelectedGroupId != null ? parseInt(adminSelectedGroupId, 10) : null;
             const group = gid != null ? groups.find(g => parseInt(g.id, 10) === gid) : null;
             nameEl.textContent = group ? (group.name || `群組 ${group.id}`) : '（請先選擇群組）';
+            const deleteBtn = document.getElementById('deleteGroupBtn');
+            if (deleteBtn) {
+                const isAdminGroup = group && (group.is_admin_group === true || group.isAdminGroup === true);
+                deleteBtn.style.display = isAdminGroup ? 'none' : '';
+            }
             if (!gid || !group) {
                 box.innerHTML = '<div style="padding:8px; color:#64748b; font-size:13px;">請先選擇群組</div>';
+                if (deleteBtn) deleteBtn.style.display = 'none';
                 return;
             }
 

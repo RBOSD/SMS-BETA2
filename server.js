@@ -1840,6 +1840,32 @@ app.put('/api/groups/:id', requireAuth, requireAdmin, verifyCsrf, async (req, re
     }
 });
 
+app.delete('/api/groups/:id', requireAuth, requireAdmin, verifyCsrf, async (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    if (!id) return res.status(400).json({ error: 'Invalid id' });
+    try {
+        const gRes = await pool.query("SELECT id, name, is_admin_group FROM groups WHERE id = $1", [id]);
+        if (gRes.rows.length === 0) return res.status(404).json({ error: '群組不存在' });
+        const g = gRes.rows[0];
+        if (g.is_admin_group === true) return res.status(400).json({ error: '無法刪除系統管理群組' });
+        const issueRef = await pool.query(
+            "SELECT 1 FROM issues WHERE owner_group_id = $1 OR $1 = ANY(COALESCE(owner_group_ids, ARRAY[]::INTEGER[])) LIMIT 1",
+            [id]
+        );
+        if (issueRef.rows.length > 0) return res.status(400).json({ error: '此群組已被開立事項使用，無法刪除' });
+        const planRef = await pool.query(
+            "SELECT 1 FROM inspection_plan_schedule WHERE owner_group_id = $1 OR $1 = ANY(COALESCE(owner_group_ids, ARRAY[]::INTEGER[])) LIMIT 1",
+            [id]
+        );
+        if (planRef.rows.length > 0) return res.status(400).json({ error: '此群組已被檢查計畫使用，無法刪除' });
+        await pool.query("DELETE FROM groups WHERE id = $1", [id]);
+        logAction(req.session.user.username, 'DELETE_GROUP', `刪除群組：${g.name} (ID ${id})`, req).catch(() => {});
+        res.json({ success: true });
+    } catch (e) {
+        handleApiError(e, req, res, 'Delete group error');
+    }
+});
+
 // --- 管理員重置使用者密碼為初始密碼 Aa123456 ---
 app.post('/api/admin/users/:id/reset-password', requireAuth, requireAdmin, verifyCsrf, async (req, res) => {
     const id = parseInt(req.params.id, 10);
