@@ -1588,9 +1588,15 @@ app.post('/api/issues/import', requireAuth, requireAdminOrManager, verifyCsrf, a
         if (!isAdmin) {
             const myGids = await getUserDataGroupIds(req.session.user.id, client);
             if (ownerGroupId == null) ownerGroupId = myGids[0] ?? null;
-            if (ownerGroupId != null && !myGids.includes(ownerGroupId)) {
-                await client.query('ROLLBACK');
-                return res.status(403).json({ error: 'Denied' });
+            if (ownerGroupId != null) {
+                const inMyGroup = myGids.includes(ownerGroupId);
+                if (!inMyGroup) {
+                    const gAllow = await client.query("SELECT allow_all_edit FROM groups WHERE id = $1 AND COALESCE(is_admin_group, false) = false LIMIT 1", [ownerGroupId]);
+                    if (gAllow.rows.length === 0 || gAllow.rows[0].allow_all_edit !== true) {
+                        await client.query('ROLLBACK');
+                        return res.status(403).json({ error: 'Denied' });
+                    }
+                }
             }
         } else {
             if (ownerGroupId != null) {
@@ -2685,8 +2691,14 @@ app.post('/api/plans', requireAuth, requireAdminOrManager, verifyCsrf, async (re
         if (!isAdmin) {
             const myGids = await getUserDataGroupIds(req.session.user.id, pool);
             if (ownerGroupId == null) ownerGroupId = myGids[0] ?? null;
-            if (ownerGroupId != null && !myGids.includes(ownerGroupId)) {
-                return res.status(403).json({ error: 'Denied' });
+            if (ownerGroupId != null) {
+                const inMyGroup = myGids.includes(ownerGroupId);
+                if (!inMyGroup) {
+                    const gAllow = await pool.query("SELECT allow_all_edit FROM groups WHERE id = $1 AND COALESCE(is_admin_group, false) = false LIMIT 1", [ownerGroupId]);
+                    if (gAllow.rows.length === 0 || gAllow.rows[0].allow_all_edit !== true) {
+                        return res.status(403).json({ error: 'Denied' });
+                    }
+                }
             }
         } else {
             if (ownerGroupId != null) {
