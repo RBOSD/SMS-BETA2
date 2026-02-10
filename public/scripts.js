@@ -2312,6 +2312,7 @@ if (dashboard) {
             body.innerHTML = groups.map(g => {
                 const id = parseInt(g.id, 10);
                 const name = g.name || `群組 ${id}`;
+                const allowAll = g.allow_all_edit === true || g.allowAllEdit === true;
                 const active = (selected != null && id === selected);
                 return `<button type="button"
                     onclick="selectGroupAdmin(${id})"
@@ -2320,6 +2321,7 @@ if (dashboard) {
                         📁 ${escapeHtml(name)}
                     </span>
                     <span style="display:flex; gap:6px; align-items:center; flex-shrink:0;">
+                        ${allowAll ? '<span class="badge" style="background:#ecfdf5;border:1px solid #a7f3d0;color:#059669;">全員可編輯</span>' : ''}
                         <span class="badge" style="background:#f8fafc;border:1px solid #e2e8f0;color:#64748b;">ID ${id}</span>
                     </span>
                 </button>`;
@@ -2408,23 +2410,6 @@ if (dashboard) {
             box.innerHTML = rows.join('') || '<div style="padding:8px; color:#64748b; font-size:13px;">查無使用者</div>';
         }
 
-        async function addAllUsersToSelectedGroup() {
-            const gid = adminSelectedGroupId != null ? parseInt(adminSelectedGroupId, 10) : null;
-            if (!gid) return showToast('請先選擇群組', 'error');
-            const confirmed = await showConfirmModal('確定要將「所有使用者」加入此群組嗎？\n\n適用於建立全員群組（如年度定檢），後續新增檢查計畫時選此群組即可讓所有人編輯。', '確定加入', '取消');
-            if (!confirmed) return;
-            try {
-                const res = await apiFetch(`/api/groups/${gid}/add-all-users`, { method: 'POST' });
-                const j = await res.json().catch(() => ({}));
-                if (!res.ok) return showToast(j.error || '操作失敗', 'error');
-                showToast(`已將所有使用者加入群組`, 'success');
-                await loadAllUsersForAdmin(true);
-                await renderSelectedGroupMembers();
-            } catch (e) {
-                showToast('操作失敗: ' + e.message, 'error');
-            }
-        }
-
         async function toggleUserInSelectedGroup(userId, checked) {
             const gid = adminSelectedGroupId != null ? parseInt(adminSelectedGroupId, 10) : null;
             if (!gid) return showToast('請先選擇群組', 'error');
@@ -2472,7 +2457,9 @@ if (dashboard) {
                 const sel = document.getElementById(id);
                 if (!sel) return;
                 sel.innerHTML = (allowedGroups.length ? allowedGroups : dataGroups).map(g => {
-                    return `<option value="${g.id}">${escapeHtml(g.name || `群組 ${g.id}`)}</option>`;
+                    const allowAll = g.allow_all_edit === true || g.allowAllEdit === true;
+                    const suffix = allowAll ? '（全員可編輯）' : '';
+                    return `<option value="${g.id}">${escapeHtml(g.name || `群組 ${g.id}`)}${suffix}</option>`;
                 }).join('') || '<option value="">（尚無群組）</option>';
                 if (defaultId) sel.value = String(defaultId);
                 if (forceDisabled) sel.disabled = true;
@@ -2502,16 +2489,19 @@ if (dashboard) {
 
         async function createGroupAdmin() {
             const input = document.getElementById('newGroupName');
+            const allowAllEditEl = document.getElementById('newGroupAllowAllEdit');
             const name = String(input?.value || '').trim();
             if (!name) return showToast('請輸入群組名稱', 'error');
+            const allowAllEdit = allowAllEditEl ? allowAllEditEl.checked : false;
             try {
                 const res = await apiFetch('/api/groups', {
                     method: 'POST',
-                    body: JSON.stringify({ name })
+                    body: JSON.stringify({ name, allow_all_edit: allowAllEdit })
                 });
                 const j = await res.json().catch(() => ({}));
                 if (!res.ok) return showToast(j.error || '新增群組失敗', 'error');
                 if (input) input.value = '';
+                if (allowAllEditEl) allowAllEditEl.checked = false;
                 showToast('新增群組成功', 'success');
                 // user modal 群組快取需要刷新
                 cachedGroupsForModal = null;
@@ -2525,11 +2515,13 @@ if (dashboard) {
             const modal = document.getElementById('groupModal');
             const idEl = document.getElementById('targetGroupId');
             const nameEl = document.getElementById('groupNameInput');
+            const allowAllEl = document.getElementById('groupAllowAllEditInput');
             if (!modal || !idEl || !nameEl) return;
             const groups = Array.isArray(cachedGroupsForModal) ? cachedGroupsForModal : [];
             const g = groups.find(x => parseInt(x.id, 10) === parseInt(groupId, 10));
             idEl.value = String(groupId);
             nameEl.value = g?.name || '';
+            if (allowAllEl) allowAllEl.checked = !!(g?.allow_all_edit === true || g?.allowAllEdit === true);
             modal.classList.add('open');
             setTimeout(() => nameEl.focus(), 50);
         }
@@ -2542,14 +2534,16 @@ if (dashboard) {
         async function submitGroupRename() {
             const idEl = document.getElementById('targetGroupId');
             const nameEl = document.getElementById('groupNameInput');
+            const allowAllEl = document.getElementById('groupAllowAllEditInput');
             const id = parseInt(idEl?.value || '', 10);
             const name = String(nameEl?.value || '').trim();
             if (!id) return showToast('群組 ID 無效', 'error');
             if (!name) return showToast('群組名稱不可為空', 'error');
+            const allowAllEdit = allowAllEl ? allowAllEl.checked : false;
             try {
                 const res = await apiFetch(`/api/groups/${id}`, {
                     method: 'PUT',
-                    body: JSON.stringify({ name })
+                    body: JSON.stringify({ name, allow_all_edit: allowAllEdit })
                 });
                 const j = await res.json().catch(() => ({}));
                 if (!res.ok) return showToast(j.error || '更新群組失敗', 'error');
