@@ -1256,7 +1256,7 @@ if (dashboard) {
                             setupAdminElements();
                             setTimeout(() => setupImportListeners(), 100);
                             loadPlanOptions();
-                            // 載入群組選項（管理群組下拉）
+                            // 載入群組選項（適用群組下拉）
                             setTimeout(() => {
                                 try { loadOwnerGroupSelectsForImportView(); } catch (e) {}
                             }, 150);
@@ -2470,8 +2470,6 @@ if (dashboard) {
             // 適用群組：預設空白，強制使用者選擇
             fill('importOwnerGroup', false, false);
             fill('createOwnerGroup', false, false);
-            // 行程群組跟隨計畫（先塞入可選群組，之後會被計畫選擇覆蓋並 disabled）
-            fill('scheduleOwnerGroup', true);
             fill('planOwnerGroup', false, false);
         }
 
@@ -7077,14 +7075,6 @@ if (dashboard) {
                 return;
             }
 
-            // 同步顯示行程歸屬群組（依計畫）
-            try {
-                await ensureGroupsForUserModalLoaded();
-                const sel = document.getElementById('scheduleOwnerGroup');
-                if (sel && schedulePlanDetails.owner_group_id) {
-                    sel.value = String(schedulePlanDetails.owner_group_id);
-                }
-            } catch (e) {}
             const adYear = parseInt(startDateVal.slice(0, 4), 10);
             const rocYear = adYear - 1911;
             const yr = String(rocYear).replace(/\D/g, '').slice(-3).padStart(3, '0');
