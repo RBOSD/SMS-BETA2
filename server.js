@@ -3,9 +3,9 @@ require('dns').setDefaultResultOrder('ipv4first');
 
 const express = require('express');
 const { Pool } = require('pg'); 
-const { createClient } = require('@supabase/supabase-js');
 const bodyParser = require('body-parser');
 const path = require('path');
+const fs = require('fs');
 const session = require('express-session');
 // [Added] pg-simple session store
 const pgSession = require('connect-pg-simple')(session);
@@ -50,74 +50,6 @@ const pool = new Pool({
 // Supabase Session Mode：每個連線獨佔一個底層連線，pool_size 限制了可用連線數
 // 因此共用同一個連線池，總連線數限制在 2 個以內
 const sessionPool = pool;
-
-// --- Supabase Storage（範例檔案） ---
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabaseStorageBucket = process.env.SUPABASE_STORAGE_BUCKET || 'templates';
-const supabase = (supabaseUrl && supabaseServiceRoleKey)
-    ? createClient(supabaseUrl, supabaseServiceRoleKey, {
-        auth: { persistSession: false }
-    })
-    : null;
-
-function getTemplateStoragePath(key) {
-    return `templates/${key}`;
-}
-
-async function uploadTemplateToStorage(key, buf, mime) {
-    if (!supabase) {
-        return { ok: false, reason: 'not-configured' };
-    }
-    const bucket = supabaseStorageBucket;
-    const path = getTemplateStoragePath(key);
-    try {
-        const { error } = await supabase.storage.from(bucket).upload(path, buf, {
-            contentType: mime,
-            upsert: true
-        });
-        if (error) {
-            console.warn('[storage] upload failed:', error.message || error);
-            return { ok: false, reason: error.message || 'upload failed' };
-        }
-        return { ok: true, bucket, path };
-    } catch (e) {
-        console.warn('[storage] upload error:', e?.message || e);
-        return { ok: false, reason: e?.message || 'upload error' };
-    }
-}
-
-async function downloadTemplateFromStorage(key) {
-    if (!supabase) {
-        return { ok: false, reason: 'not-configured' };
-    }
-    const bucket = supabaseStorageBucket;
-    const path = getTemplateStoragePath(key);
-    try {
-        const { data, error } = await supabase.storage.from(bucket).download(path);
-        if (error || !data) {
-            if (error && error.statusCode !== 404 && error.statusCode !== '404') {
-                console.warn('[storage] download failed:', error.message || error);
-            }
-            return { ok: false, reason: error?.message || 'download failed' };
-        }
-        let buffer;
-        if (Buffer.isBuffer(data)) {
-            buffer = data;
-        } else if (data instanceof ArrayBuffer) {
-            buffer = Buffer.from(data);
-        } else if (typeof data.arrayBuffer === 'function') {
-            const arrayBuffer = await data.arrayBuffer();
-            buffer = Buffer.from(arrayBuffer);
-        } else {
-            return { ok: false, reason: 'unknown data type' };
-        }
-        return { ok: true, bucket, path, buffer };
-    } catch (e) {
-        console.warn('[storage] download error:', e?.message || e);
-        return { ok: false, reason: e?.message || 'download error' };
-    }
-}
 
 // 資料庫連線錯誤處理
 pool.on('error', async (err) => {
@@ -441,6 +373,12 @@ async function canEditByOwnership(user, record, db = pool) {
     // legacy (owner_group_id 未設定) → 開發中先不擋，避免舊資料無法操作
     if (!ownerGroupId) return true;
 
+    // 全部可編輯群組：任何登入使用者皆可編輯
+    try {
+        const gRes = await db.query("SELECT allow_all_edit FROM groups WHERE id = $1 LIMIT 1", [ownerGroupId]);
+        if (gRes.rows.length > 0 && gRes.rows[0].allow_all_edit === true) return true;
+    } catch (e) {}
+
     const gids = await getUserGroupIds(user.id, db);
     return gids.includes(ownerGroupId);
 }
@@ -609,10 +547,13 @@ async function initDB() {
                     id SERIAL PRIMARY KEY,
                     name TEXT UNIQUE NOT NULL,
                     is_admin_group BOOLEAN DEFAULT false,
+                    allow_all_edit BOOLEAN DEFAULT false,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )`);
                 // 向後兼容：舊資料庫可能沒有 is_admin_group
                 try { await client.query(`ALTER TABLE groups ADD COLUMN IF NOT EXISTS is_admin_group BOOLEAN DEFAULT false`); } catch (e) {}
+                // 全部可編輯群組（年度定檢等參與人員眾多時使用）
+                try { await client.query(`ALTER TABLE groups ADD COLUMN IF NOT EXISTS allow_all_edit BOOLEAN DEFAULT false`); } catch (e) {}
                 // 確保「系統管理群組」唯一（只允許一個 true）
                 try {
                     await client.query(`
@@ -931,6 +872,8 @@ async function logAction(username, action, details, req) {
         }
     } catch (e) { 
         console.error("Log error:", e);
+        // 記錄錯誤到檔案
+        writeToLogFile(`Error logging action: ${e.message}`, 'ERROR');
     }
 }
 
@@ -953,10 +896,30 @@ async function logError(error, context, req) {
             // 資料庫記錄失敗，只記錄到檔案
             console.error("Failed to log error to database:", dbError);
         }
+        
+        // 同時寫入檔案日誌
+        writeToLogFile(`[ERROR] ${context}: ${errorMessage}`, 'ERROR');
     } catch (e) {
         // 如果整個錯誤記錄過程失敗，至少輸出到 console
         console.error("Failed to log error:", e);
         console.error("Original error:", error);
+    }
+}
+
+// 寫入日誌檔案
+function writeToLogFile(message, level = 'INFO') {
+    try {
+        const logDir = path.join(__dirname, 'logs');
+        if (!fs.existsSync(logDir)) {
+            fs.mkdirSync(logDir, { recursive: true });
+        }
+        const today = new Date().toISOString().split('T')[0];
+        const logFile = path.join(logDir, `app-${today}.log`);
+        const timestamp = new Date().toISOString();
+        const logEntry = `[${timestamp}] [${level}] ${message}\n`;
+        fs.appendFileSync(logFile, logEntry, 'utf8');
+    } catch (e) {
+        console.error("Write log file error:", e);
     }
 }
 
@@ -985,6 +948,56 @@ function validatePassword(password) {
     return { valid: true };
 }
 
+// 日誌輪轉機制：清理舊日誌檔案
+function cleanupOldLogs() {
+    try {
+        const logDir = path.join(__dirname, 'logs');
+        if (!fs.existsSync(logDir)) {
+            return;
+        }
+        
+        const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 天
+        const now = Date.now();
+        
+        fs.readdir(logDir, (err, files) => {
+            if (err) {
+                console.error('Error reading log directory:', err);
+                return;
+            }
+            
+            files.forEach(file => {
+                if (!file.startsWith('app-') || !file.endsWith('.log')) {
+                    return;
+                }
+                
+                const filePath = path.join(logDir, file);
+                fs.stat(filePath, (err, stats) => {
+                    if (err) {
+                        return;
+                    }
+                    
+                    const fileAge = now - stats.mtime.getTime();
+                    if (fileAge > maxAge) {
+                        fs.unlink(filePath, (err) => {
+                            if (err) {
+                                console.error(`Error deleting old log file ${file}:`, err);
+                            } else {
+                                console.log(`Deleted old log file: ${file}`);
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    } catch (e) {
+        console.error('Error in cleanupOldLogs:', e);
+    }
+}
+
+// 啟動時執行一次日誌清理，然後每天執行一次
+cleanupOldLogs();
+setInterval(cleanupOldLogs, 24 * 60 * 60 * 1000); // 每 24 小時執行一次
+
 // API: 取得 CSRF token
 app.get('/api/csrf-token', (req, res) => {
     if (!req.session.csrfSecret) {
@@ -999,10 +1012,7 @@ app.post('/api/log', requireAuth, verifyCsrf, (req, res) => {
     try {
         const { message, level = 'INFO' } = req.body;
         if (message) {
-            const username = req.session?.user?.username || 'unknown';
-            const safeLevel = String(level || 'INFO').toUpperCase();
-            const safeMessage = String(message).slice(0, 4000);
-            logAction(username, 'CLIENT_LOG', `[${safeLevel}] ${safeMessage}`, req).catch(() => {});
+            writeToLogFile(message, level);
             res.json({ success: true });
         } else {
             res.status(400).json({ error: 'Message is required' });
@@ -1748,7 +1758,7 @@ app.post('/api/issues/import', requireAuth, requireAdminOrManager, verifyCsrf, a
 // --- Groups API ---
 app.get('/api/groups', requireAuth, requireAdminOrManager, async (req, res) => {
     try {
-        const r = await pool.query("SELECT id, name, is_admin_group FROM groups ORDER BY is_admin_group DESC, name ASC, id ASC");
+        const r = await pool.query("SELECT id, name, is_admin_group, COALESCE(allow_all_edit, false) AS allow_all_edit FROM groups ORDER BY is_admin_group DESC, name ASC, id ASC");
         res.json({ data: r.rows || [] });
     } catch (e) {
         handleApiError(e, req, res, 'Get groups error');
@@ -1801,9 +1811,10 @@ app.get('/api/users/lookup', requireAuth, requireAdminOrManager, async (req, res
 
 app.post('/api/groups', requireAuth, requireAdmin, verifyCsrf, async (req, res) => {
     const name = String(req.body?.name || '').trim();
+    const allowAllEdit = req.body?.allow_all_edit === true || req.body?.allowAllEdit === true;
     if (!name) return res.status(400).json({ error: '群組名稱為必填' });
     try {
-        const r = await pool.query("INSERT INTO groups (name) VALUES ($1) RETURNING id, name", [name]);
+        const r = await pool.query("INSERT INTO groups (name, allow_all_edit) VALUES ($1, $2) RETURNING id, name, allow_all_edit", [name, allowAllEdit]);
         logAction(req.session.user.username, 'CREATE_GROUP', `新增群組：${name}`, req).catch(() => {});
         res.json({ success: true, group: r.rows[0] });
     } catch (e) {
@@ -1814,14 +1825,35 @@ app.post('/api/groups', requireAuth, requireAdmin, verifyCsrf, async (req, res) 
 app.put('/api/groups/:id', requireAuth, requireAdmin, verifyCsrf, async (req, res) => {
     const id = parseInt(req.params.id, 10);
     const name = String(req.body?.name || '').trim();
+    const allowAllEdit = req.body?.allow_all_edit === true || req.body?.allowAllEdit === true;
     if (!id) return res.status(400).json({ error: 'Invalid id' });
     if (!name) return res.status(400).json({ error: '群組名稱為必填' });
     try {
-        await pool.query("UPDATE groups SET name = $1 WHERE id = $2", [name, id]);
+        await pool.query("UPDATE groups SET name = $1, allow_all_edit = $2 WHERE id = $3", [name, allowAllEdit, id]);
         logAction(req.session.user.username, 'UPDATE_GROUP', `更新群組：ID ${id} → ${name}`, req).catch(() => {});
         res.json({ success: true });
     } catch (e) {
         handleApiError(e, req, res, 'Update group error');
+    }
+});
+
+// --- 管理員重置使用者密碼 ---
+app.post('/api/admin/users/:id/reset-password', requireAuth, requireAdmin, verifyCsrf, async (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    const { password } = req.body;
+    if (!id || !Number.isFinite(id)) return res.status(400).json({ error: 'Invalid user id' });
+    if (!password || typeof password !== 'string') return res.status(400).json({ error: '密碼為必填' });
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) return res.status(400).json({ error: passwordValidation.message });
+    try {
+        const uRes = await pool.query("SELECT id, username, name FROM users WHERE id = $1", [id]);
+        if (uRes.rows.length === 0) return res.status(404).json({ error: '找不到該使用者' });
+        const hash = bcrypt.hashSync(password, 10);
+        await pool.query("UPDATE users SET password = $1, must_change_password = $2 WHERE id = $3", [hash, true, id]);
+        logAction(req.session.user.username, 'RESET_PASSWORD', `管理員重置密碼：${uRes.rows[0].username}`, req).catch(() => {});
+        res.json({ success: true });
+    } catch (e) {
+        handleApiError(e, req, res, 'Reset password error');
     }
 });
 
@@ -3263,27 +3295,16 @@ app.get('/api/holidays/:year', requireAuth, async (req, res) => {
 // 下載/上傳：檢查計畫匯入 Excel 範例檔（存於資料庫）
 app.get('/api/templates/plans-import-xlsx', requireAuth, async (req, res) => {
     try {
-        const storageKey = 'plans_import_xlsx';
-        const r = await pool.query('SELECT filename, mime, data FROM app_files WHERE key = $1', [storageKey]);
-        const row = r.rows?.[0];
-        const filename = row?.filename || '檢查計畫匯入範例.xlsx';
-        const mime = row?.mime || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-        let fileBuffer = null;
-
-        const storageResult = await downloadTemplateFromStorage(storageKey);
-        if (storageResult.ok) {
-            fileBuffer = storageResult.buffer;
-        } else if (row?.data) {
-            fileBuffer = row.data;
-        }
-
-        if (!fileBuffer) {
+        const r = await pool.query('SELECT filename, mime, data FROM app_files WHERE key = $1', ['plans_import_xlsx']);
+        if (!r.rows || r.rows.length === 0) {
             return res.status(404).json({ error: 'Template not set' });
         }
-
+        const row = r.rows[0];
+        const filename = row.filename || '檢查計畫匯入範例.xlsx';
+        const mime = row.mime || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
         res.setHeader('Content-Type', mime);
         res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`);
-        res.send(fileBuffer);
+        res.send(row.data);
     } catch (e) {
         handleApiError(e, req, res, 'Get plans import template error');
     }
@@ -3297,19 +3318,14 @@ app.post('/api/templates/plans-import-xlsx', requireAuth, requireAdminOrManager,
         const buf = Buffer.from(dataBase64, 'base64');
         if (!buf || buf.length === 0) return res.status(400).json({ error: '檔案內容無效' });
         const mime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-        const storageKey = 'plans_import_xlsx';
-        const storageResult = await uploadTemplateToStorage(storageKey, buf, mime);
-        if (!storageResult.ok && storageResult.reason !== 'not-configured') {
-            console.warn('[storage] plans template upload fallback:', storageResult.reason);
-        }
         await pool.query(
             `INSERT INTO app_files (key, filename, mime, data, updated_at)
              VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
              ON CONFLICT (key) DO UPDATE SET filename = EXCLUDED.filename, mime = EXCLUDED.mime, data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP`,
-            [storageKey, filename, mime, buf]
+            ['plans_import_xlsx', filename, mime, buf]
         );
         logAction(req.session.user.username, 'UPLOAD_TEMPLATE', `更新檢查計畫匯入範例檔：${filename}`, req);
-        res.json({ success: true, storage: storageResult.ok ? 'supabase' : 'db' });
+        res.json({ success: true });
     } catch (e) {
         handleApiError(e, req, res, 'Upload plans import template error');
     }
@@ -3318,27 +3334,16 @@ app.post('/api/templates/plans-import-xlsx', requireAuth, requireAdminOrManager,
 // 帳號匯入 CSV 範例檔（存於資料庫）
 app.get('/api/templates/users-import-csv', requireAuth, async (req, res) => {
     try {
-        const storageKey = 'users_import_csv';
-        const r = await pool.query('SELECT filename, mime, data FROM app_files WHERE key = $1', [storageKey]);
-        const row = r.rows?.[0];
-        const filename = row?.filename || '帳號匯入範例.csv';
-        const mime = row?.mime || 'text/csv; charset=utf-8';
-        let fileBuffer = null;
-
-        const storageResult = await downloadTemplateFromStorage(storageKey);
-        if (storageResult.ok) {
-            fileBuffer = storageResult.buffer;
-        } else if (row?.data) {
-            fileBuffer = row.data;
-        }
-
-        if (!fileBuffer) {
+        const r = await pool.query('SELECT filename, mime, data FROM app_files WHERE key = $1', ['users_import_csv']);
+        if (!r.rows || r.rows.length === 0) {
             return res.status(404).json({ error: 'Template not set' });
         }
-
+        const row = r.rows[0];
+        const filename = row.filename || '帳號匯入範例.csv';
+        const mime = row.mime || 'text/csv; charset=utf-8';
         res.setHeader('Content-Type', mime);
         res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`);
-        res.send(fileBuffer);
+        res.send(row.data);
     } catch (e) {
         handleApiError(e, req, res, 'Get users import csv template error');
     }
@@ -3352,19 +3357,14 @@ app.post('/api/templates/users-import-csv', requireAuth, requireAdminOrManager, 
         const buf = Buffer.from(dataBase64, 'base64');
         if (!buf || buf.length === 0) return res.status(400).json({ error: '檔案內容無效' });
         const mime = 'text/csv; charset=utf-8';
-        const storageKey = 'users_import_csv';
-        const storageResult = await uploadTemplateToStorage(storageKey, buf, mime);
-        if (!storageResult.ok && storageResult.reason !== 'not-configured') {
-            console.warn('[storage] users template upload fallback:', storageResult.reason);
-        }
         await pool.query(
             `INSERT INTO app_files (key, filename, mime, data, updated_at)
              VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
              ON CONFLICT (key) DO UPDATE SET filename = EXCLUDED.filename, mime = EXCLUDED.mime, data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP`,
-            [storageKey, filename, mime, buf]
+            ['users_import_csv', filename, mime, buf]
         );
         logAction(req.session.user.username, 'UPLOAD_TEMPLATE', `更新帳號匯入範例檔：${filename}`, req);
-        res.json({ success: true, storage: storageResult.ok ? 'supabase' : 'db' });
+        res.json({ success: true });
     } catch (e) {
         handleApiError(e, req, res, 'Upload users import csv template error');
     }

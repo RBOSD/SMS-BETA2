@@ -65,9 +65,9 @@
         <div class="detail-card admin-users-right" style="margin:0; min-width:0;">
             <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; padding-bottom:12px; border-bottom:1px solid var(--border);">
                 <div style="min-width:180px;">
-                    <div style="font-weight:800; color:#334155; font-size:16px;">👥 群組管理</div>
+                    <div style="font-weight:800; color:#334155; font-size:16px;">👥 編輯及審查群組</div>
                     <div style="color:#64748b; font-size:13px; margin-top:4px; line-height:1.6;">
-                        點選群組（像資料夾）後，可在下方新增/移除使用者。
+                        用於編輯及審查開立事項。點選群組後可新增/移除成員，或點「更名」修改群組名稱。
                     </div>
                 </div>
                 <div style="display:flex; gap:8px; align-items:center;">
@@ -78,10 +78,14 @@
                 <div style="font-weight:800; color:#334155; font-size:13px; margin-bottom:8px;">新增群組</div>
                 <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
                     <input id="newGroupName" class="filter-input" placeholder="例如：工務組 / 運務組 / 審查組" style="flex:1; min-width:220px;" autocomplete="off">
+                    <label style="display:flex; align-items:center; gap:6px; font-size:13px; color:#475569; cursor:pointer; white-space:nowrap;">
+                        <input type="checkbox" id="newGroupAllowAllEdit" style="width:16px; height:16px;">
+                        全部可編輯
+                    </label>
                     <button class="btn btn-primary btn-sm" onclick="createGroupAdmin()">➕ 建立</button>
                 </div>
                 <div style="margin-top:8px; font-size:12px; color:#64748b; line-height:1.5;">
-                    建立後可點選群組（📁）進入管理成員。
+                    建立後可點選群組進入管理成員。勾選「全部可編輯」適用於年度定檢等參與人員眾多之情況。
                 </div>
             </div>
             <div id="groupsFolderList" style="margin-top:12px; border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#ffffff;">

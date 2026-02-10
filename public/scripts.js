@@ -2007,6 +2007,7 @@ if (dashboard) {
                         (myId && u.id === myId)
                             ? '-'
                             : `<button class="btn btn-outline" style="padding:2px 6px;margin-right:4px;" onclick="openUserModal('edit', ${u.id})">✏️</button>
+                               <button class="btn btn-outline" style="padding:2px 6px;margin-right:4px;" onclick="openResetPasswordModal(${u.id})" title="重置密碼">🔑</button>
                                <button class="btn btn-danger" style="padding:2px 6px;" onclick="deleteUser(${u.id})">🗑️</button>`
                     }</td>
                 </tr>`;
@@ -2311,6 +2312,7 @@ if (dashboard) {
             body.innerHTML = groups.map(g => {
                 const id = parseInt(g.id, 10);
                 const name = g.name || `群組 ${id}`;
+                const allowAll = g.allow_all_edit === true || g.allowAllEdit === true;
                 const active = (selected != null && id === selected);
                 return `<button type="button"
                     onclick="selectGroupAdmin(${id})"
@@ -2319,6 +2321,7 @@ if (dashboard) {
                         📁 ${escapeHtml(name)}
                     </span>
                     <span style="display:flex; gap:6px; align-items:center; flex-shrink:0;">
+                        ${allowAll ? '<span class="badge" style="background:#ecfdf5;border:1px solid #a7f3d0;color:#059669;">全部可編輯</span>' : ''}
                         <span class="badge" style="background:#f8fafc;border:1px solid #e2e8f0;color:#64748b;">ID ${id}</span>
                     </span>
                 </button>`;
@@ -2454,7 +2457,9 @@ if (dashboard) {
                 const sel = document.getElementById(id);
                 if (!sel) return;
                 sel.innerHTML = (allowedGroups.length ? allowedGroups : dataGroups).map(g => {
-                    return `<option value="${g.id}">${escapeHtml(g.name || `群組 ${g.id}`)}</option>`;
+                    const allowAll = g.allow_all_edit === true || g.allowAllEdit === true;
+                    const suffix = allowAll ? '（全部可編輯）' : '';
+                    return `<option value="${g.id}">${escapeHtml(g.name || `群組 ${g.id}`)}${suffix}</option>`;
                 }).join('') || '<option value="">（尚無群組）</option>';
                 if (defaultId) sel.value = String(defaultId);
                 if (forceDisabled) sel.disabled = true;
@@ -2484,16 +2489,19 @@ if (dashboard) {
 
         async function createGroupAdmin() {
             const input = document.getElementById('newGroupName');
+            const allowAllEditEl = document.getElementById('newGroupAllowAllEdit');
             const name = String(input?.value || '').trim();
             if (!name) return showToast('請輸入群組名稱', 'error');
+            const allowAllEdit = allowAllEditEl ? allowAllEditEl.checked : false;
             try {
                 const res = await apiFetch('/api/groups', {
                     method: 'POST',
-                    body: JSON.stringify({ name })
+                    body: JSON.stringify({ name, allow_all_edit: allowAllEdit })
                 });
                 const j = await res.json().catch(() => ({}));
                 if (!res.ok) return showToast(j.error || '新增群組失敗', 'error');
                 if (input) input.value = '';
+                if (allowAllEditEl) allowAllEditEl.checked = false;
                 showToast('新增群組成功', 'success');
                 // user modal 群組快取需要刷新
                 cachedGroupsForModal = null;
@@ -2507,11 +2515,13 @@ if (dashboard) {
             const modal = document.getElementById('groupModal');
             const idEl = document.getElementById('targetGroupId');
             const nameEl = document.getElementById('groupNameInput');
+            const allowAllEl = document.getElementById('groupAllowAllEditInput');
             if (!modal || !idEl || !nameEl) return;
             const groups = Array.isArray(cachedGroupsForModal) ? cachedGroupsForModal : [];
             const g = groups.find(x => parseInt(x.id, 10) === parseInt(groupId, 10));
             idEl.value = String(groupId);
             nameEl.value = g?.name || '';
+            if (allowAllEl) allowAllEl.checked = !!(g?.allow_all_edit === true || g?.allowAllEdit === true);
             modal.classList.add('open');
             setTimeout(() => nameEl.focus(), 50);
         }
@@ -2524,14 +2534,16 @@ if (dashboard) {
         async function submitGroupRename() {
             const idEl = document.getElementById('targetGroupId');
             const nameEl = document.getElementById('groupNameInput');
+            const allowAllEl = document.getElementById('groupAllowAllEditInput');
             const id = parseInt(idEl?.value || '', 10);
             const name = String(nameEl?.value || '').trim();
             if (!id) return showToast('群組 ID 無效', 'error');
             if (!name) return showToast('群組名稱不可為空', 'error');
+            const allowAllEdit = allowAllEl ? allowAllEl.checked : false;
             try {
                 const res = await apiFetch(`/api/groups/${id}`, {
                     method: 'PUT',
-                    body: JSON.stringify({ name })
+                    body: JSON.stringify({ name, allow_all_edit: allowAllEdit })
                 });
                 const j = await res.json().catch(() => ({}));
                 if (!res.ok) return showToast(j.error || '更新群組失敗', 'error');
@@ -5438,6 +5450,43 @@ if (dashboard) {
                 showToast('刪除失敗: ' + e.message, 'error');
             }
         }
+
+        function openResetPasswordModal(userId) {
+            const u = (userList || []).find(x => parseInt(x.id, 10) === parseInt(userId, 10));
+            const info = u ? `${u.name || '-'}（${u.username || '-'}）` : `ID: ${userId}`;
+            document.getElementById('resetPasswordUserId').value = String(userId);
+            document.getElementById('resetPasswordUserInfo').textContent = `為使用者「${info}」設定新密碼：`;
+            document.getElementById('resetPasswordNew').value = '';
+            document.getElementById('resetPasswordConfirm').value = '';
+            document.getElementById('resetPasswordModal').classList.add('open');
+        }
+        function closeResetPasswordModal() {
+            document.getElementById('resetPasswordModal').classList.remove('open');
+        }
+        async function submitResetPassword() {
+            const id = parseInt(document.getElementById('resetPasswordUserId').value, 10);
+            const pwd = document.getElementById('resetPasswordNew').value;
+            const conf = document.getElementById('resetPasswordConfirm').value;
+            if (!pwd) return showToast('請輸入新密碼', 'error');
+            if (pwd !== conf) return showToast('兩次輸入的密碼不一致', 'error');
+            const validation = validatePasswordFrontend(pwd);
+            if (!validation.valid) return showToast(validation.message, 'error');
+            try {
+                const res = await apiFetch(`/api/admin/users/${id}/reset-password`, {
+                    method: 'POST',
+                    body: JSON.stringify({ password: pwd })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast('密碼已重置，該使用者下次登入時須修改密碼', 'success');
+                    closeResetPasswordModal();
+                } else {
+                    showToast(data.error || '重置失敗', 'error');
+                }
+            } catch (e) {
+                showToast('重置失敗: ' + e.message, 'error');
+            }
+        }
         
         // 帳號匯出功能
         async function exportUsers() {
@@ -7211,6 +7260,8 @@ if (dashboard) {
             
             if (mode === 'create') {
                 t.innerText = '新增檢查計畫';
+                const planEditorsWrap = document.getElementById('planEditorsBtnWrap');
+                if (planEditorsWrap) planEditorsWrap.style.display = 'none';
                 document.getElementById('targetPlanId').value = '';
                 document.getElementById('targetScheduleId').value = '';
                 document.getElementById('planName').value = '';
@@ -7236,6 +7287,8 @@ if (dashboard) {
             
             const p = planList.find(x => x.id === id) || {};
             t.innerText = '編輯檢查計畫';
+            const planEditorsWrap = document.getElementById('planEditorsBtnWrap');
+            if (planEditorsWrap) planEditorsWrap.style.display = 'flex';
             document.getElementById('targetPlanId').value = p.id || '';
             document.getElementById('targetScheduleId').value = '';
             const planPlannedCountEl = document.getElementById('planPlannedCount');
@@ -8073,7 +8126,6 @@ if (dashboard) {
 
             const canEdit = (currentUser && (currentUser.isAdmin === true || currentUser.role === 'manager')); const canDelete = canEdit;
             document.getElementById('editBtn').classList.toggle('hidden', !canEdit);
-            document.getElementById('editorsBtnDrawer')?.classList.toggle('hidden', !canEdit);
             document.getElementById('deleteBtnDrawer').classList.toggle('hidden', !canDelete);
             document.getElementById('drawerBackdrop').classList.add('open'); document.getElementById('detailDrawer').classList.add('open'); toggleEditMode(isEdit);
         }
