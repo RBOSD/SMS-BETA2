@@ -2449,12 +2449,12 @@ if (dashboard) {
             // 排除「系統管理群組」：只允許資料群組作為 owner_group
             const dataGroups = groups.filter(g => !(g && (g.is_admin_group === true || g.isAdminGroup === true)));
             const myGroupIds = Array.isArray(currentUser?.groupIds) ? currentUser.groupIds.map(x => parseInt(x, 10)).filter(n => Number.isFinite(n)) : [];
-            // 系統管理員：可見全部群組。資料管理員：可見(1)自己所屬群組 + (2)全員可編輯群組（如定檢群組，無需先加入即可選用）
+            // 系統管理員：可見全部。資料管理員：僅可見(1)自己所屬群組 + (2)全員可編輯群組（如定檢群組）
             const allowedSet = currentUser?.isAdmin === true ? null : new Set(myGroupIds);
             const allowedGroups = allowedSet
                 ? dataGroups.filter(g => allowedSet.has(parseInt(g.id, 10)) || (g.allow_all_edit === true || g.allowAllEdit === true))
                 : dataGroups;
-            const defaultId = allowedGroups[0]?.id || dataGroups[0]?.id || '';
+            const defaultId = allowedGroups[0]?.id || '';
 
             const fill = (id, forceDisabled = false, useDefault = true) => {
                 const sel = document.getElementById(id);
