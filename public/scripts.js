@@ -2453,15 +2453,17 @@ if (dashboard) {
             const allowedGroups = allowedSet ? dataGroups.filter(g => allowedSet.has(parseInt(g.id, 10))) : dataGroups;
             const defaultId = allowedGroups[0]?.id || dataGroups[0]?.id || '';
 
-            const fill = (id, forceDisabled = false) => {
+            const fill = (id, forceDisabled = false, useDefault = true) => {
                 const sel = document.getElementById(id);
                 if (!sel) return;
-                sel.innerHTML = (allowedGroups.length ? allowedGroups : dataGroups).map(g => {
+                const optionsHtml = (allowedGroups.length ? allowedGroups : dataGroups).map(g => {
                     const allowAll = g.allow_all_edit === true || g.allowAllEdit === true;
                     const suffix = allowAll ? '（全員可編輯）' : '';
                     return `<option value="${g.id}">${escapeHtml(g.name || `群組 ${g.id}`)}${suffix}</option>`;
-                }).join('') || '<option value="">（尚無群組）</option>';
-                if (defaultId) sel.value = String(defaultId);
+                }).join('');
+                const emptyOpt = '<option value="">請選擇</option>';
+                sel.innerHTML = (useDefault ? '' : emptyOpt) + (optionsHtml || '<option value="">（尚無群組）</option>');
+                if (useDefault && defaultId) sel.value = String(defaultId);
                 if (forceDisabled) sel.disabled = true;
             };
 
@@ -2469,7 +2471,8 @@ if (dashboard) {
             fill('createOwnerGroup', false);
             // 行程群組跟隨計畫（先塞入可選群組，之後會被計畫選擇覆蓋並 disabled）
             fill('scheduleOwnerGroup', true);
-            fill('planOwnerGroup', false);
+            // 檢查計畫的群組：預設空白，強制使用者選擇（不可預設全員可編輯）
+            fill('planOwnerGroup', false, false);
         }
 
         function getOwnerGroupIdFromSelect(selectId) {
@@ -7241,6 +7244,8 @@ if (dashboard) {
                 t.innerText = '新增檢查計畫';
                 const planEditorsWrap = document.getElementById('planEditorsBtnWrap');
                 if (planEditorsWrap) planEditorsWrap.style.display = 'none';
+                const planOwnerGroupEl = document.getElementById('planOwnerGroup');
+                if (planOwnerGroupEl) planOwnerGroupEl.value = '';
                 document.getElementById('targetPlanId').value = '';
                 document.getElementById('targetScheduleId').value = '';
                 document.getElementById('planName').value = '';
