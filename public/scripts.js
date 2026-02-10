@@ -2312,7 +2312,6 @@ if (dashboard) {
             body.innerHTML = groups.map(g => {
                 const id = parseInt(g.id, 10);
                 const name = g.name || `群組 ${id}`;
-                const allowAll = g.allow_all_edit === true || g.allowAllEdit === true;
                 const active = (selected != null && id === selected);
                 return `<button type="button"
                     onclick="selectGroupAdmin(${id})"
@@ -2320,10 +2319,7 @@ if (dashboard) {
                     <span style="font-weight:800; color:${active ? '#1d4ed8' : '#334155'}; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                         📁 ${escapeHtml(name)}
                     </span>
-                    <span style="display:flex; gap:6px; align-items:center; flex-shrink:0;">
-                        ${allowAll ? '<span class="badge" style="background:#ecfdf5;border:1px solid #a7f3d0;color:#059669;">全員可編輯</span>' : ''}
-                        <span class="badge" style="background:#f8fafc;border:1px solid #e2e8f0;color:#64748b;">ID ${id}</span>
-                    </span>
+                    <span class="badge" style="background:#f8fafc;border:1px solid #e2e8f0;color:#64748b;">ID ${id}</span>
                 </button>`;
             }).join('');
         }
@@ -2443,69 +2439,68 @@ if (dashboard) {
         }
 
         async function loadOwnerGroupSelectsForImportView() {
-            // 供資料管理頁面使用：開立事項匯入/建檔、計畫新增、行程規劃
+            // 供資料管理頁面使用：開立事項匯入/建檔、計畫新增、行程規劃（可多選群組）
             await ensureGroupsForUserModalLoaded();
             const groups = Array.isArray(cachedGroupsForModal) ? cachedGroupsForModal : [];
-            // 排除「系統管理群組」：只允許資料群組作為 owner_group
             const dataGroups = groups.filter(g => !(g && (g.is_admin_group === true || g.isAdminGroup === true)));
             const myGroupIds = Array.isArray(currentUser?.groupIds) ? currentUser.groupIds.map(x => parseInt(x, 10)).filter(n => Number.isFinite(n)) : [];
-            // 系統管理員：可見全部。資料管理員：僅可見(1)自己所屬群組 + (2)全員可編輯群組（如定檢群組）
             const allowedSet = currentUser?.isAdmin === true ? null : new Set(myGroupIds);
             const allowedGroups = allowedSet
-                ? dataGroups.filter(g => allowedSet.has(parseInt(g.id, 10)) || (g.allow_all_edit === true || g.allowAllEdit === true))
+                ? dataGroups.filter(g => allowedSet.has(parseInt(g.id, 10)))
                 : dataGroups;
-            const defaultId = allowedGroups[0]?.id || '';
 
-            const fill = (id, forceDisabled = false, useDefault = true) => {
-                const sel = document.getElementById(id);
-                if (!sel) return;
-                const optionsHtml = (allowedGroups.length ? allowedGroups : dataGroups).map(g => {
-                    const allowAll = g.allow_all_edit === true || g.allowAllEdit === true;
-                    const suffix = allowAll ? '（全員可編輯）' : '';
-                    return `<option value="${g.id}">${escapeHtml(g.name || `群組 ${g.id}`)}${suffix}</option>`;
+            const fill = (id) => {
+                const container = document.getElementById(id);
+                if (!container) return;
+                if (allowedGroups.length === 0) {
+                    container.innerHTML = '<span style="color:#94a3b8;font-size:13px;">尚無可選群組</span>';
+                    return;
+                }
+                container.innerHTML = allowedGroups.map(g => {
+                    const gid = g.id;
+                    const gname = escapeHtml(g.name || `群組 ${gid}`);
+                    return `<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:#334155;">
+                        <input type="checkbox" class="owner-group-cb" data-group-id="${gid}" style="width:16px;height:16px;">
+                        <span>${gname}</span>
+                    </label>`;
                 }).join('');
-                const emptyOpt = '<option value="">請選擇</option>';
-                sel.innerHTML = (useDefault ? '' : emptyOpt) + (optionsHtml || '<option value="">（尚無群組）</option>');
-                if (useDefault && defaultId) sel.value = String(defaultId);
-                if (forceDisabled) sel.disabled = true;
             };
 
-            // 適用群組：預設空白，強制使用者選擇
-            fill('importOwnerGroup', false, false);
-            fill('createOwnerGroup', false, false);
-            fill('planOwnerGroup', false, false);
+            fill('importOwnerGroup');
+            fill('createOwnerGroup');
+            fill('planOwnerGroup');
         }
 
-        function getOwnerGroupIdFromSelect(selectId) {
-            const el = document.getElementById(selectId);
-            if (!el) return null;
-            const v = String(el.value || '').trim();
-            const n = v ? parseInt(v, 10) : NaN;
-            return Number.isFinite(n) ? n : null;
+        function getOwnerGroupIdsFromCheckboxes(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return [];
+            const checked = container.querySelectorAll('.owner-group-cb:checked');
+            return Array.from(checked).map(cb => parseInt(cb.dataset.groupId, 10)).filter(n => Number.isFinite(n));
         }
 
-        function getIssueOwnerGroupId() {
-            // 優先使用當前所在子頁的選擇器
-            return getOwnerGroupIdFromSelect('importOwnerGroup')
-                || getOwnerGroupIdFromSelect('createOwnerGroup')
-                || null;
+        function getIssueOwnerGroupIds() {
+            const ids = getOwnerGroupIdsFromCheckboxes('importOwnerGroup').length > 0
+                ? getOwnerGroupIdsFromCheckboxes('importOwnerGroup')
+                : getOwnerGroupIdsFromCheckboxes('createOwnerGroup');
+            return ids;
+        }
+
+        function getPlanOwnerGroupIds() {
+            return getOwnerGroupIdsFromCheckboxes('planOwnerGroup');
         }
 
         async function createGroupAdmin() {
             const input = document.getElementById('newGroupName');
-            const allowAllEditEl = document.getElementById('newGroupAllowAllEdit');
             const name = String(input?.value || '').trim();
             if (!name) return showToast('請輸入群組名稱', 'error');
-            const allowAllEdit = allowAllEditEl ? allowAllEditEl.checked : false;
             try {
                 const res = await apiFetch('/api/groups', {
                     method: 'POST',
-                    body: JSON.stringify({ name, allow_all_edit: allowAllEdit })
+                    body: JSON.stringify({ name })
                 });
                 const j = await res.json().catch(() => ({}));
                 if (!res.ok) return showToast(j.error || '新增群組失敗', 'error');
                 if (input) input.value = '';
-                if (allowAllEditEl) allowAllEditEl.checked = false;
                 showToast('新增群組成功', 'success');
                 // user modal 群組快取需要刷新
                 cachedGroupsForModal = null;
@@ -2519,13 +2514,11 @@ if (dashboard) {
             const modal = document.getElementById('groupModal');
             const idEl = document.getElementById('targetGroupId');
             const nameEl = document.getElementById('groupNameInput');
-            const allowAllEl = document.getElementById('groupAllowAllEditInput');
             if (!modal || !idEl || !nameEl) return;
             const groups = Array.isArray(cachedGroupsForModal) ? cachedGroupsForModal : [];
             const g = groups.find(x => parseInt(x.id, 10) === parseInt(groupId, 10));
             idEl.value = String(groupId);
             nameEl.value = g?.name || '';
-            if (allowAllEl) allowAllEl.checked = !!(g?.allow_all_edit === true || g?.allowAllEdit === true);
             modal.classList.add('open');
             setTimeout(() => nameEl.focus(), 50);
         }
@@ -2538,16 +2531,14 @@ if (dashboard) {
         async function submitGroupRename() {
             const idEl = document.getElementById('targetGroupId');
             const nameEl = document.getElementById('groupNameInput');
-            const allowAllEl = document.getElementById('groupAllowAllEditInput');
             const id = parseInt(idEl?.value || '', 10);
             const name = String(nameEl?.value || '').trim();
             if (!id) return showToast('群組 ID 無效', 'error');
             if (!name) return showToast('群組名稱不可為空', 'error');
-            const allowAllEdit = allowAllEl ? allowAllEl.checked : false;
             try {
                 const res = await apiFetch(`/api/groups/${id}`, {
                     method: 'PUT',
-                    body: JSON.stringify({ name, allow_all_edit: allowAllEdit })
+                    body: JSON.stringify({ name })
                 });
                 const j = await res.json().catch(() => ({}));
                 if (!res.ok) return showToast(j.error || '更新群組失敗', 'error');
@@ -2926,6 +2917,9 @@ if (dashboard) {
             if (!isBackup && !planValue) {
                 return showToast('請選擇檢查計畫', 'error');
             }
+            if (!isBackup && getIssueOwnerGroupIds().length === 0) {
+                return showToast('請至少選擇一個適用群組', 'error');
+            }
             // 從計畫選項值中提取計畫名稱和年度
             const selectedPlan = isBackup ? { name: '', year: '' } : parsePlanValue(planValue);
             
@@ -3002,7 +2996,7 @@ if (dashboard) {
                         reviewDate: responseDate,
                         replyDate: replyDate,
                         mode: currentImportMode,
-                        ownerGroupId: getOwnerGroupIdFromSelect('importOwnerGroup')
+                        ownerGroupIds: getIssueOwnerGroupIds()
                     })
                 });
                 if (res.ok) { 
@@ -3312,7 +3306,7 @@ if (dashboard) {
                         round: 1,
                         reviewDate: '',
                         replyDate: '',
-                        ownerGroupId: getIssueOwnerGroupId()
+                        ownerGroupIds: getIssueOwnerGroupIds()
                     })
                 });
 
@@ -4151,7 +4145,7 @@ if (dashboard) {
                 round: 1, 
                 reviewDate: '', 
                 replyDate: firstHandling.replyDate ? firstHandling.replyDate.trim() : '',
-                ownerGroupId: getIssueOwnerGroupId()
+                ownerGroupIds: getIssueOwnerGroupIds()
             };
 
             try {
@@ -4753,6 +4747,7 @@ if (dashboard) {
             if (!planValue) return showToast('請選擇檢查計畫', 'error');
             const { name: planName, year: planYear } = parsePlanValue(planValue);
             if (!issueDate) return showToast('請填寫初次發函日期', 'error');
+            if (getIssueOwnerGroupIds().length === 0) return showToast('請至少選擇一個適用群組', 'error');
 
             const rows = document.querySelectorAll('#createBatchGridBody tr');
             const items = [];
@@ -4857,7 +4852,7 @@ if (dashboard) {
                         round: 1,
                         reviewDate: '',
                         // 不再使用統一的 replyDate，改為使用每個 item 的 replyDate
-                        ownerGroupId: getIssueOwnerGroupId()
+                        ownerGroupIds: getIssueOwnerGroupIds()
                     })
                 });
 
@@ -7238,7 +7233,7 @@ if (dashboard) {
                 const planEditorsWrap = document.getElementById('planEditorsBtnWrap');
                 if (planEditorsWrap) planEditorsWrap.style.display = 'none';
                 const planOwnerGroupEl = document.getElementById('planOwnerGroup');
-                if (planOwnerGroupEl) planOwnerGroupEl.value = '';
+                if (planOwnerGroupEl) planOwnerGroupEl.querySelectorAll('.owner-group-cb').forEach(cb => { cb.checked = false; });
                 document.getElementById('targetPlanId').value = '';
                 document.getElementById('targetScheduleId').value = '';
                 document.getElementById('planName').value = '';
@@ -7661,13 +7656,14 @@ if (dashboard) {
             const planInspectorEl = document.getElementById('planInspector');
             const location = planLocationEl ? planLocationEl.value.trim() : '';
             const inspector = planInspectorEl ? planInspectorEl.value.trim() : '';
-            const ownerGroupId = getOwnerGroupIdFromSelect('planOwnerGroup');
+            const ownerGroupIds = getPlanOwnerGroupIds();
             
             if (!planId) {
                 if (!name) return showToast('請輸入計畫名稱', 'error');
                 if (!year) return showToast('請輸入年度', 'error');
                 if (!railway) return showToast('請選擇鐵路機構', 'error');
                 if (!inspectionType) return showToast('請選擇檢查類別', 'error');
+                if (ownerGroupIds.length === 0) return showToast('請至少選擇一個適用群組', 'error');
                 try {
                     const res = await apiFetch('/api/plans', {
                         method: 'POST',
@@ -7678,7 +7674,7 @@ if (dashboard) {
                             inspection_type: inspectionType,
                             business,
                             planned_count: plannedCount,
-                            ownerGroupId
+                            ownerGroupIds
                         })
                     });
                     const j = await res.json();
