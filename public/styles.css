@@ -3131,6 +3131,7 @@
         /* 計畫管理表格：標題與內容對齊 */
         .user-table thead th { text-align: left; padding: 12px 16px; vertical-align: middle; font-weight: 600; }
         .user-table tbody td { padding: 12px 16px; vertical-align: middle; }
+        .user-table tr.user-row-disabled { opacity: 0.6; background: #f8fafc; }
         .user-table thead th:first-child { padding-left: 16px; }
 
         /* 編輯計畫視窗 v2：跳出框架重新設計 */

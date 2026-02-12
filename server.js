@@ -532,6 +532,10 @@ async function initDB() {
                 try {
                     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN DEFAULT true`);
                 } catch (e) {}
+                // 新增 is_disabled 欄位（帳號停用）
+                try {
+                    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_disabled BOOLEAN DEFAULT false`);
+                } catch (e) {}
                 
                 // 角色整併（方案A）：editor 視為 manager，避免舊帳號失效
                 try {
@@ -1033,6 +1037,9 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
         if (!user || !user.password) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
+        if (user.is_disabled === true) {
+            return res.status(401).json({ error: '此帳號已停用，請聯繫管理員' });
+        }
 
         if (bcrypt.compareSync(password, user.password)) {
             const isAdmin = await isAdminUser(user.id, pool);
@@ -1073,7 +1080,7 @@ app.get('/api/auth/me', async (req, res) => {
     if (req.session && req.session.user) {
         try {
             const result = await pool.query(
-                `SELECT u.id, u.username, u.name, u.role,
+                `SELECT u.id, u.username, u.name, u.role, u.is_disabled,
                         COALESCE(array_agg(ug.group_id) FILTER (WHERE ug.group_id IS NOT NULL), '{}') AS group_ids,
                         COALESCE(BOOL_OR(g.is_admin_group = true), false) AS is_admin
                  FROM users u
@@ -1086,6 +1093,10 @@ app.get('/api/auth/me', async (req, res) => {
             const latestUser = result.rows[0];
 
             if (!latestUser) {
+                req.session.destroy();
+                return res.json({ isLogin: false });
+            }
+            if (latestUser.is_disabled === true) {
                 req.session.destroy();
                 return res.json({ isLogin: false });
             }
@@ -1898,7 +1909,7 @@ app.get('/api/users', requireAuth, requireAdmin, async (req, res) => {
         const cRes = await pool.query(`SELECT count(*) FROM users u WHERE ${where.join(" AND ")}`, params);
         const total = parseInt(cRes.rows[0].count);
         const dRes = await pool.query(
-            `SELECT u.id, u.username, u.name, u.role, u.created_at,
+            `SELECT u.id, u.username, u.name, u.role, u.created_at, u.is_disabled,
                     COALESCE(array_agg(ug.group_id) FILTER (WHERE ug.group_id IS NOT NULL), '{}') AS group_ids,
                     COALESCE(BOOL_OR(g.is_admin_group = true), false) AS is_admin
              FROM users u
@@ -1916,6 +1927,7 @@ app.get('/api/users', requireAuth, requireAdmin, async (req, res) => {
             name: u.name,
             role: u.role,
             isAdmin: u.is_admin === true,
+            isDisabled: u.is_disabled === true,
             created_at: u.created_at,
             groupIds: Array.isArray(u.group_ids) ? u.group_ids.map(x => parseInt(x, 10)).filter(n => Number.isFinite(n)) : []
         }));
@@ -1968,7 +1980,7 @@ app.post('/api/users', requireAuth, requireAdmin, verifyCsrf, async (req, res) =
 });
 
 app.put('/api/users/:id', requireAuth, requireAdmin, verifyCsrf, async (req, res) => {
-    const { name, password, role, groupIds } = req.body;
+    const { name, username, password, role, groupIds } = req.body;
     const id = parseInt(req.params.id, 10);
     const safeRoleRaw = String(role || '').toLowerCase();
     const safeRole = safeRoleRaw === 'admin' ? 'manager' : (['manager', 'viewer'].includes(safeRoleRaw) ? safeRoleRaw : 'viewer');
@@ -1982,6 +1994,12 @@ app.put('/api/users/:id', requireAuth, requireAdmin, verifyCsrf, async (req, res
         const targetUsername = targetUser ? targetUser.username : `ID:${id}`;
         const targetName = targetUser ? targetUser.name : '未知';
         
+        const newUsername = (typeof username === 'string' && username.trim()) ? username.trim() : null;
+        if (newUsername) {
+            const dupRes = await pool.query("SELECT id FROM users WHERE username = $1 AND id != $2", [newUsername, id]);
+            if (dupRes.rows.length > 0) return res.status(400).json({ error: '此帳號已被其他使用者使用' });
+        }
+        
         const client = await pool.connect();
         try {
             await client.query('BEGIN');
@@ -1993,10 +2011,18 @@ app.put('/api/users/:id', requireAuth, requireAdmin, verifyCsrf, async (req, res
                 return res.status(400).json({ error: passwordValidation.message });
             }
             const hash = bcrypt.hashSync(password, 10);
-            await client.query("UPDATE users SET name=$1, role=$2, password=$3, must_change_password=$4 WHERE id=$5", [name, safeRole, hash, true, id]);
+            if (newUsername) {
+                await client.query("UPDATE users SET username=$1, name=$2, role=$3, password=$4, must_change_password=$5 WHERE id=$6", [newUsername, name, safeRole, hash, true, id]);
+            } else {
+                await client.query("UPDATE users SET name=$1, role=$2, password=$3, must_change_password=$4 WHERE id=$5", [name, safeRole, hash, true, id]);
+            }
             logAction(req.session.user.username, 'UPDATE_USER', `修改使用者：${targetName} (${targetUsername})，已更新姓名、權限和密碼`, req);
         } else {
-            await client.query("UPDATE users SET name=$1, role=$2 WHERE id=$3", [name, safeRole, id]);
+            if (newUsername) {
+                await client.query("UPDATE users SET username=$1, name=$2, role=$3 WHERE id=$4", [newUsername, name, safeRole, id]);
+            } else {
+                await client.query("UPDATE users SET name=$1, role=$2 WHERE id=$3", [name, safeRole, id]);
+            }
             logAction(req.session.user.username, 'UPDATE_USER', `修改使用者：${targetName} (${targetUsername})，已更新姓名和權限`, req);
         }
 
@@ -2025,6 +2051,24 @@ app.put('/api/users/:id', requireAuth, requireAdmin, verifyCsrf, async (req, res
         res.json({success:true});
     } catch (e) { 
         handleApiError(e, req, res, 'Update user error');
+    }
+});
+
+app.patch('/api/users/:id/disable', requireAuth, requireAdmin, verifyCsrf, async (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    if (id === req.session.user.id) return res.status(400).json({ error: '無法停用自己的帳號' });
+    if (!id || !Number.isFinite(id)) return res.status(400).json({ error: 'Invalid user id' });
+    try {
+        const uRes = await pool.query("SELECT username, name, is_disabled FROM users WHERE id=$1", [id]);
+        if (uRes.rows.length === 0) return res.status(404).json({ error: '找不到該使用者' });
+        const target = uRes.rows[0];
+        const newDisabled = !(target.is_disabled === true);
+        await pool.query("UPDATE users SET is_disabled = $1 WHERE id = $2", [newDisabled, id]);
+        logAction(req.session.user.username, newDisabled ? 'DISABLE_USER' : 'ENABLE_USER',
+            `${newDisabled ? '停用' : '啟用'}使用者：${target.name} (${target.username})`, req);
+        res.json({ success: true, isDisabled: newDisabled });
+    } catch (e) {
+        handleApiError(e, req, res, 'Toggle user disable error');
     }
 });
 

@@ -1997,18 +1997,20 @@ if (dashboard) {
                 const groupHtml = groupNames.length
                     ? groupNames.map(n => `<span class="badge" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-weight:700;">${escapeHtml(n)}</span>`).join(' ')
                     : '<span style="color:#94a3b8;">-</span>';
-                return `<tr>
+                const disabledBadge = (u.isDisabled === true) ? '<span class="badge" style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-weight:700;margin-left:4px;">已停用</span>' : '';
+                return `<tr class="${u.isDisabled === true ? 'user-row-disabled' : ''}">
                     <td data-label="姓名" style="padding:12px;">${escapeHtml(u.name || '-')}</td>
-                    <td data-label="帳號">${escapeHtml(u.username || '-')}</td>
+                    <td data-label="帳號">${escapeHtml(u.username || '-')}${disabledBadge}</td>
                     <td data-label="群組" style="display:flex; flex-wrap:wrap; gap:6px; padding:12px 8px;">${groupHtml}</td>
                     <td data-label="權限">${escapeHtml(u.isAdmin === true ? '系統管理員' : getRoleName(u.role))}</td>
                     <td data-label="註冊時間">${u.created_at ? new Date(u.created_at).toLocaleDateString() : '-'}</td>
                     <td data-label="操作">${
                         (myId && u.id === myId)
                             ? '-'
-                            : `<button class="btn btn-outline" style="padding:2px 6px;margin-right:4px;" onclick="openUserModal('edit', ${u.id})">✏️</button>
+                            : `<button class="btn btn-outline" style="padding:2px 6px;margin-right:4px;" onclick="openUserModal('edit', ${u.id})" title="編輯">✏️</button>
+                               <button class="btn btn-outline" style="padding:2px 6px;margin-right:4px;" onclick="toggleUserDisable(${u.id})" title="${u.isDisabled === true ? '啟用' : '停用'}">${u.isDisabled === true ? '✅' : '⏸️'}</button>
                                <button class="btn btn-outline" style="padding:2px 6px;margin-right:4px;" onclick="resetUserPassword(${u.id})" title="重置為初始密碼 Aa123456">🔑</button>
-                               <button class="btn btn-danger" style="padding:2px 6px;" onclick="deleteUser(${u.id})">🗑️</button>`
+                               <button class="btn btn-danger" style="padding:2px 6px;" onclick="deleteUser(${u.id})" title="刪除">🗑️</button>`
                     }</td>
                 </tr>`;
             }).join(''); 
@@ -5394,7 +5396,7 @@ if (dashboard) {
                 document.getElementById('targetUserId').value = u.id || '';
                 document.getElementById('uName').value = u.name || '';
                 e.value = u.username || '';
-                e.disabled = true;
+                e.disabled = false;
                 document.getElementById('uPwd').value = '';
                 document.getElementById('uPwdConfirm').value = '';
                 document.getElementById('pwdHint').innerText = '(留空不改)';
@@ -5437,7 +5439,8 @@ if (dashboard) {
                     loadUsersPage(1); 
                 } else showToast(j.error || '新增失敗', 'error'); 
             } else { 
-                const payload = { name, role }; 
+                if (!email) return showToast('請輸入帳號', 'error');
+                const payload = { name, username: email, role }; 
                 payload.groupIds = groupIds;
                 if (pwd) { 
                     if (pwd !== pwdConfirm) return showToast('密碼與確認密碼不符', 'error'); 
@@ -5459,6 +5462,24 @@ if (dashboard) {
                     loadUsersPage(usersPage); 
                 } else showToast(j.error || '更新失敗', 'error'); 
             } 
+        }
+        async function toggleUserDisable(id) {
+            const u = userList.find(x => x.id === id);
+            const action = u?.isDisabled === true ? '啟用' : '停用';
+            const confirmed = await showConfirmModal(`確定要${action}此帳號嗎？`, `確定${action}`, '取消');
+            if (!confirmed) return;
+            try {
+                const res = await apiFetch(`/api/users/${id}/disable`, { method: 'PATCH' });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast(`${action}成功`);
+                    loadUsersPage(usersPage || 1);
+                } else {
+                    showToast(data.error || `${action}失敗`, 'error');
+                }
+            } catch (e) {
+                showToast('連線錯誤', 'error');
+            }
         }
         async function deleteUser(id) { 
             const confirmed = await showConfirmModal('確定要刪除此帳號嗎？\n\n此操作無法復原！', '確定刪除', '取消');
@@ -8357,99 +8378,67 @@ if (dashboard) {
             if (viewHandlingBox) viewHandlingBox.style.display = 'none';
             
             if (selectedValue === 'latest') {
-                // 顯示最新進度 - 優先顯示「同時有審查意見和辦理情形」的最高輪次
-                // 如果最高輪次只有其中一個，則顯示次高的完整輪次
+                // 顯示最新進度 - 僅當「同時有審查意見和辦理情形」的相同次數時，才在左側顯示
+                //  otherwise 只顯示在右側參考資料
                 let bestRound = 0;
-                let maxRound = 0;
-                
-                // 先找出最高的完整輪次（同時有審查意見和辦理情形）
                 for (let k = 200; k >= 1; k--) {
                     const suffix = k === 1 ? '' : k;
                     const hasHandling = currentEditItem['handling' + suffix] && currentEditItem['handling' + suffix].trim();
                     const hasReview = currentEditItem['review' + suffix] && currentEditItem['review' + suffix].trim();
-                    
-                    // 記錄最高輪次（有任一內容即可）
-                    if ((hasHandling || hasReview) && maxRound === 0) {
-                        maxRound = k;
-                    }
-                    
-                    // 優先選擇同時有兩個內容的輪次
                     if (hasHandling && hasReview) {
                         bestRound = k;
                         break;
                     }
                 }
-                
-                // 如果沒有完整的輪次，使用最高輪次
-                const displayRound = bestRound > 0 ? bestRound : maxRound;
-                
-                if (displayRound > 0) {
-                    const suffix = displayRound === 1 ? '' : displayRound;
+                // 僅在 same round 同時有辦理情形與審查意見時顯示左側區塊
+                if (bestRound > 0) {
+                    const suffix = bestRound === 1 ? '' : bestRound;
                     const handling = currentEditItem['handling' + suffix] || '';
                     const review = currentEditItem['review' + suffix] || '';
-                    
-                    // 顯示審查意見
                     if (review && review.trim()) {
                         const viewReviewRoundNum = document.getElementById('viewReviewRoundNum');
                         const viewReviewText = document.getElementById('viewReviewText');
                         const viewReviewDate = document.getElementById('viewReviewDate');
-                        if (viewReviewRoundNum) viewReviewRoundNum.textContent = displayRound;
+                        if (viewReviewRoundNum) viewReviewRoundNum.textContent = bestRound;
                         if (viewReviewText) viewReviewText.textContent = review;
-                        // 顯示審查函復日期
-                        const responseDate = currentEditItem['response_date_r' + displayRound] || '';
-                        if (viewReviewDate) {
-                            viewReviewDate.textContent = responseDate ? `函復日期：${responseDate}` : '';
-                        }
+                        const responseDate = currentEditItem['response_date_r' + bestRound] || '';
+                        if (viewReviewDate) viewReviewDate.textContent = responseDate ? `函復日期：${responseDate}` : '';
                         if (viewReviewBox) viewReviewBox.style.display = 'block';
                     }
-                    
-                    // 顯示辦理情形
                     if (handling && handling.trim()) {
                         const viewHandlingRoundNum = document.getElementById('viewHandlingRoundNum');
                         const viewHandlingText = document.getElementById('viewHandlingText');
                         const viewHandlingDate = document.getElementById('viewHandlingDate');
-                        if (viewHandlingRoundNum) viewHandlingRoundNum.textContent = displayRound;
+                        if (viewHandlingRoundNum) viewHandlingRoundNum.textContent = bestRound;
                         if (viewHandlingText) viewHandlingText.textContent = handling;
-                        // 顯示辦理情形回復日期
-                        const replyDate = currentEditItem['reply_date_r' + displayRound] || '';
-                        if (viewHandlingDate) {
-                            viewHandlingDate.textContent = replyDate ? `回復日期：${replyDate}` : '';
-                        }
+                        const replyDate = currentEditItem['reply_date_r' + bestRound] || '';
+                        if (viewHandlingDate) viewHandlingDate.textContent = replyDate ? `回復日期：${replyDate}` : '';
                         if (viewHandlingBox) viewHandlingBox.style.display = 'block';
                     }
                 }
             } else {
-                // 顯示指定輪次
+                // 顯示指定輪次 - 僅當該輪次同時有辦理情形與審查意見時才在左側顯示
                 const round = parseInt(selectedValue, 10);
                 const suffix = round === 1 ? '' : round;
                 const handling = currentEditItem['handling' + suffix] || '';
                 const review = currentEditItem['review' + suffix] || '';
-                
-                if (review && review.trim()) {
+                const hasBoth = (handling && handling.trim()) && (review && review.trim());
+                if (hasBoth) {
                     const viewReviewRoundNum = document.getElementById('viewReviewRoundNum');
                     const viewReviewText = document.getElementById('viewReviewText');
                     const viewReviewDate = document.getElementById('viewReviewDate');
                     if (viewReviewRoundNum) viewReviewRoundNum.textContent = round;
                     if (viewReviewText) viewReviewText.textContent = review;
-                    // 顯示審查函復日期
                     const responseDate = currentEditItem['response_date_r' + round] || '';
-                    if (viewReviewDate) {
-                        viewReviewDate.textContent = responseDate ? `函復日期：${responseDate}` : '';
-                    }
+                    if (viewReviewDate) viewReviewDate.textContent = responseDate ? `函復日期：${responseDate}` : '';
                     if (viewReviewBox) viewReviewBox.style.display = 'block';
-                }
-                
-                if (handling && handling.trim()) {
                     const viewHandlingRoundNum = document.getElementById('viewHandlingRoundNum');
                     const viewHandlingText = document.getElementById('viewHandlingText');
                     const viewHandlingDate = document.getElementById('viewHandlingDate');
                     if (viewHandlingRoundNum) viewHandlingRoundNum.textContent = round;
                     if (viewHandlingText) viewHandlingText.textContent = handling;
-                    // 顯示辦理情形回復日期
                     const replyDate = currentEditItem['reply_date_r' + round] || '';
-                    if (viewHandlingDate) {
-                        viewHandlingDate.textContent = replyDate ? `回復日期：${replyDate}` : '';
-                    }
+                    if (viewHandlingDate) viewHandlingDate.textContent = replyDate ? `回復日期：${replyDate}` : '';
                     if (viewHandlingBox) viewHandlingBox.style.display = 'block';
                 }
             }
