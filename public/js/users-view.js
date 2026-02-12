@@ -97,6 +97,473 @@
         }).join('');
     }
 
+    // --- 群組快取（供 user modal、import 等使用） ---
+    var cachedGroupsForModal = null;
+    window.cachedGroupsForModal = null;
+
+    async function ensureGroupsForUserModalLoaded() {
+        if (cachedGroupsForModal) return;
+        try {
+            var res = await window.apiFetch('/api/groups?_t=' + Date.now());
+            var j = await res.json().catch(function () { return {}; });
+            cachedGroupsForModal = res.ok && Array.isArray(j.data) ? j.data : [];
+            window.cachedGroupsForModal = cachedGroupsForModal;
+        } catch (e) {
+            cachedGroupsForModal = [];
+            window.cachedGroupsForModal = [];
+        }
+    }
+    window.ensureGroupsForUserModalLoaded = ensureGroupsForUserModalLoaded;
+
+    function renderUserGroupsCheckboxes(selectedGroupIds) {
+        var box = document.getElementById('uGroupsBox');
+        if (!box) return;
+        var groups = Array.isArray(cachedGroupsForModal) ? cachedGroupsForModal : [];
+        var selected = new Set((selectedGroupIds || []).map(function (x) { return parseInt(x, 10); }).filter(function (n) { return Number.isFinite(n); }));
+        var escape = window.escapeHtml || function (s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
+        box.innerHTML = groups.map(function (g) {
+            var id = g.id;
+            var name = g.name || '群組 ' + id;
+            var isSel = selected.has(parseInt(id, 10));
+            return '<label style="display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; cursor:pointer; background:' + (isSel ? '#eff6ff' : 'transparent') + ';">' +
+                '<input type="checkbox" class="uGroupCheck" value="' + id + '" ' + (isSel ? 'checked' : '') + ' style="width:16px;height:16px;cursor:pointer;">' +
+                '<span style="font-size:14px; color:#334155;">' + escape(name) + '</span></label>';
+        }).join('');
+    }
+
+    // --- 群組管理 ---
+    var adminSelectedGroupId = null;
+    var adminAllUsersCache = null;
+
+    async function loadAllUsersForAdmin(force) {
+        if (adminAllUsersCache && !force) return adminAllUsersCache;
+        var params = new URLSearchParams({ page: 1, pageSize: 10000, q: '', sortField: 'id', sortDir: 'asc', _t: Date.now() });
+        var res = await window.apiFetch('/api/users?' + params.toString());
+        if (!res.ok) {
+            var j = await res.json().catch(function () { return {}; });
+            throw new Error(j.error || '載入使用者失敗');
+        }
+        var j = await res.json();
+        adminAllUsersCache = j.data || [];
+        return adminAllUsersCache;
+    }
+
+    function renderGroupsFolderList() {
+        var body = document.getElementById('groupsFolderListBody');
+        if (!body) return;
+        var groups = Array.isArray(cachedGroupsForModal) ? cachedGroupsForModal : [];
+        if (groups.length === 0) {
+            body.innerHTML = '<div style="padding:12px; color:#64748b; font-size:13px;">尚無群組</div>';
+            return;
+        }
+        var selected = adminSelectedGroupId != null ? parseInt(adminSelectedGroupId, 10) : null;
+        var escape = window.escapeHtml || function (s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
+        body.innerHTML = groups.map(function (g) {
+            var id = parseInt(g.id, 10);
+            var name = g.name || '群組 ' + id;
+            var active = (selected != null && id === selected);
+            return '<button type="button" onclick="selectGroupAdmin(' + id + ')" style="width:100%; text-align:left; border:none; background:' + (active ? '#eff6ff' : '#ffffff') + '; cursor:pointer; padding:10px 12px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between; gap:10px;">' +
+                '<span style="font-weight:800; color:' + (active ? '#1d4ed8' : '#334155') + '; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📁 ' + escape(name) + '</span>' +
+                '<span class="badge" style="background:#f8fafc;border:1px solid #e2e8f0;color:#64748b;">ID ' + id + '</span></button>';
+        }).join('');
+    }
+
+    async function loadGroupsAdmin() {
+        var folderBody = document.getElementById('groupsFolderListBody');
+        var membersBody = document.getElementById('groupMembersBody');
+        if (folderBody) folderBody.innerHTML = '<div style="padding:12px; color:#64748b; font-size:13px;">載入中…</div>';
+        if (membersBody) membersBody.innerHTML = '<div style="padding:8px; color:#64748b; font-size:13px;">載入中…</div>';
+        try {
+            var res = await window.apiFetch('/api/groups?_t=' + Date.now());
+            if (!res.ok) {
+                var j = await res.json().catch(function () { return {}; });
+                if (folderBody) folderBody.innerHTML = '<div style="padding:12px; color:#ef4444; font-size:13px;">載入失敗：' + (window.escapeHtml ? window.escapeHtml(j.error || 'Denied') : (j.error || 'Denied')) + '</div>';
+                return;
+            }
+            var j = await res.json();
+            var groups = j.data || [];
+            cachedGroupsForModal = groups;
+            window.cachedGroupsForModal = groups;
+            if (!adminSelectedGroupId && groups.length > 0) adminSelectedGroupId = groups[0].id;
+            renderGroupsFolderList();
+            try { renderUsers(); } catch (e) {}
+            await renderSelectedGroupMembers();
+        } catch (e) {
+            if (folderBody) folderBody.innerHTML = '<div style="padding:12px; color:#ef4444; font-size:13px;">載入失敗：' + (window.escapeHtml ? window.escapeHtml(e.message || 'error') : (e.message || 'error')) + '</div>';
+        }
+    }
+    window.loadGroupsAdmin = loadGroupsAdmin;
+
+    function selectGroupAdmin(groupId) {
+        adminSelectedGroupId = parseInt(groupId, 10);
+        renderGroupsFolderList();
+        renderSelectedGroupMembers();
+    }
+    window.selectGroupAdmin = selectGroupAdmin;
+
+    function openRenameSelectedGroup() {
+        if (!adminSelectedGroupId) return window.showToast('請先選擇群組', 'error');
+        openRenameGroupModal(adminSelectedGroupId);
+    }
+    window.openRenameSelectedGroup = openRenameSelectedGroup;
+
+    async function deleteSelectedGroup() {
+        if (!adminSelectedGroupId) return window.showToast('請先選擇群組', 'error');
+        var groups = Array.isArray(cachedGroupsForModal) ? cachedGroupsForModal : [];
+        var g = groups.find(function (x) { return parseInt(x.id, 10) === parseInt(adminSelectedGroupId, 10); });
+        var gname = g ? (g.name || '群組 ' + adminSelectedGroupId) : adminSelectedGroupId;
+        if (g && (g.is_admin_group === true || g.isAdminGroup === true)) {
+            return window.showToast('無法刪除系統管理群組', 'error');
+        }
+        var confirmed = await window.showConfirmModal('確定要刪除群組「' + (window.escapeHtml ? window.escapeHtml(gname) : gname) + '」嗎？\n\n此操作無法復原，且會一併移除該群組下所有成員的隸屬關係。', '確定刪除', '取消');
+        if (!confirmed) return;
+        try {
+            var res = await window.apiFetch('/api/groups/' + adminSelectedGroupId, { method: 'DELETE' });
+            var j = await res.json().catch(function () { return {}; });
+            if (!res.ok) return window.showToast(j.error || '刪除失敗', 'error');
+            window.showToast('刪除成功', 'success');
+            cachedGroupsForModal = null;
+            window.cachedGroupsForModal = null;
+            adminSelectedGroupId = null;
+            await loadGroupsAdmin();
+        } catch (e) {
+            window.showToast('刪除失敗: ' + (e.message || 'error'), 'error');
+        }
+    }
+    window.deleteSelectedGroup = deleteSelectedGroup;
+
+    async function renderSelectedGroupMembers() {
+        var box = document.getElementById('groupMembersBody');
+        var nameEl = document.getElementById('selectedGroupName');
+        if (!box || !nameEl) return;
+        var groups = Array.isArray(cachedGroupsForModal) ? cachedGroupsForModal : [];
+        var gid = adminSelectedGroupId != null ? parseInt(adminSelectedGroupId, 10) : null;
+        var group = gid != null ? groups.find(function (g) { return parseInt(g.id, 10) === gid; }) : null;
+        nameEl.textContent = group ? (group.name || '群組 ' + group.id) : '（請先選擇群組）';
+        var deleteBtn = document.getElementById('deleteGroupBtn');
+        if (deleteBtn) {
+            var isAdminGroup = group && (group.is_admin_group === true || group.isAdminGroup === true);
+            deleteBtn.style.display = isAdminGroup ? 'none' : '';
+        }
+        if (!gid || !group) {
+            box.innerHTML = '<div style="padding:8px; color:#64748b; font-size:13px;">請先選擇群組</div>';
+            if (deleteBtn) deleteBtn.style.display = 'none';
+            return;
+        }
+        var users;
+        try {
+            users = await loadAllUsersForAdmin(false);
+        } catch (e) {
+            box.innerHTML = '<div style="padding:8px; color:#ef4444; font-size:13px;">載入使用者失敗：' + (window.escapeHtml ? window.escapeHtml(e.message || 'error') : (e.message || 'error')) + '</div>';
+            return;
+        }
+        var q = String((document.getElementById('groupUserSearch') || {}).value || '').trim().toLowerCase();
+        var escape = window.escapeHtml || function (s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
+        var getRole = window.getRoleName || function (r) { return r || ''; };
+        var rows = users.filter(function (u) {
+            if (!q) return true;
+            var hay = ((u.name || '') + ' ' + (u.username || '')).toLowerCase();
+            return hay.indexOf(q) >= 0;
+        }).map(function (u) {
+            var member = Array.isArray(u.groupIds) && u.groupIds.map(function (x) { return parseInt(x, 10); }).indexOf(gid) >= 0;
+            return '<label style="display:flex; align-items:flex-start; gap:10px; padding:8px 10px; border-radius:10px; background:' + (member ? '#eff6ff' : '#ffffff') + '; border:1px solid ' + (member ? '#bfdbfe' : '#e2e8f0') + '; margin-bottom:8px; cursor:pointer;">' +
+                '<input type="checkbox" style="margin-top:3px; width:16px; height:16px; cursor:pointer;" ' + (member ? 'checked' : '') + ' onchange="toggleUserInSelectedGroup(' + u.id + ', this.checked)">' +
+                '<div style="min-width:0;"><div style="font-weight:800; color:#334155; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + escape(u.name || u.username || '-') + '</div>' +
+                '<div style="color:#64748b; font-size:12px; margin-top:2px;">' + escape(u.username || '-') + ' · ' + escape(u.isAdmin === true ? '系統管理員' : getRole(u.role)) + '</div></div></label>';
+        });
+        box.innerHTML = rows.join('') || '<div style="padding:8px; color:#64748b; font-size:13px;">查無使用者</div>';
+    }
+    window.renderSelectedGroupMembers = renderSelectedGroupMembers;
+
+    async function toggleUserInSelectedGroup(userId, checked) {
+        var gid = adminSelectedGroupId != null ? parseInt(adminSelectedGroupId, 10) : null;
+        if (!gid) return window.showToast('請先選擇群組', 'error');
+        try {
+            var users = await loadAllUsersForAdmin(false);
+            var u = users.find(function (x) { return parseInt(x.id, 10) === parseInt(userId, 10); });
+            if (!u) return window.showToast('找不到使用者', 'error');
+            var cur = Array.isArray(u.groupIds) ? u.groupIds.map(function (x) { return parseInt(x, 10); }).filter(function (n) { return Number.isFinite(n); }) : [];
+            var next = checked ? [...new Set([].concat(cur, [gid]))] : cur.filter(function (x) { return x !== gid; });
+            var res = await window.apiFetch('/api/users/' + u.id, {
+                method: 'PUT',
+                body: JSON.stringify({ name: u.name, role: u.role, groupIds: next })
+            });
+            var j = await res.json().catch(function () { return {}; });
+            if (!res.ok) {
+                window.showToast(j.error || '更新失敗', 'error');
+                await loadAllUsersForAdmin(true);
+                await renderSelectedGroupMembers();
+                return;
+            }
+            await loadAllUsersForAdmin(true);
+            await loadUsersPage(window.usersPage || 1);
+            await renderSelectedGroupMembers();
+        } catch (e) {
+            window.showToast('更新失敗: ' + (e.message || 'error'), 'error');
+            try { await loadAllUsersForAdmin(true); } catch (_) {}
+            try { await renderSelectedGroupMembers(); } catch (_) {}
+        }
+    }
+    window.toggleUserInSelectedGroup = toggleUserInSelectedGroup;
+
+    async function createGroupAdmin() {
+        var input = document.getElementById('newGroupName');
+        var name = String((input && input.value) || '').trim();
+        if (!name) return window.showToast('請輸入群組名稱', 'error');
+        try {
+            var res = await window.apiFetch('/api/groups', {
+                method: 'POST',
+                body: JSON.stringify({ name: name })
+            });
+            var j = await res.json().catch(function () { return {}; });
+            if (!res.ok) return window.showToast(j.error || '新增群組失敗', 'error');
+            if (input) input.value = '';
+            window.showToast('新增群組成功', 'success');
+            cachedGroupsForModal = null;
+            window.cachedGroupsForModal = null;
+            await loadGroupsAdmin();
+        } catch (e) {
+            window.showToast('新增群組失敗: ' + e.message, 'error');
+        }
+    }
+    window.createGroupAdmin = createGroupAdmin;
+
+    function openRenameGroupModal(groupId) {
+        var modal = document.getElementById('groupModal');
+        var idEl = document.getElementById('targetGroupId');
+        var nameEl = document.getElementById('groupNameInput');
+        if (!modal || !idEl || !nameEl) return;
+        var groups = Array.isArray(cachedGroupsForModal) ? cachedGroupsForModal : [];
+        var g = groups.find(function (x) { return parseInt(x.id, 10) === parseInt(groupId, 10); });
+        idEl.value = String(groupId);
+        nameEl.value = g && g.name ? g.name : '';
+        modal.classList.add('open');
+        setTimeout(function () { nameEl.focus(); }, 50);
+    }
+    window.openRenameGroupModal = openRenameGroupModal;
+
+    function closeGroupModal() {
+        var modal = document.getElementById('groupModal');
+        if (modal) modal.classList.remove('open');
+    }
+    window.closeGroupModal = closeGroupModal;
+
+    async function submitGroupRename() {
+        var idEl = document.getElementById('targetGroupId');
+        var nameEl = document.getElementById('groupNameInput');
+        var id = parseInt((idEl && idEl.value) || '', 10);
+        var name = String((nameEl && nameEl.value) || '').trim();
+        if (!id) return window.showToast('群組 ID 無效', 'error');
+        if (!name) return window.showToast('群組名稱不可為空', 'error');
+        try {
+            var res = await window.apiFetch('/api/groups/' + id, {
+                method: 'PUT',
+                body: JSON.stringify({ name: name })
+            });
+            var j = await res.json().catch(function () { return {}; });
+            if (!res.ok) return window.showToast(j.error || '更新群組失敗', 'error');
+            window.showToast('更新群組成功', 'success');
+            cachedGroupsForModal = null;
+            window.cachedGroupsForModal = null;
+            closeGroupModal();
+            await loadGroupsAdmin();
+        } catch (e) {
+            window.showToast('更新群組失敗: ' + e.message, 'error');
+        }
+    }
+    window.submitGroupRename = submitGroupRename;
+
+    // --- 使用者 CRUD ---
+    async function openUserModal(mode, id) {
+        var m = document.getElementById('userModal');
+        var t = document.getElementById('userModalTitle');
+        var e = document.getElementById('uEmail');
+        var groupIds = [];
+        if (mode === 'create') {
+            t.innerText = '新增';
+            document.getElementById('targetUserId').value = '';
+            document.getElementById('uName').value = '';
+            e.value = '';
+            e.disabled = false;
+            document.getElementById('uPwd').value = '';
+            document.getElementById('uPwdConfirm').value = '';
+            document.getElementById('pwdStrength').innerText = '密碼強度: -';
+            document.getElementById('pwdHint').innerText = '';
+            document.getElementById('uRole').value = 'viewer';
+        } else {
+            var userList = window.userList || [];
+            var u = userList.find(function (x) { return x.id === id; }) || {};
+            t.innerText = '編輯';
+            document.getElementById('targetUserId').value = u.id || '';
+            document.getElementById('uName').value = u.name || '';
+            e.value = u.username || '';
+            e.disabled = false;
+            document.getElementById('uPwd').value = '';
+            document.getElementById('uPwdConfirm').value = '';
+            document.getElementById('pwdHint').innerText = '(留空不改)';
+            document.getElementById('pwdStrength').innerText = '密碼強度: -';
+            document.getElementById('uRole').value = u.role || 'viewer';
+            if (Array.isArray(u.groupIds)) groupIds = groupIds.concat(u.groupIds);
+        }
+        await ensureGroupsForUserModalLoaded();
+        renderUserGroupsCheckboxes(groupIds);
+        m.classList.add('open');
+    }
+    window.openUserModal = openUserModal;
+
+    async function submitUser() {
+        var id = (document.getElementById('targetUserId') || {}).value;
+        var name = (document.getElementById('uName') || {}).value;
+        var email = (document.getElementById('uEmail') || {}).value;
+        var pwd = (document.getElementById('uPwd') || {}).value;
+        var pwdConfirm = (document.getElementById('uPwdConfirm') || {}).value;
+        var role = (document.getElementById('uRole') || {}).value;
+        var groupIds = Array.from(document.querySelectorAll('#uGroupsBox .uGroupCheck:checked'))
+            .map(function (cb) { return parseInt(cb.value, 10); })
+            .filter(function (n) { return Number.isFinite(n); });
+        if (!id) {
+            if (!email) return window.showToast('請輸入帳號', 'error');
+            if (!pwd) return window.showToast('請輸入密碼', 'error');
+            if (pwd !== pwdConfirm) return window.showToast('密碼與確認密碼不符', 'error');
+            var validation = window.validatePasswordFrontend ? window.validatePasswordFrontend(pwd) : { valid: true };
+            if (!validation.valid) return window.showToast(validation.message || '密碼不符合規定', 'error');
+            var res = await window.apiFetch('/api/users', {
+                method: 'POST',
+                body: JSON.stringify({ username: email, name: name, password: pwd, role: role, groupIds: groupIds })
+            });
+            var j = await res.json().catch(function () { return {}; });
+            if (res.ok) {
+                window.showToast('新增成功');
+                document.getElementById('userModal').classList.remove('open');
+                loadUsersPage(1);
+            } else {
+                window.showToast(j.error || '新增失敗', 'error');
+            }
+        } else {
+            if (!email) return window.showToast('請輸入帳號', 'error');
+            var payload = { name: name, username: email, role: role, groupIds: groupIds };
+            if (pwd) {
+                if (pwd !== pwdConfirm) return window.showToast('密碼與確認密碼不符', 'error');
+                var validation = window.validatePasswordFrontend ? window.validatePasswordFrontend(pwd) : { valid: true };
+                if (!validation.valid) return window.showToast(validation.message || '密碼不符合規定', 'error');
+                payload.password = pwd;
+            }
+            var res = await window.apiFetch('/api/users/' + id, {
+                method: 'PUT',
+                body: JSON.stringify(payload)
+            });
+            var j = await res.json().catch(function () { return {}; });
+            if (res.ok) {
+                window.showToast('更新成功');
+                document.getElementById('userModal').classList.remove('open');
+                loadUsersPage(window.usersPage || 1);
+            } else {
+                window.showToast(j.error || '更新失敗', 'error');
+            }
+        }
+    }
+    window.submitUser = submitUser;
+
+    async function toggleUserDisable(id) {
+        var userList = window.userList || [];
+        var u = userList.find(function (x) { return x.id === id; });
+        var action = u && u.isDisabled === true ? '啟用' : '停用';
+        var confirmed = await window.showConfirmModal('確定要' + action + '此帳號嗎？', '確定' + action, '取消');
+        if (!confirmed) return;
+        try {
+            var res = await window.apiFetch('/api/users/' + id + '/disable', { method: 'PATCH' });
+            var data = await res.json().catch(function () { return {}; });
+            if (res.ok) {
+                window.showToast(action + '成功');
+                loadUsersPage(window.usersPage || 1);
+            } else {
+                window.showToast(data.error || action + '失敗', 'error');
+            }
+        } catch (e) {
+            window.showToast('連線錯誤', 'error');
+        }
+    }
+    window.toggleUserDisable = toggleUserDisable;
+
+    async function deleteUser(id) {
+        var confirmed = await window.showConfirmModal('確定要刪除此帳號嗎？\n\n此操作無法復原！', '確定刪除', '取消');
+        if (!confirmed) return;
+        try {
+            var res = await window.apiFetch('/api/users/' + id, { method: 'DELETE' });
+            var data = await res.json().catch(function () { return {}; });
+            if (res.ok) {
+                window.showToast('刪除成功');
+                loadUsersPage(1);
+            } else {
+                window.showToast(data.error || '刪除失敗', 'error');
+            }
+        } catch (e) {
+            window.showToast('刪除失敗: ' + e.message, 'error');
+        }
+    }
+    window.deleteUser = deleteUser;
+
+    async function resetUserPassword(userId) {
+        var userList = window.userList || [];
+        var u = userList.find(function (x) { return parseInt(x.id, 10) === parseInt(userId, 10); });
+        var info = u ? (u.name || '-') + '（' + (u.username || '-') + '）' : 'ID: ' + userId;
+        var confirmed = await window.showConfirmModal('確定要將使用者「' + info + '」的密碼重置為初始密碼 Aa123456 嗎？\n\n該使用者下次登入時須修改密碼。', '確定重置', '取消');
+        if (!confirmed) return;
+        try {
+            var res = await window.apiFetch('/api/admin/users/' + userId + '/reset-password', { method: 'POST' });
+            var data = await res.json().catch(function () { return {}; });
+            if (res.ok) {
+                window.showToast('密碼已重置為 Aa123456，該使用者下次登入時須修改密碼', 'success');
+            } else {
+                window.showToast(data.error || '重置失敗', 'error');
+            }
+        } catch (e) {
+            window.showToast('重置失敗: ' + e.message, 'error');
+        }
+    }
+    window.resetUserPassword = resetUserPassword;
+
+    async function exportUsers() {
+        try {
+            window.showToast('準備匯出中，請稍候...', 'info');
+            var res = await fetch('/api/users?page=1&pageSize=10000', { credentials: 'include' });
+            if (!res.ok) throw new Error('取得帳號資料失敗');
+            var json = await res.json();
+            var users = json.data || [];
+            if (users.length === 0) return window.showToast('無帳號資料可匯出', 'error');
+            var formatRadio = document.querySelector('input[name="userExportFormat"]:checked');
+            var format = formatRadio ? formatRadio.value : 'csv';
+            if (format === 'json') {
+                var blob = new Blob([JSON.stringify(users, null, 2)], { type: 'application/json' });
+                var link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'Users_Backup_' + new Date().toISOString().slice(0, 10) + '.json';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.showToast('JSON 匯出完成', 'success');
+            } else {
+                var csvContent = '\uFEFF';
+                csvContent += '姓名,帳號,權限,建立時間\n';
+                users.forEach(function (user) {
+                    var clean = function (t) { return '"' + String(t || '').replace(/"/g, '""').trim() + '"'; };
+                    csvContent += clean(user.name) + ',' + clean(user.username) + ',' + clean(user.role) + ',' + clean(new Date(user.created_at).toLocaleString('zh-TW')) + '\n';
+                });
+                var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                var link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'Users_' + new Date().toISOString().slice(0, 10) + '.csv';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.showToast('CSV 匯出完成', 'success');
+            }
+        } catch (e) {
+            window.showToast('匯出失敗: ' + e.message, 'error');
+        }
+    }
+    window.exportUsers = exportUsers;
+
     function usersSortBy(field) {
         if (window.usersSortField === field) {
             window.usersSortDir = window.usersSortDir === 'asc' ? 'desc' : 'asc';

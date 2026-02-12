@@ -209,7 +209,28 @@
     }
     window.openPlanEditorsModal = openPlanEditorsModal;
 
+    // --- 批次編輯 Modal（開關邏輯） ---
+    function closeBatchContentModal() {
+        // 已改為直接在表格中輸入，此函數保留以供 HTML onclick 呼叫
+    }
+    window.closeBatchContentModal = closeBatchContentModal;
+
+    function saveBatchContent() {
+        // 已改為直接在表格中輸入，此函數保留以供 HTML onclick 呼叫
+    }
+    window.saveBatchContent = saveBatchContent;
+
+    function initBatchContentModal() {
+        var modal = document.getElementById('batchContentModal');
+        if (modal) {
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) closeBatchContentModal();
+            });
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
+        initBatchContentModal();
         var confirmModal = document.getElementById('confirmModal');
         if (confirmModal) {
             confirmModal.addEventListener('click', function (e) {
