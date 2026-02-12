@@ -1,191 +1,4 @@
-        // 全域狀態
-        let rawData = [], currentData = [], currentUser = null, charts = {}, currentEditItem = null, userList = [], sortState = { field: null, dir: 'asc' }, stagedImportData = [];
-        let autoLogoutTimer;
-        let currentLogs = { login: [], action: [] };
-        let cachedGlobalStats = null;
-        let csrfToken = null; // CSRF token 快取
-        
-        // 開發模式檢測（用於條件輸出 console.warn）
-        const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.includes('dev');
-        
-        // 取得 CSRF token
-        async function getCsrfToken() {
-            if (csrfToken) return csrfToken;
-            try {
-                const res = await fetch('/api/csrf-token', {
-                    credentials: 'include'
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    csrfToken = data.csrfToken;
-                    return csrfToken;
-                }
-            } catch (e) {
-                console.error('Failed to get CSRF token:', e);
-            }
-            return null;
-        }
-        
-        // 密碼複雜度驗證函數（前端）
-        function validatePasswordFrontend(password) {
-            if (!password || password.length < 8) {
-                return { valid: false, message: '密碼至少需要 8 個字元' };
-            }
-            if (!/[A-Z]/.test(password)) {
-                return { valid: false, message: '密碼必須包含至少一個大寫字母' };
-            }
-            if (!/[a-z]/.test(password)) {
-                return { valid: false, message: '密碼必須包含至少一個小寫字母' };
-            }
-            if (!/[0-9]/.test(password)) {
-                return { valid: false, message: '密碼必須包含至少一個數字' };
-            }
-            return { valid: true };
-        }
-        
-        // 統一的 API 請求包裝函數，自動處理認證錯誤和 CSRF token
-        // 生成類別標籤 HTML
-        function getKindLabel(kindCode) {
-            if (!kindCode) return '';
-            const labels = {
-                'N': '<span class="kind-tag N">缺失</span>',
-                'O': '<span class="kind-tag O">觀察</span>',
-                'R': '<span class="kind-tag R">建議</span>'
-            };
-            return labels[kindCode] || '';
-        }
-
-        // 生成狀態標籤 HTML
-        function getStatusBadge(status) {
-            if (!status || status === 'Open') return '';
-            const statusClass = status === '持續列管' ? 'active' : (status === '解除列管' ? 'resolved' : 'self');
-            return `<span class="badge ${statusClass}">${status}</span>`;
-        }
-
-        // 驗證日期格式（6或7位數字，例如：1130601 或 1141001）
-        function validateDateFormat(dateStr, fieldName = '日期') {
-            if (!dateStr || !/^\d{6,7}$/.test(dateStr)) {
-                showToast(`${fieldName}格式錯誤，應為6或7位數字（例如：1130601 或 1141001）`, 'error');
-                return false;
-            }
-            return true;
-        }
-
-        async function apiFetch(url, options = {}) {
-            try {
-                // 對於需要 CSRF 保護的請求（POST, PUT, DELETE），自動加入 token
-                const needsCsrf = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(options.method);
-                if (needsCsrf) {
-                    const token = await getCsrfToken();
-                    if (!token) {
-                        console.error('Failed to get CSRF token');
-                        throw new Error('無法取得 CSRF token，請重新整理頁面');
-                    }
-                    options.headers = options.headers || {};
-                    options.headers['X-CSRF-Token'] = token;
-                }
-                
-                const response = await fetch(url, {
-                    ...options,
-                    credentials: 'include', // 確保包含 cookies
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...options.headers
-                    }
-                });
-                
-                // 處理認證錯誤
-                // 重要：403 不一定是未登入（可能是權限不足 / 被拒絕），不可一律導向登入頁
-                if (response.status === 401) {
-                    if (isDevelopment) console.warn('未登入（401），重定向到登入頁');
-                    sessionStorage.clear();
-                    window.location.href = '/login.html';
-                    throw new Error('Unauthorized');
-                }
-                if (response.status === 403) {
-                    // 如果是 CSRF token 錯誤，清除快取並重試一次
-                    if (response.status === 403 && needsCsrf) {
-                        const errorData = await response.json().catch(() => ({}));
-                        if (errorData.error && errorData.error.includes('CSRF')) {
-                            csrfToken = null; // 清除快取的 token
-                            const newToken = await getCsrfToken();
-                            if (newToken) {
-                                options.headers['X-CSRF-Token'] = newToken;
-                                const retryResponse = await fetch(url, {
-                                    ...options,
-                                    credentials: 'include',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        ...options.headers
-                                    }
-                                });
-                                // 只要不是 CSRF 造成的 403，就把回應交回呼叫端處理（不要導向登入頁）
-                                if (retryResponse.ok || retryResponse.status !== 403) {
-                                    return retryResponse;
-                                }
-                            }
-                        }
-                    }
-                    // 403（權限不足）交由呼叫端決定如何顯示訊息
-                    return response;
-                }
-                
-                return response;
-            } catch (error) {
-                // 如果是我們自己拋出的認證錯誤，直接重新拋出
-                if (error.message === 'Unauthorized') {
-                    throw error;
-                }
-                // 其他錯誤正常處理
-                throw error;
-            }
-        }
-        
-        // 日誌記錄函數（寫入檔案，不在控制台顯示）
-        async function writeLog(message, level = 'INFO') {
-            try {
-                await apiFetch('/api/log', {
-                    method: 'POST',
-                    body: JSON.stringify({ message, level })
-                }).catch(() => {}); // 靜默失敗，不影響主流程
-            } catch (e) {
-                // 靜默處理錯誤
-            }
-        }
-        let issuesPage = 1, issuesPageSize = 20, issuesTotal = 0, issuesPages = 1;
-        let usersPage = 1, usersPageSize = 20, usersTotal = 0, usersPages = 1, usersSortField = 'id', usersSortDir = 'asc';
-        let plansPage = 1, plansPageSize = 20, plansTotal = 0, plansPages = 1, plansSortField = 'year', plansSortDir = 'desc';
-        let planList = [];
-        // 目前在計畫管理編輯視窗中正在查看的該計畫所有排程
-        let currentPlanSchedules = [];
-        let logsPage = 1, logsPageSize = 20, logsTotal = 0, logsPages = 1;
-        let actionsPage = 1, actionsPageSize = 20, actionsTotal = 0, actionsPages = 1;
-        // Current import mode: 'word' (uses param) or 'backup' (ignores param)
-        let currentImportMode = 'word';
-
-        function resetAutoLogout() { clearTimeout(autoLogoutTimer); autoLogoutTimer = setTimeout(() => { showToast("您已閒置過久，系統將自動登出。", 'warning'); setTimeout(() => logout(), 2000); }, 1800000); }
-        window.onload = resetAutoLogout; document.onmousemove = resetAutoLogout; document.onkeypress = resetAutoLogout;
-
-        function toggleDashboard(btn) { 
-            const d = document.getElementById('dashboardSection'); 
-            const c = d.classList.contains('collapsed'); 
-            d.classList.toggle('collapsed', !c); 
-            const icon = btn.querySelector('.toggle-icon');
-            if (icon) {
-                icon.textContent = c ? '▲' : '▼';
-            }
-            btn.title = c ? '收合統計圖表' : '展開統計圖表';
-        }
-        function toggleUserMenu() { document.getElementById('userDropdown').classList.toggle('show'); }
-
-        function toggleGroupsPanelSize() {
-            const layout = document.getElementById('adminUsersLayout') || document.querySelector('.admin-users-layout');
-            if (!layout) return;
-            layout.classList.toggle('groups-expanded');
-            const expanded = layout.classList.contains('groups-expanded');
-            const btn = document.getElementById('btnToggleGroupsPanel');
-            if (btn) btn.textContent = expanded ? '⤡ 縮小' : '⤢ 放大';
-        }
+        // [Modularized] 全域狀態、apiFetch、getCsrfToken、showToast、writeLog、utils → 已移至 js/core.js、js/utils.js
 
         // --- 協作編修人員（開立事項 / 檢查計畫） ---
         let editorsAllUsersCache = null; // [{id, username, name, role, isAdmin}]
@@ -774,29 +587,7 @@
         function parseStatusFromResultCell(cell) { if (!cell) return ""; var src = normalizeMultiline((cell.innerText || cell.textContent || "") + "\n" + (cell.innerHTML || "").replace(/<[^>]+>/g, "")); if (!src) return ""; var allMarks = FILLED_MARKS.concat(EMPTY_MARKS).join(""); allMarks = allMarks.replace(/[-\\^$*+?.()|[\]{}]/g, "\\$&"); var reFront = new RegExp("([" + allMarks + "])\\s*(?:[:：﹕-]?\\s*)?(解除列管|持續列管|自行列管)", "g"); var reBack = new RegExp("(解除列管|持續列管|自行列管)\\s*(?:[:：﹕-]?\\s*)?([" + allMarks + "])", "g"); var hits = [], m; while ((m = reFront.exec(src)) !== null) { hits.push({ idx: m.index, label: m[2], mark: m[1], filled: FILLED_MARKS.indexOf(m[1]) >= 0 }); } while ((m = reBack.exec(src)) !== null) { hits.push({ idx: m.index, label: m[1], mark: m[2], filled: FILLED_MARKS.indexOf(m[2]) >= 0 }); } var filled = hits.filter(function (h) { return h.filled; }).sort(function (a, b) { return a.idx - b.idx; }); if (filled.length) return filled[filled.length - 1].label; var labels = ["解除列管", "持續列管", "自行列管"]; var present = labels.filter(function (l) { return src.indexOf(l) >= 0; }); if (present.length === 1) return present[0]; return ""; }
         function formatHtmlToText(html) { if (!html) return ""; let temp = String(html).replace(/<li[^>]*>/gi, "\n• ").replace(/<\/li>/gi, "").replace(/<ul[^>]*>/gi, "").replace(/<\/ul>/gi, "").replace(/<ol[^>]*>/gi, "").replace(/<\/ol>/gi, "").replace(/<br\s*\/?>/gi, "\n").replace(/<\/p>/gi, "\n").replace(/<p[^>]*>/gi, ""); let div = document.createElement("div"); div.innerHTML = temp; return (div.textContent || div.innerText || "").replace(/\n\s*\n/g, "\n").trim(); }
 
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            let icon, title;
-            if (type === 'success') {
-                icon = '✅';
-                title = '成功';
-            } else if (type === 'warning') {
-                icon = '⚠️';
-                title = '警告';
-            } else if (type === 'info') {
-                icon = 'ℹ️';
-                title = '資訊';
-            } else {
-                icon = '❌';
-                title = '錯誤';
-            }
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `<div class="toast-icon">${icon}</div><div class="toast-content"><div class="toast-title">${title}</div><div class="toast-msg">${message}</div></div>`;
-            container.appendChild(toast);
-            requestAnimationFrame(() => { toast.classList.add('show'); });
-            setTimeout(() => { toast.classList.remove('show'); toast.addEventListener('transitionend', () => toast.remove()); }, 3000);
-        }
+        // showToast → js/core.js
 
         function showPreview(html, title) { document.getElementById('previewTitle').innerText = title || '內容預覽'; document.getElementById('previewContent').innerHTML = html || '(無內容)'; document.getElementById('previewModal').classList.add('open'); }
         function closePreview() { document.getElementById('previewModal').classList.remove('open'); }
@@ -1109,17 +900,7 @@
             }
         }
         
-        // 輔助函數：從計畫選項值中提取計畫名稱和年度
-        function parsePlanValue(value) {
-            if (!value) return { name: '', year: '' };
-            // 新格式：使用 ||| 分隔符
-            if (value.includes('|||')) {
-                const parts = value.split('|||');
-                return { name: parts[0] || '', year: parts[1] || '' };
-            }
-            // 舊格式：直接是計畫名稱
-            return { name: value, year: '' };
-        }
+        // parsePlanValue → js/utils.js
         
         // 共用函數：載入計畫下的所有事項
         async function loadIssuesByPlan(planValue, options = {}) {
@@ -3862,13 +3643,7 @@ if (dashboard) {
             }
         }
         
-        // HTML 轉義函數（防止 XSS）
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+        // escapeHtml → js/utils.js
         
         // 從檢查計畫查詢並預填審查函復輪次
         async function updateBatchResponseRoundFromPlan() {
