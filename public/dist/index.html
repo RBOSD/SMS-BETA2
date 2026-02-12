@@ -510,19 +510,8 @@
         </div>
     </div>
 
-    <!-- 打包後單一 bundle（由 npm run build 產生）；若不存在則載入個別腳本 -->
-    <script>
-      (function(){
-        var bundle = document.createElement('script');
-        bundle.src = '/dist/app.js';
-        bundle.onerror = function(){
-          var scripts = ['/js/core.js','/js/utils.js','/js/auth.js','/js/navigation.js','/js/dashboard.js','/js/search-view.js','/js/import-view.js','/js/plans-view.js','/js/users-view.js','/js/calendar-view.js','/js/modals.js','/scripts.js','/js/main.js'];
-          function load(i){ if(i>=scripts.length)return; var s=document.createElement('script'); s.src=scripts[i]; s.onload=function(){load(i+1);}; document.body.appendChild(s); }
-          load(0);
-        };
-        document.body.appendChild(bundle);
-      })();
-    </script>
+    <!-- 打包後單一 bundle（由 npm run build 產生） -->
+    <script src="/dist/app.js"></script>
 </body>
 
 </html>

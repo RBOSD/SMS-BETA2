@@ -1,0 +1,697 @@
+        .integrated-controls {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: #ffffff;
+        }
+
+        .filter-primary-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-advanced-row {
+            display: none;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            padding-top: 12px;
+            margin-top: 4px;
+            border-top: 1px dashed #e2e8f0;
+        }
+
+        .filter-advanced-row.show {
+            display: flex;
+        }
+
+        .control-row-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .search-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .search-item label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .btn {
+            padding: 9px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-ai {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .btn-link {
+            background: none;
+            border: none;
+            color: var(--primary);
+            padding: 0;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+
+        .filter-input,
+        .filter-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #f8fafc;
+            font-size: 14px;
+            transition: all 0.2s;
+            color: #334155;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 修正下拉選單文字被遮住的問題 */
+        .filter-select {
+            z-index: 10;
+        }
+        
+        .filter-select:focus {
+            z-index: 100;
+        }
+        
+        /* 確保表格中的下拉選單有足夠的 z-index */
+        table .filter-select {
+            position: relative;
+            z-index: 10;
+        }
+        
+        table .filter-select:focus {
+            z-index: 100;
+        }
+        
+        /* 確保表格中的下拉選單選項可以正確顯示 */
+        table td {
+            position: relative;
+            overflow: visible;
+        }
+        
+        /* 當下拉選單展開時，確保選項不被遮住 */
+        table .filter-select option {
+            background: white;
+            color: #334155;
+            padding: 8px 12px;
+        }
+
+        .filter-input:focus,
+        .filter-select:focus {
+            border-color: var(--primary);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        /* 美化 optgroup 樣式，讓計畫分組更清晰 */
+        .filter-select optgroup {
+            font-weight: 600;
+            color: var(--primary);
+            background: #eff6ff;
+            padding: 4px 0;
+        }
+
+        .filter-select optgroup option {
+            font-weight: normal;
+            color: #334155;
+            padding-left: 20px;
+            background: white;
+        }
+
+        .filter-select optgroup option:hover {
+            background: #f1f5f9;
+        }
+
+        /* 後台：帳號/群組雙欄（避免右側超出畫面） */
+        .admin-users-layout {
+            display: grid;
+            grid-template-columns: minmax(560px, 2.2fr) minmax(320px, 1fr);
+            gap: 16px;
+            align-items: start;
+            /* 群組清單/成員清單高度（可被放大模式覆寫） */
+            --groups-list-max: 240px;
+            --group-members-max: 320px;
+        }
+
+        .admin-users-layout > * {
+            min-width: 0;
+        }
+
+        /* 放大群組管理：右側佔滿，方便大量人員勾選 */
+        .admin-users-layout.groups-expanded {
+            grid-template-columns: 1fr;
+            --groups-list-max: 360px;
+            --group-members-max: 70vh;
+        }
+
+        .admin-users-layout.groups-expanded .admin-users-left {
+            display: none;
+        }
+
+        @media (max-width: 1100px) {
+            .admin-users-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* [Added] Custom focus styles for date inputs in edit mode */
+        #editReplyDate:focus,
+        #editResponseDate:focus {
+            border-color: #667eea !important;
+            background: #ffffff !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15) !important;
+            outline: none;
+        }
+
+        .filter-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .pwd-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .pwd-wrapper .filter-input {
+            padding-right: 45px; /* 為顯示/隱藏按鈕留出空間 */
+        }
+
+        .pwd-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #94a3b8;
+            border: none;
+            background: none;
+            font-size: 18px;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: color 0.2s;
+        }
+
+        .pwd-toggle:hover {
+            color: var(--primary);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .sidebar-btn {
+            width: 100%;
+            text-align: left;
+            padding: 14px 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-sub);
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+
+        .sidebar-btn:hover {
+            background: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        .sidebar-btn.active {
+            background: #eff6ff;
+            color: var(--primary);
+        }
+
+
+        .admin-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding: 8px;
+            background: #f8fafc;
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .admin-tab-btn {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #64748b;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .admin-tab-btn:hover {
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--primary);
+        }
+
+        .admin-tab-btn.active {
+            background: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-end) 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .data-container {
+            overflow-x: auto;
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+            position: relative;
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
+            padding: 16px 16px;
+            text-align: left;
+            font-size: 13px;
+            color: var(--text-sub);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        th:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        td {
+            padding: 16px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            vertical-align: top;
+            color: #334155;
+            line-height: 1.5;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+            cursor: pointer;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .preview-table {
+            table-layout: fixed;
+            width: 100%;
+            min-width: 900px;
+        }
+
+        .preview-table th:nth-child(1) {
+            width: 60px;
+        }
+
+        /* Status */
+        .preview-table th:nth-child(2) {
+            width: 140px;
+        }
+
+        /* Number */
+        .preview-table th:nth-child(3) {
+            width: 80px;
+        }
+
+        /* Unit */
+        .preview-table th:nth-child(4) {
+            width: 40%;
+        }
+
+        /* Content */
+        .preview-table th:nth-child(5) {
+            width: 35%;
+        }
+
+        /* Review */
+        .preview-content-box {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            white-space: normal;
+            word-break: break-word;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #475569;
+        }
+
+        .pagination-bar {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .page-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-main);
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: var(--primary);
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f8fafc;
+        }
+
+        .page-dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            color: var(--text-sub);
+            font-size: 12px;
+        }
+
+            .page-size-select {
+                padding: 8px 12px;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 15px;
+                background: white;
+                cursor: pointer;
+                color: var(--text-sub);
+                font-weight: 500;
+            }
+
+            .page-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 15px;
+            }
+
+        .page-size-select:hover {
+            border-color: #cbd5e1;
+            color: var(--text-main);
+        }
+
+        /* [Modified] Badges and Tags unified style */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .badge.active {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge.resolved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge.self {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge.new {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge.update {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .ai-tag {
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+        }
+
+        .ai-tag.yes {
+            color: #059669;
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+        }
+
+        .ai-tag.no {
+            color: #dc2626;
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        /* Kind tag now matches Badge style */
+        .kind-tag {
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 20px;
+            padding: 4px 10px;
+            border: none;
+            color: #555;
+            background: #f8fafc;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .kind-tag.N {
+            color: #b91c1c;
+            background: #fef2f2;
+        }
+
+        /* 缺失 */
+        .kind-tag.O {
+            color: #c2410c;
+            background: #fff7ed;
+        }
+
+        /* 觀察 */
+        .kind-tag.R {
+            color: #15803d;
+            background: #f0fdf4;
+        }
+
+        /* 建議 */
+
+        .drawer-backdrop,
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(2px);
+        }
+        
+        /* 批次內容模態視窗需要有更高的 z-index */
+        #batchContentModal {
+            z-index: 1000 !important;
+        }
+
+        .drawer-backdrop.open,
+        .modal-overlay.open {
+            display: flex;
+        }
+        
+        /* 自訂確認對話框顯示 */
+        .modal-overlay[id="confirmModal"] {
+            display: none;
+            z-index: 10000 !important; /* 確保確認視窗顯示在 drawer 之上 */
+        }
+        
+        .modal-overlay[id="confirmModal"][style*="flex"],
+        .modal-overlay[id="confirmModal"][style*="display: flex"] {
+            display: flex !important;
+            z-index: 10000 !important;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 900px;
+            max-width: 100vw;
+            background: white;
+            z-index: 101;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .drawer.open {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fcfcfc;
+        }
+
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 200;
+            position: relative;
+        }
+        
+        /* 批次內容模態視窗的 modal-box 需要更高的 z-index */
+        #batchContentModal .modal-box {
+            z-index: 1001 !important;
+        }
+
+        .detail-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #475569;
+        }
