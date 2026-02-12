@@ -1,4 +1,25 @@
+# 依賴
 node_modules/
+
+# 環境變數（含機密）
 .env
-.env.*
+.env.local
+.env.*.local
+
+# 建置輸出
+public/dist/
+dist/
+
+# 日誌
+*.log
 logs/
+
+# 編輯器
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 作業系統
+.DS_Store
+Thumbs.db
