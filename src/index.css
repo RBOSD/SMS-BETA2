@@ -1,0 +1,11 @@
+/* 整合現有 CSS - 維持原有功能、顏色、版面、字體、字形不變 */
+@import '../public/css/base.css';
+@import '../public/css/header.css';
+@import '../public/css/layout.css';
+@import '../public/css/components.css';
+@import '../public/css/views.css';
+
+/* React 掛載後 body 改為 flex 顯示（原 base.css 為 display:none 等 JS 載入） */
+body {
+  display: flex !important;
+}

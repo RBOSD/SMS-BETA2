@@ -11,7 +11,12 @@
     "build:watch": "vite build --watch",
     "preview": "vite preview"
   },
-  "keywords": ["sms", "railway", "issue-tracking", "postgresql"],
+  "keywords": [
+    "sms",
+    "railway",
+    "issue-tracking",
+    "postgresql"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -25,9 +30,13 @@
     "express-rate-limit": "^7.1.5",
     "express-session": "^1.18.0",
     "mammoth": "^1.6.0",
-    "pg": "^8.11.3"
+    "pg": "^8.11.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.3"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
     "nodemon": "^3.0.3",
     "vite": "^5.4.0"
   },

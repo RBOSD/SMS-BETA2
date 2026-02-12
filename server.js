@@ -99,6 +99,11 @@ app.use(protectViewTemplates);
 const distPath = path.join(__dirname, 'dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
+  // SPA fallback：React 路由需回傳 index.html
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
 }
 app.use(express.static(path.join(__dirname, 'public')));
 
