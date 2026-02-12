@@ -2008,7 +2008,7 @@ if (dashboard) {
                         (myId && u.id === myId)
                             ? '-'
                             : `<button class="btn btn-outline" style="padding:2px 6px;margin-right:4px;" onclick="openUserModal('edit', ${u.id})" title="編輯">✏️</button>
-                               <button class="btn btn-outline" style="padding:2px 6px;margin-right:4px;" onclick="toggleUserDisable(${u.id})" title="${u.isDisabled === true ? '啟用' : '停用'}">${u.isDisabled === true ? '✅' : '⏸️'}</button>
+                               <button class="btn btn-outline" style="padding:2px 6px;margin-right:4px;" onclick="toggleUserDisable(${u.id})" title="${u.isDisabled === true ? '啟用' : '停用'}">${u.isDisabled === true ? '🔓' : '🔒'}</button>
                                <button class="btn btn-outline" style="padding:2px 6px;margin-right:4px;" onclick="resetUserPassword(${u.id})" title="重置為初始密碼 Aa123456">🔑</button>
                                <button class="btn btn-danger" style="padding:2px 6px;" onclick="deleteUser(${u.id})" title="刪除">🗑️</button>`
                     }</td>
