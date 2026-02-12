@@ -1,8 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import Layout from './components/layout/Layout';
 import LoginPage from './views/LoginPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -38,7 +38,9 @@ function AppRoutes() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppRoutes />
+      <ToastProvider>
+        <AppRoutes />
+      </ToastProvider>
     </AuthProvider>
   );
 }

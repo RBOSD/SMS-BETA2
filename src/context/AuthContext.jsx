@@ -13,7 +13,11 @@ export function AuthProvider({ children }) {
         return null;
       })
       .then((data) => {
-        setUser(data?.user || null);
+        if (data?.isLogin && data?.id) {
+          setUser({ id: data.id, username: data.username, name: data.name, role: data.role, isAdmin: data.isAdmin });
+        } else {
+          setUser(null);
+        }
       })
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
