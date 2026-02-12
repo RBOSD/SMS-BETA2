@@ -48,6 +48,7 @@
     window.actionsTotal = 0;
     window.actionsPages = 1;
     window.currentImportMode = 'word';
+    window.holidayData = {}; // 共用的假日資料（行程規劃月曆、檢查行程檢索月曆）
 
     async function getCsrfToken() {
         if (window.csrfToken) return window.csrfToken;
