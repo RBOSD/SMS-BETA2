@@ -580,130 +580,7 @@
 
         // showPreview, closePreview, showConfirmModal, closeConfirmModal → js/modals.js
 
-        // 載入計畫選項（資料管理頁面使用：顯示所有計畫）
-        async function loadPlanOptions() {
-            try {
-                const res = await fetch('/api/options/plans?t=' + Date.now(), {
-                    cache: 'no-store',
-                    headers: {
-                        'Cache-Control': 'no-cache'
-                    }
-                });
-                
-                if (!res.ok) {
-                    console.error('載入計畫選項失敗：', res.status, res.statusText);
-                    return;
-                }
-                
-                const json = await res.json();
-                if (!json.data || json.data.length === 0) {
-                    if (isDevelopment) console.warn('沒有找到任何檢查計畫');
-                    // 即使沒有計畫，也要嘗試載入查詢看板的計畫選項
-                    await loadFilterPlanOptions();
-                    return;
-                }
-                
-                // 更新資料管理頁面的計畫選擇下拉選單（顯示所有計畫）
-                const selectIds = ['importPlanName', 'batchPlanName', 'manualPlanName', 'createPlanName'];
-                selectIds.forEach(selectId => {
-                    const select = document.getElementById(selectId);
-                    if (select) {
-                        const currentValue = select.value;
-                        // 保留第一個選項（通常是「全部計畫」或「請選擇計畫」）
-                        const firstOption = select.options[0] ? select.options[0].outerHTML : '';
-                        
-                        // 處理新的資料格式，按年度分組
-                        const yearGroups = new Map(); // key: 年度, value: 該年度下的所有計畫
-                        const existingValues = new Set();
-                        
-                        if (firstOption) {
-                            const tempDiv = document.createElement('div');
-                            tempDiv.innerHTML = firstOption;
-                            const firstOpt = tempDiv.querySelector('option');
-                            if (firstOpt && firstOpt.value) {
-                                existingValues.add(firstOpt.value);
-                            }
-                        }
-                        
-                        // 將計畫按年度分組
-                        json.data.forEach(p => {
-                            let planName, planYear, planValue, planDisplay;
-                            
-                            if (typeof p === 'object' && p !== null) {
-                                planName = p.name || '';
-                                planYear = p.year || '';
-                                planValue = p.value || `${planName}|||${planYear}`;
-                                // 因為已經用年度分組，所以只顯示計畫名稱，不顯示年度
-                                planDisplay = planName;
-                            } else {
-                                // 舊格式（字串），向後兼容
-                                planName = p;
-                                planYear = '';
-                                planValue = p;
-                                planDisplay = p;
-                            }
-                            
-                            if (!existingValues.has(planValue) && planName) {
-                                existingValues.add(planValue);
-                                // 使用年度作為分組鍵，如果沒有年度則使用「未分類」
-                                const groupKey = planYear || '未分類';
-                                if (!yearGroups.has(groupKey)) {
-                                    yearGroups.set(groupKey, []);
-                                }
-                                yearGroups.get(groupKey).push({ 
-                                    value: planValue, 
-                                    display: planDisplay, 
-                                    name: planName, 
-                                    year: planYear 
-                                });
-                            }
-                        });
-                        
-                        // 建立選項 HTML
-                        let allOptions = '';
-                        
-                        // 將年度分組按年度降序排序（最新的在前）
-                        const sortedYears = Array.from(yearGroups.keys()).sort((a, b) => {
-                            // 「未分類」放在最後
-                            if (a === '未分類') return 1;
-                            if (b === '未分類') return -1;
-                            const yearA = parseInt(a) || 0;
-                            const yearB = parseInt(b) || 0;
-                            return yearB - yearA;
-                        });
-                        
-                        sortedYears.forEach(year => {
-                            const plans = yearGroups.get(year);
-                            // 按計畫名稱排序（同一年度內的計畫按名稱排序）
-                            plans.sort((a, b) => {
-                                return (a.name || '').localeCompare(b.name || '', 'zh-TW');
-                            });
-                            
-                            // 使用 optgroup 按年度分組
-                            const yearLabel = year === '未分類' ? '未分類' : `${year} 年度`;
-                            allOptions += `<optgroup label="${yearLabel}">`;
-                            plans.forEach(plan => {
-                                allOptions += `<option value="${plan.value}">${plan.display}</option>`;
-                            });
-                            allOptions += `</optgroup>`;
-                        });
-                        
-                        // 完全重建選項列表
-                        select.innerHTML = firstOption + allOptions;
-                        
-                        // 恢復之前選擇的值
-                        if (currentValue && Array.from(select.options).some(opt => opt.value === currentValue)) {
-                            select.value = currentValue;
-                        }
-                    }
-                });
-                
-                // 同時更新查詢看板的計畫選項（只顯示有關聯開立事項的計畫）
-                await loadFilterPlanOptions();
-            } catch (e) {
-                console.error("Load plans failed", e);
-            }
-        }
+        // loadPlanOptions → js/import-view.js
         
         // loadFilterPlanOptions → js/search-view.js
         
@@ -1104,48 +981,7 @@
             }
         }
         
-        // 在視圖載入後設置 admin 專屬元素的函數
-        function setupAdminElements() {
-            if (!currentUser || currentUser.isAdmin !== true) return;
-            
-            const uploadCardBackup = document.getElementById('uploadCardBackup');
-            if (uploadCardBackup) {
-                uploadCardBackup.classList.remove('hidden');
-            }
-            
-            const exportJsonOption = document.getElementById('exportJsonOption');
-            if (exportJsonOption) {
-                exportJsonOption.style.display = 'flex';
-                exportJsonOption.style.alignItems = 'center';
-            }
-        }
-        
-        // [Added] 設置導入視圖的事件監聽器
-        function setupImportListeners() {
-            const wordInputEl = document.getElementById('wordInput');
-            const importIssueDateEl = document.getElementById('importIssueDate');
-            
-            if (wordInputEl) {
-                // [修正] 確保文件選擇框是啟用的
-                wordInputEl.disabled = false;
-                // 移除舊的事件監聽器（如果有的話），然後添加新的
-                wordInputEl.removeEventListener('change', checkImportReady);
-                wordInputEl.addEventListener('change', checkImportReady);
-            }
-            
-            if (importIssueDateEl) {
-                importIssueDateEl.removeEventListener('input', checkImportReady);
-                importIssueDateEl.removeEventListener('keyup', checkImportReady);
-                importIssueDateEl.addEventListener('input', checkImportReady);
-                importIssueDateEl.addEventListener('keyup', checkImportReady);
-            }
-            
-            // [Added] 初始化審查次數選項
-            initImportRoundOptions();
-            
-            // 初始化按鈕狀態（但不禁用文件選擇框）
-            checkImportReady();
-        }
+        // setupAdminElements, setupImportListeners → js/import-view.js
 
         // loadIssuesPage, applyFilters, renderTable, sortData, renderPagination 等 → js/search-view.js
 
@@ -2289,45 +2125,7 @@
             }
         }
 
-        function switchDataTab(tab) { 
-            // 匯出功能已移至「後台管理」，避免舊狀態導向不存在的頁籤
-            if (tab === 'export') tab = 'issues';
-            // 保存當前 tab 到 sessionStorage
-            sessionStorage.setItem('currentDataTab', tab);
-            
-            document.querySelectorAll('#importView .admin-tab-btn').forEach(b => b.classList.remove('active')); 
-            if (event && event.target) {
-                event.target.classList.add('active');
-            } else {
-                // 如果沒有 event，找到對應的按鈕
-                const buttons = document.querySelectorAll('#importView .admin-tab-btn');
-                buttons.forEach(btn => {
-                    if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${tab}'`)) {
-                        btn.classList.add('active');
-                    }
-                });
-            }
-            
-            // 主要 tab 切換
-            document.getElementById('tab-data-issues').classList.toggle('hidden', tab !== 'issues'); 
-            document.getElementById('tab-data-plans').classList.toggle('hidden', tab !== 'plans');
-            
-            // 處理各 tab 的初始化
-            if (tab === 'issues') {
-                // 恢復開立事項子 tab
-                const savedSubTab = sessionStorage.getItem('currentIssuesSubTab') || 'import';
-                setTimeout(() => switchIssuesSubTab(savedSubTab), 100);
-                // 確保檢查計畫選項已載入（用於資料管理頁面的其他功能）
-                loadPlanOptions();
-            }
-            if (tab === 'plans') {
-                // 恢復檢查計畫子 tab
-                const savedSubTab = sessionStorage.getItem('currentPlansSubTab') || 'schedule';
-                setTimeout(() => switchPlansSubTab(savedSubTab), 100);
-                loadPlanOptions();
-            }
-            // 匯出功能已移至「後台管理」
-        }
+        // switchDataTab → js/import-view.js
         
         // 檢查計畫的子 tab 切換
         function switchPlansSubTab(subTab) {
@@ -2357,60 +2155,7 @@
             }
         }
         
-        // 開立事項的子 tab 切換
-        function switchIssuesSubTab(subTab) {
-            sessionStorage.setItem('currentIssuesSubTab', subTab);
-            
-            // 更新子 tab 按鈕狀態
-            document.querySelectorAll('#tab-data-issues .admin-tab-btn').forEach(b => b.classList.remove('active'));
-            if (event && event.target) {
-                event.target.classList.add('active');
-            } else {
-                const buttons = document.querySelectorAll('#tab-data-issues .admin-tab-btn');
-                buttons.forEach(btn => {
-                    if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${subTab}'`)) {
-                        btn.classList.add('active');
-                    }
-                });
-            }
-            
-            // 切換子 tab 內容
-            document.getElementById('subtab-issues-import').classList.toggle('hidden', subTab !== 'import');
-            document.getElementById('subtab-issues-create').classList.toggle('hidden', subTab !== 'create');
-            document.getElementById('subtab-issues-year-edit').classList.toggle('hidden', subTab !== 'year-edit');
-            
-            // 向後兼容：batch 和 manual 都指向 create
-            if (subTab === 'batch' || subTab === 'manual') {
-                document.getElementById('subtab-issues-create').classList.remove('hidden');
-                if (subTab === 'batch') {
-                    switchCreateMode('batch');
-                } else {
-                    switchCreateMode('single');
-                }
-            }
-            
-            if (subTab === 'create') {
-                // 初始化開立事項建檔頁面
-                createMode = 'batch'; // 固定為批次模式
-                initCreateIssuePage();
-                // 確保計畫選項已載入
-                loadPlanOptions();
-            }
-            
-            if (subTab === 'year-edit') {
-                // 重置事項修正頁面
-                yearEditIssue = null;
-                yearEditIssueList = [];
-                hideYearEditIssueContent();
-                hideYearEditIssueList();
-                document.getElementById('yearEditEmpty').style.display = 'block';
-                document.getElementById('yearEditNotFound').style.display = 'none';
-                // 載入有開立事項的檢查計畫選項到下拉選單
-                setTimeout(() => {
-                    loadYearEditPlanOptions();
-                }, 100);
-            }
-        }
+        // switchIssuesSubTab → js/import-view.js
         
         function setupExportOptions() {
             const exportDataTypeRadios = document.querySelectorAll('input[name="exportDataType"]');
@@ -7599,6 +7344,12 @@
         // --- 事項修正功能 ---
         let yearEditIssue = null; // 儲存當前編輯的事項資料
         let yearEditIssueList = []; // 儲存當前計畫下的事項列表
+        
+        function resetYearEditState() {
+            yearEditIssue = null;
+            yearEditIssueList = [];
+        }
+        window.resetYearEditState = resetYearEditState;
         
         // 從編號字串中提取數字（用於排序）
         function extractNumberFromString(str) {
