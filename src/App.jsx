@@ -1,11 +1,28 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import Layout from './components/layout/Layout';
 import LoginPage from './views/LoginPage';
+import ChangePasswordModal from './components/common/ChangePasswordModal';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 
 function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
+  const [showChangePwd, setShowChangePwd] = useState(false);
+
+  useEffect(() => {
+    if (user && sessionStorage.getItem('mustChangePassword') === 'true') {
+      setShowChangePwd(true);
+    }
+  }, [user]);
+
+  const handleChangePwdSuccess = async () => {
+    sessionStorage.removeItem('mustChangePassword');
+    setShowChangePwd(false);
+    await logout();
+    window.location.href = '/login';
+  };
+
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f8fafc' }}>
@@ -16,7 +33,12 @@ function ProtectedRoute({ children }) {
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-  return children;
+  return (
+    <>
+      {children}
+      {showChangePwd && <ChangePasswordModal open onSuccess={handleChangePwdSuccess} />}
+    </>
+  );
 }
 
 function AppRoutes() {

@@ -572,7 +572,7 @@ export default function SearchView() {
         </div>
       </div>
 
-      <DetailDrawer open={!!drawerIssue} issue={drawerIssue} onClose={() => setDrawerIssue(null)} />
+      <DetailDrawer open={!!drawerIssue} issue={drawerIssue} onClose={() => setDrawerIssue(null)} onRefresh={() => loadIssues(page)} />
       <PreviewModal open={previewOpen} title={previewTitle} content={previewContent} onClose={() => setPreviewOpen(false)} />
       <ConfirmModal
         open={confirmOpen}

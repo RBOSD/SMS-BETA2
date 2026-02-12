@@ -26,7 +26,11 @@ export default function LoginPage() {
         sessionStorage.removeItem('currentView');
         sessionStorage.removeItem('currentDataTab');
         sessionStorage.removeItem('currentUsersTab');
-        sessionStorage.removeItem('mustChangePassword');
+        if (result.mustChangePassword) {
+          sessionStorage.setItem('mustChangePassword', 'true');
+        } else {
+          sessionStorage.removeItem('mustChangePassword');
+        }
         navigate('/', { replace: true });
       } else {
         setError(result.message || '登入失敗');
