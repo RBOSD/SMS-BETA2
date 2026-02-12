@@ -460,12 +460,14 @@ const { initDB } = require('./db/init');
 cleanupOldLogs();
 setInterval(cleanupOldLogs, 24 * 60 * 60 * 1000); // 每 24 小時執行一次
 
-// [Modularized] 註冊 auth 與 misc 路由
-require('./routes/auth')(app);
-require('./routes/misc')(app, { csrfProtection });
+// [Modularized] 註冊所有路由（auth, misc, issues, users, admin, options, plans, schedule, templates）
+require('./routes')(app, { csrfProtection });
 
-// --- API Routes ---
+// --- API Routes（已移至 routes/*.js） ---
+// 以下區塊已移除，改由 routes/index.js 統一註冊
 
+/*
+[REMOVED - issues, users, admin, options, plans, schedule, templates]
 app.get('/api/issues', requireAuth, async (req, res) => {
     const { page = 1, pageSize = 20, q, year, unit, status, itemKindCode, division, inspectionCategory, planName, sortField, sortDir } = req.query;
     const limit = parseInt(pageSize);
@@ -2873,6 +2875,7 @@ app.delete('/api/plan-schedule/:id', requireAuth, requireAdminOrManager, verifyC
         handleApiError(e, req, res, 'Delete plan schedule error');
     }
 });
+*/
 
 // 1. 初始化資料庫 (維持異步執行)
 initDB().catch(err => {
