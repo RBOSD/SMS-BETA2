@@ -578,73 +578,7 @@
 
         // showToast → js/core.js
 
-        function showPreview(html, title) { document.getElementById('previewTitle').innerText = title || '內容預覽'; document.getElementById('previewContent').innerHTML = html || '(無內容)'; document.getElementById('previewModal').classList.add('open'); }
-        function closePreview() { document.getElementById('previewModal').classList.remove('open'); }
-        
-        // 自訂確認對話框（Promise 版本）
-        let confirmModalResolve = null;
-        let confirmModalHandler = null;
-        
-        function showConfirmModal(message, confirmText = '確認', cancelText = '取消') {
-            return new Promise((resolve) => {
-                const modal = document.getElementById('confirmModal');
-                const messageEl = document.getElementById('confirmModalMessage');
-                const confirmBtn = document.getElementById('confirmModalConfirmBtn');
-                
-                if (!modal || !messageEl || !confirmBtn) {
-                    // 如果 modal 不存在，回退到原生 confirm
-                    resolve(confirm(message));
-                    return;
-                }
-                
-                // 清除舊的事件處理器
-                if (confirmModalHandler) {
-                    confirmBtn.removeEventListener('click', confirmModalHandler);
-                }
-                
-                // 重置狀態
-                confirmModalResolve = resolve;
-                
-                messageEl.textContent = message;
-                confirmBtn.textContent = confirmText;
-                
-                // 設置新的確認按鈕點擊事件
-                confirmModalHandler = function handleConfirm() {
-                    modal.style.display = 'none';
-                    if (confirmModalResolve) {
-                        confirmModalResolve(true);
-                        confirmModalResolve = null;
-                    }
-                };
-                confirmBtn.addEventListener('click', confirmModalHandler);
-                
-                modal.style.display = 'flex';
-            });
-        }
-        
-        function closeConfirmModal() {
-            const modal = document.getElementById('confirmModal');
-            if (modal) {
-                modal.style.display = 'none';
-                if (confirmModalResolve) {
-                    // 取消時 resolve(false)
-                    confirmModalResolve(false);
-                    confirmModalResolve = null;
-                }
-            }
-        }
-        
-        // 點擊 modal 背景關閉
-        document.addEventListener('DOMContentLoaded', () => {
-            const confirmModal = document.getElementById('confirmModal');
-            if (confirmModal) {
-                confirmModal.addEventListener('click', (e) => {
-                    if (e.target === confirmModal) {
-                        closeConfirmModal();
-                    }
-                });
-            }
-        });
+        // showPreview, closePreview, showConfirmModal, closeConfirmModal → js/modals.js
 
         // 載入計畫選項（資料管理頁面使用：顯示所有計畫）
         async function loadPlanOptions() {
@@ -7330,7 +7264,7 @@
             document.getElementById('drawerBackdrop').classList.add('open'); document.getElementById('detailDrawer').classList.add('open'); toggleEditMode(isEdit);
         }
         // logout → js/auth.js
-        function closeDrawer() { document.getElementById('drawerBackdrop').classList.remove('open'); document.getElementById('detailDrawer').classList.remove('open'); }
+        // closeDrawer → js/modals.js
         function initListeners() { document.getElementById('filterKeyword').addEventListener('keyup', (e) => { if (e.key === 'Enter') applyFilters() }); document.getElementById('drawerBackdrop').addEventListener('click', closeDrawer); }
         // onToggleSidebar → js/navigation.js
 
