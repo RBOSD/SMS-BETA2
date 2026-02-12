@@ -44,7 +44,8 @@ async function logError(error, context, req) {
 
 function writeToLogFile(message, level = 'INFO') {
     try {
-        const logDir = path.join(__dirname, '..', 'logs');
+        // Vercel 等 serverless 環境：/var/task 唯讀，改用 /tmp（僅當次有效）
+        const logDir = process.env.VERCEL ? path.join('/tmp', 'logs') : path.join(__dirname, '..', 'logs');
         if (!fs.existsSync(logDir)) {
             fs.mkdirSync(logDir, { recursive: true });
         }
@@ -60,7 +61,7 @@ function writeToLogFile(message, level = 'INFO') {
 
 function cleanupOldLogs() {
     try {
-        const logDir = path.join(__dirname, '..', 'logs');
+        const logDir = process.env.VERCEL ? path.join('/tmp', 'logs') : path.join(__dirname, '..', 'logs');
         if (!fs.existsSync(logDir)) {
             return;
         }
