@@ -1,143 +1,6 @@
         // [Modularized] 全域狀態、apiFetch、getCsrfToken、showToast、writeLog、utils → 已移至 js/core.js、js/utils.js
+        // 協作編修：openEditorsModal、closeEditorsModal、renderEditorsUserList、saveEditorsSelection、toggleEditorsUser、openIssueEditorsModalFromDrawer、openPlanEditorsModal → js/modals.js
 
-        // --- 協作編修人員（開立事項 / 檢查計畫） ---
-        let editorsAllUsersCache = null; // [{id, username, name, role, isAdmin}]
-        let editorsSelectedSet = new Set();
-        let editorsModalLoadedFor = null; // { type, id }
-
-        async function ensureEditorsUsersLoaded(force = false) {
-            if (editorsAllUsersCache && !force) return editorsAllUsersCache;
-            const res = await apiFetch('/api/users/lookup?limit=5000&_t=' + Date.now());
-            const j = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(j.error || '載入使用者清單失敗');
-            editorsAllUsersCache = Array.isArray(j.data) ? j.data : [];
-            return editorsAllUsersCache;
-        }
-
-        function closeEditorsModal() {
-            const m = document.getElementById('editorsModal');
-            if (m) m.classList.remove('open');
-            editorsSelectedSet = new Set();
-            editorsModalLoadedFor = null;
-            const q = document.getElementById('editorsUserSearch');
-            if (q) q.value = '';
-        }
-
-        async function openEditorsModal(type, id, subtitle) {
-            const m = document.getElementById('editorsModal');
-            const titleEl = document.getElementById('editorsModalTitle');
-            const subEl = document.getElementById('editorsModalSubtitle');
-            const box = document.getElementById('editorsUsersBox');
-            if (!m || !box) return;
-
-            document.getElementById('editorsTargetType').value = String(type || '');
-            document.getElementById('editorsTargetId').value = String(id || '');
-            editorsSelectedSet = new Set();
-            editorsModalLoadedFor = { type: String(type || ''), id: Number(id) };
-
-            if (titleEl) titleEl.textContent = '協作編修人員';
-            if (subEl) subEl.textContent = subtitle ? String(subtitle) : '';
-            box.innerHTML = '<div style="color:#64748b;font-size:13px;">（載入中…）</div>';
-            m.classList.add('open');
-
-            try {
-                await ensureEditorsUsersLoaded(false);
-                const endpoint = type === 'plan' ? `/api/plans/${id}/editors` : `/api/issues/${id}/editors`;
-                const res = await apiFetch(endpoint + '?_t=' + Date.now());
-                const j = await res.json().catch(() => ({}));
-                if (!res.ok) {
-                    showToast(j.error || '載入失敗', 'error');
-                    closeEditorsModal();
-                    return;
-                }
-                const existing = Array.isArray(j.data) ? j.data : [];
-                editorsSelectedSet = new Set(existing.map(x => parseInt(x.id, 10)).filter(n => Number.isFinite(n)));
-                renderEditorsUserList();
-            } catch (e) {
-                showToast(e.message || '載入失敗', 'error');
-                closeEditorsModal();
-            }
-        }
-
-        function renderEditorsUserList() {
-            const box = document.getElementById('editorsUsersBox');
-            if (!box) return;
-            const q = String(document.getElementById('editorsUserSearch')?.value || '').trim().toLowerCase();
-            const users = Array.isArray(editorsAllUsersCache) ? editorsAllUsersCache : [];
-
-            // 僅顯示可被指派的人（manager 或 系統管理員）
-            const candidates = users.filter(u => (u && (u.isAdmin === true || u.role === 'manager')));
-            const filtered = candidates.filter(u => {
-                if (!q) return true;
-                const hay = `${u.name || ''} ${u.username || ''}`.toLowerCase();
-                return hay.includes(q);
-            });
-
-            if (filtered.length === 0) {
-                box.innerHTML = '<div style="color:#64748b;font-size:13px;">查無使用者</div>';
-                return;
-            }
-
-            box.innerHTML = filtered.map(u => {
-                const uid = parseInt(u.id, 10);
-                const checked = editorsSelectedSet.has(uid);
-                const displayName = u.name || u.username || '-';
-                const sub = `${u.username || '-'} · ${u.isAdmin === true ? '系統管理員' : getRoleName(u.role)}`;
-                return `<label style="display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border-radius:12px; background:${checked ? '#eff6ff' : '#ffffff'}; border:1px solid ${checked ? '#bfdbfe' : '#e2e8f0'}; margin-bottom:10px; cursor:pointer;">
-                    <input type="checkbox" style="margin-top:3px; width:16px; height:16px; cursor:pointer;" ${checked ? 'checked' : ''} onchange="toggleEditorsUser(${uid}, this.checked)">
-                    <div style="min-width:0;">
-                        <div style="font-weight:800; color:#334155; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                            ${escapeHtml(displayName)}
-                        </div>
-                        <div style="color:#64748b; font-size:12px; margin-top:2px;">
-                            ${escapeHtml(sub)}
-                        </div>
-                    </div>
-                </label>`;
-            }).join('');
-        }
-
-        function toggleEditorsUser(userId, checked) {
-            const uid = parseInt(userId, 10);
-            if (!Number.isFinite(uid)) return;
-            if (checked) editorsSelectedSet.add(uid);
-            else editorsSelectedSet.delete(uid);
-        }
-
-        async function saveEditorsSelection() {
-            const type = String(document.getElementById('editorsTargetType')?.value || '');
-            const id = parseInt(String(document.getElementById('editorsTargetId')?.value || ''), 10);
-            if (!type || !Number.isFinite(id)) return showToast('資料不完整', 'error');
-            try {
-                const editorUserIds = Array.from(editorsSelectedSet.values()).filter(n => Number.isFinite(n));
-                const endpoint = type === 'plan' ? `/api/plans/${id}/editors` : `/api/issues/${id}/editors`;
-                const res = await apiFetch(endpoint, {
-                    method: 'PUT',
-                    body: JSON.stringify({ editorUserIds })
-                });
-                const j = await res.json().catch(() => ({}));
-                if (!res.ok) return showToast(j.error || '儲存失敗', 'error');
-                showToast('已更新協作編修人員', 'success');
-                closeEditorsModal();
-            } catch (e) {
-                showToast('儲存失敗：' + (e.message || 'error'), 'error');
-            }
-        }
-
-        function openIssueEditorsModalFromDrawer() {
-            if (!currentEditItem) return showToast('找不到當前資料', 'error');
-            const id = currentEditItem.id;
-            const number = currentEditItem.number || `ID:${id}`;
-            openEditorsModal('issue', id, `開立事項：${number}`);
-        }
-
-        function openPlanEditorsModal() {
-            const id = parseInt(String(document.getElementById('targetPlanId')?.value || ''), 10);
-            if (!Number.isFinite(id)) return showToast('請先選擇既有計畫再設定協作人員', 'error');
-            const name = String(document.getElementById('planName')?.value || '').trim();
-            const year = String(document.getElementById('planYear')?.value || '').trim();
-            openEditorsModal('plan', id, `檢查計畫：${name || ''}${year ? ` (${year})` : ''}`.trim());
-        }
         window.addEventListener('click', function (e) { if (!e.target.closest('.user-menu-container')) { document.getElementById('userDropdown').classList.remove('show'); } });
 
         // togglePwdVisibility → js/auth.js
@@ -212,7 +75,7 @@
             
             return null;
         }
-        function getRoleName(r) { const map = { 'manager': '資料管理者', 'viewer': '檢視人員' }; return map[r] || r; }
+        // getRoleName → js/utils.js
         // [Enhanced] 改進編號提取，支持從帶換行的儲存格中提取編號
         function extractNumberFromCell(cell) {
             if (!cell) return "";
@@ -668,135 +531,7 @@
         // switchView → js/navigation.js
         // loadDashboardYearOptions, onDashboardYearChange, loadCalendarDashboardStats, initDashboardCalendar, renderDashboardCalendar, loadDashboardScheduleForMonth, dashboardSchedulePrevMonth, dashboardScheduleNextMonth, dashboardSelectDay → js/calendar-view.js
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            // 首先確保 body 可見，避免空白頁面
-            document.body.style.display = 'flex';
-            
-            try {
-                await checkAuth();
-                if (currentUser) {
-                    // 檢查是否需要更新密碼（首次登入）
-                    const mustChangePassword = sessionStorage.getItem('mustChangePassword') === 'true';
-                    if (mustChangePassword) {
-                        // 顯示密碼更新模態框
-                        const modal = document.getElementById('changePasswordModal');
-                        if (modal) {
-                            modal.style.display = 'flex';
-                            // 清除 sessionStorage 中的標記
-                            sessionStorage.removeItem('mustChangePassword');
-                            // 阻止其他操作，直到密碼更新完成
-                            return;
-                        }
-                    }
-                    
-                    // 確保 body 可見（再次確認）
-                    document.body.style.display = 'flex';
-                    
-                    // 嘗試恢復上次的視圖
-                    const savedView = sessionStorage.getItem('currentView');
-                    let targetView = savedView || 'searchView';
-                    
-                    // 確保視圖存在
-                    const viewElement = document.getElementById(targetView);
-                    if (!viewElement) {
-                        targetView = 'searchView';
-                    }
-                    
-                    // 切換到目標視圖（添加錯誤處理）
-                    try {
-                        await switchView(targetView);
-                    } catch (viewError) {
-                        console.error('切換視圖錯誤:', viewError);
-                        // 如果切換失敗，至少顯示 searchView
-                        const searchViewEl = document.getElementById('searchView');
-                        if (searchViewEl) {
-                            searchViewEl.classList.add('active');
-                            document.querySelectorAll('.view-section').forEach(el => {
-                                if (el.id !== 'searchView') el.classList.remove('active');
-                            });
-                        }
-                    }
-                    
-                    // 初始化其他功能（每個都添加錯誤處理）
-                    try {
-                        initListeners();
-                    } catch (e) {
-                        console.error('初始化監聽器錯誤:', e);
-                    }
-                    
-                    try {
-                        initEditForm();
-                    } catch (e) {
-                        console.error('初始化編輯表單錯誤:', e);
-                    }
-                    
-                    try {
-                        initCharts();
-                    } catch (e) {
-                        console.error('初始化圖表錯誤:', e);
-                    }
-                    
-                    try {
-                        loadPlanOptions(); // 這會自動調用 loadFilterPlanOptions()
-                        // 確保查詢看板的計畫選項也被載入
-                        loadFilterPlanOptions();
-                    } catch (e) {
-                        console.error('載入計畫選項錯誤:', e);
-                    }
-                    
-                    try {
-                        initImportRoundOptions();
-                    } catch (e) {
-                        console.error('初始化匯入輪次選項錯誤:', e);
-                    }
-                    
-                    // 如果目標視圖是 searchView，載入資料
-                    if (targetView === 'searchView') {
-                        try {
-                            await loadIssuesPage(1);
-                        } catch (e) {
-                            console.error('載入事項資料錯誤:', e);
-                            // 即使載入失敗，也要顯示錯誤訊息
-                            const emptyMsg = document.getElementById('emptyMsg');
-                            if (emptyMsg) {
-                                emptyMsg.innerText = '載入資料時發生錯誤，請重新整理頁面';
-                                emptyMsg.style.display = 'block';
-                            }
-                        }
-                    }
-                    // Preload users if needed
-                    if(currentUser.isAdmin === true && targetView === 'usersView') {
-                        try {
-                            loadUsersPage(1);
-                        } catch (e) {
-                            console.error('載入使用者資料錯誤:', e);
-                        }
-                    }
-                } else {
-                    // 如果沒有 currentUser，應該是重定向到登入頁
-                    // 但如果重定向失敗，至少顯示 body
-                    if (isDevelopment) console.warn('未檢測到登入狀態，嘗試重定向到登入頁');
-                }
-            } catch (error) {
-                console.error('初始化錯誤:', error);
-                // 即使出錯也嘗試顯示頁面
-                document.body.style.display = 'flex';
-                
-                // 顯示錯誤訊息給用戶
-                const appBody = document.getElementById('appBody');
-                if (appBody) {
-                    appBody.innerHTML = `
-                        <div style="padding: 40px; text-align: center; color: #ef4444;">
-                            <h2>初始化錯誤</h2>
-                            <p>頁面載入時發生錯誤，請重新整理頁面或聯絡系統管理員。</p>
-                            <button onclick="window.location.reload()" class="btn btn-primary" style="margin-top: 20px;">
-                                重新整理頁面
-                            </button>
-                        </div>
-                    `;
-                }
-            }
-        });
+        // DOMContentLoaded、initListeners、initEditForm → js/main.js
 
         async function checkAuth() {
             try {
@@ -826,7 +561,7 @@
                     const roleEl = document.getElementById('headerUserRole');
                     if (nameEl) nameEl.innerText = data.name || data.username;
                     const isAdmin = data.isAdmin === true;
-                    if (roleEl) roleEl.innerText = isAdmin ? '系統管理員' : getRoleName(data.role);
+                    if (roleEl) roleEl.innerText = isAdmin ? '系統管理員' : (window.getRoleName || function(r){return r;})(data.role);
                     
                     const btnCalendar = document.getElementById('btn-planCalendarView');
                     if (btnCalendar) btnCalendar.classList.remove('hidden');
@@ -876,7 +611,8 @@
                 }
             }
         }
-        
+        window.checkAuth = checkAuth;
+
         // setupAdminElements, setupImportListeners → js/import-view.js
 
         // loadIssuesPage, applyFilters, renderTable, sortData, renderPagination 等 → js/search-view.js
@@ -1026,7 +762,7 @@
                                 ${escapeHtml(u.name || u.username || '-')}
                             </div>
                             <div style="color:#64748b; font-size:12px; margin-top:2px;">
-                                ${escapeHtml(u.username || '-')} · ${escapeHtml(u.isAdmin === true ? '系統管理員' : getRoleName(u.role))}
+                                ${escapeHtml(u.username || '-')} · ${escapeHtml(u.isAdmin === true ? '系統管理員' : (window.getRoleName || function(r){return r;})(u.role))}
                             </div>
                         </div>
                     </label>`;
@@ -5058,11 +4794,8 @@
                 loadRoundData();
             }
         }
-        function initEditForm() { 
-            // 審查次數現在是只讀顯示，不再需要初始化下拉選項
-            // 保留此函數以保持代碼兼容性
-        }
-        
+        // initEditForm → js/main.js
+
         // 動態添加更多審查次數選項（如果需要超過 100 次，用於隱藏的 select）
         function ensureRoundOption(round) {
             const s = document.getElementById('editRoundSelect');
@@ -5161,7 +4894,7 @@
         }
         // logout → js/auth.js
         // closeDrawer → js/modals.js
-        function initListeners() { document.getElementById('filterKeyword').addEventListener('keyup', (e) => { if (e.key === 'Enter') applyFilters() }); document.getElementById('drawerBackdrop').addEventListener('click', closeDrawer); }
+        // initListeners → js/main.js
         // onToggleSidebar → js/navigation.js
 
         // updateChartsData, initCharts → js/dashboard.js

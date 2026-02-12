@@ -43,6 +43,12 @@
     }
     window.escapeHtml = escapeHtml;
 
+    function getRoleName(r) {
+        var map = { 'manager': '資料管理者', 'viewer': '檢視人員' };
+        return (map[r] || r) || '';
+    }
+    window.getRoleName = getRoleName;
+
     function parsePlanValue(value) {
         if (!value) return { name: '', year: '' };
         if (value.indexOf('|||') >= 0) {

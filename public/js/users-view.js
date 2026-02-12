@@ -76,11 +76,6 @@
     }
     window.loadUsersPage = loadUsersPage;
 
-    function getRoleName(r) {
-        var map = { 'manager': '資料管理者', 'viewer': '檢視人員' };
-        return map[r] || r;
-    }
-
     function renderUsers() {
         var tbody = document.getElementById('usersTableBody');
         if (!tbody) return;
@@ -98,7 +93,7 @@
             var opHtml = (myId && u.id === myId)
                 ? '-'
                 : '<button class="btn btn-outline" style="padding:2px 6px;margin-right:4px;" onclick="openUserModal(\'edit\', ' + u.id + ')" title="編輯">✏️</button><button class="btn btn-outline" style="padding:2px 6px;margin-right:4px;font-size:12px;" onclick="toggleUserDisable(' + u.id + ')" title="' + (u.isDisabled === true ? '啟用此帳號' : '停用此帳號') + '">' + (u.isDisabled === true ? '啟用' : '停用') + '</button><button class="btn btn-outline" style="padding:2px 6px;margin-right:4px;" onclick="resetUserPassword(' + u.id + ')" title="重置為初始密碼 Aa123456">🔑</button><button class="btn btn-danger" style="padding:2px 6px;" onclick="deleteUser(' + u.id + ')" title="刪除">🗑️</button>';
-            return '<tr class="' + (u.isDisabled === true ? 'user-row-disabled' : '') + '"><td data-label="姓名" style="padding:12px;">' + escapeHtml(u.name || '-') + '</td><td data-label="帳號">' + escapeHtml(u.username || '-') + disabledBadge + '</td><td data-label="群組" style="display:flex; flex-wrap:wrap; gap:6px; padding:12px 8px;">' + groupHtml + '</td><td data-label="權限">' + escapeHtml(u.isAdmin === true ? '系統管理員' : getRoleName(u.role)) + '</td><td data-label="註冊時間">' + (u.created_at ? new Date(u.created_at).toLocaleDateString() : '-') + '</td><td data-label="操作">' + opHtml + '</td></tr>';
+            return '<tr class="' + (u.isDisabled === true ? 'user-row-disabled' : '') + '"><td data-label="姓名" style="padding:12px;">' + escapeHtml(u.name || '-') + '</td><td data-label="帳號">' + escapeHtml(u.username || '-') + disabledBadge + '</td><td data-label="群組" style="display:flex; flex-wrap:wrap; gap:6px; padding:12px 8px;">' + groupHtml + '</td><td data-label="權限">' + escapeHtml(u.isAdmin === true ? '系統管理員' : (window.getRoleName ? window.getRoleName(u.role) : (u.role || ''))) + '</td><td data-label="註冊時間">' + (u.created_at ? new Date(u.created_at).toLocaleDateString() : '-') + '</td><td data-label="操作">' + opHtml + '</td></tr>';
         }).join('');
     }
 
