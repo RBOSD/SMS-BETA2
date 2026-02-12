@@ -69,9 +69,21 @@ npm start
 | /import | 資料管理（Phase 2） |
 | /users | 後台管理（Phase 2） |
 
-## 後續 Phase 2–3
+## Phase 2 完成（SearchView 完整遷移）
 
-- 完整遷移 SearchView（篩選、列表、Drawer、圖表）
+- ✅ 搜尋、篩選（關鍵字、年度、計畫、機構、狀態、進階篩選）
+- ✅ 列表、分頁、排序
+- ✅ Dashboard _stats-bar（總數、列管中、已解除）
+- ✅ Dashboard 圖表（Chart.js：圓餅、長條、趨勢）
+- ✅ DetailDrawer（詳細資料、歷程紀錄）
+- ✅ PreviewModal（預覽更多內容）
+- ✅ ConfirmModal（批次刪除確認）
+- ✅ Toast 通知
+- ✅ 批次刪除（管理員/資料管理者）
+- ⏳ 審查模式（Drawer 內編輯）將於 Phase 3 遷移
+
+## 後續 Phase 3
+
+- 遷移 Drawer 審查模式（AI 分析、多輪次審查）
 - 遷移 CalendarView、ImportView、UsersView
-- 遷移 Modal、Drawer 等共用元件
 - 首次登入密碼更新流程
