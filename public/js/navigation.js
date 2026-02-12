@@ -54,6 +54,7 @@
             onToggleSidebar();
         }
         var viewMap = {
+            'searchView': '/views/search-view.html',
             'planCalendarView': '/views/calendar-dashboard-view.html',
             'importView': '/views/import-view.html',
             'usersView': '/views/users-view.html'
