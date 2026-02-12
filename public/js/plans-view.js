@@ -799,6 +799,7 @@
             console.error('載入計畫選項失敗:', e);
         }
     }
+    window.loadSchedulePlanOptions = loadSchedulePlanOptions;
 
     async function scheduleSubmitPlan() {
         var planSelect = document.getElementById('schedulePlanSelect');
