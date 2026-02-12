@@ -22,23 +22,36 @@
 
 ---
 
-## 二、目前架構概覽
+## 二、目前架構概覽（模組化完成後）
 
 ```
 SMS-BETA/
 ├── vercel.json              # 所有請求 → server.js
 ├── package.json
-├── server.js                # ~3,625 行（單一檔案）
+├── server.js                # 精簡入口
+├── config/, db/, middleware/, routes/, utils/  # 後端模組
 └── public/
-    ├── index.html           # 主頁 + searchView 內嵌
+    ├── index.html           # 主頁，各 view 由 switchView 動態載入
     ├── login.html
-    ├── scripts.js           # ~9,652 行（單一檔案）
-    ├── styles.css           # ~3,227 行（單一檔案）
+    ├── scripts.js           # 剩餘邏輯（與 js/*.js 並存）
+    ├── styles.css           # 保留備援（實際使用 css/*.css）
+    ├── css/
+    │   ├── base.css
+    │   ├── header.css
+    │   ├── layout.css
+    │   ├── components.css
+    │   └── views.css
+    ├── js/
+    │   ├── core.js, utils.js, auth.js, navigation.js
+    │   ├── dashboard.js, search-view.js, import-view.js
+    │   ├── plans-view.js, users-view.js, calendar-view.js
+    │   ├── modals.js, main.js
+    │   └── ...
     └── views/
+        ├── search-view.html
         ├── calendar-dashboard-view.html
         ├── import-view.html
         ├── plans-view.html
-        ├── search-view.html
         └── users-view.html
 ```
 
@@ -149,7 +162,7 @@ SMS-BETA/
 | 1.19 | 建立 `routes/misc.js` | csrf-token、log、gemini | 一般 API |
 | 1.20 | 精簡 `server.js` | require 各模組、app.use、掛載路由 | 本機啟動、Vercel 部署測試 |
 
-### 階段二：前端 JS 模組化 🔄 進行中
+### 階段二：前端 JS 模組化 ✅ 已完成
 
 | 步驟 | 內容 | 產出 | 驗證 |
 |------|------|------|------|
@@ -167,7 +180,7 @@ SMS-BETA/
 | 2.12 | 建立 `js/main.js` | DOMContentLoaded、initListeners、initCharts、initEditForm | 頁面載入 |
 | 2.13 | 修改 `index.html` | 依序載入 js/*.js（先 core→utils→auth→...→main） | 全功能測試 |
 
-### 階段三：CSS 模組化（可選）
+### 階段三：CSS 模組化 ✅ 已完成
 
 | 步驟 | 內容 | 產出 | 驗證 |
 |------|------|------|------|
@@ -178,7 +191,7 @@ SMS-BETA/
 | 3.5 | 建立 `css/views.css` | 各 view 專用樣式 | 各頁無異 |
 | 3.6 | 修改 `index.html` | 依序載入 css/*.css | 視覺完全相同 |
 
-### 階段四：HTML 視圖（可選）
+### 階段四：HTML 視圖 ✅ 已完成
 
 | 步驟 | 內容 | 產出 | 驗證 |
 |------|------|------|------|
