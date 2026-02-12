@@ -20,7 +20,7 @@
     window.initListeners = initListeners;
     window.initEditForm = initEditForm;
 
-    document.addEventListener('DOMContentLoaded', async function () {
+    async function runInit() {
         document.body.style.display = 'flex';
         try {
             var checkAuth = window.checkAuth;
@@ -94,5 +94,10 @@
                     '<button onclick="window.location.reload()" class="btn btn-primary" style="margin-top: 20px;">重新整理頁面</button></div>';
             }
         }
-    });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', runInit);
+    } else {
+        runInit();
+    }
 })();

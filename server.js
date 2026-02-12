@@ -95,7 +95,11 @@ const { validatePassword } = require('./utils/validation');
 app.use(protectHtmlPages);
 app.use(protectViewTemplates);
 
-// 靜態檔案服務
+// 靜態檔案服務（主流專業架構：build 後優先使用 dist）
+const distPath = path.join(__dirname, 'dist');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+}
 app.use(express.static(path.join(__dirname, 'public')));
 
 // 為所有 API 路由提供 CSRF token

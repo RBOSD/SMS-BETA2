@@ -6,8 +6,10 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "dev:client": "vite",
     "build": "vite build",
-    "build:watch": "vite build --watch"
+    "build:watch": "vite build --watch",
+    "preview": "vite preview"
   },
   "keywords": ["sms", "railway", "issue-tracking", "postgresql"],
   "author": "",

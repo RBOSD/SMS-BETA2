@@ -1,29 +1,27 @@
 /**
- * Vite 建置設定
- * 將前端 JS 打包為單一 bundle，維持原有功能、版面、樣式不變
+ * Vite 建置設定 - 主流專業架構
+ * 單一入口打包、維持原有功能、版面、樣式、字體、字形不變
  */
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
   root: '.',
-  publicDir: false, // 純 JS 打包，靜態檔由 Express 提供
+  publicDir: 'public',
   build: {
-    outDir: 'public/dist',
+    outDir: 'dist',
     emptyOutDir: true,
     rollupOptions: {
-      input: resolve(__dirname, 'public/js/entry.js'),
+      input: resolve(__dirname, 'public/index.html'),
       output: {
-        entryFileNames: 'app.js',
-        format: 'iife',
-        // 確保所有 side-effect 模組正確執行
-        inlineDynamicImports: true,
+        entryFileNames: 'assets/[name]-[hash].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash][extname]',
       },
     },
-    minify: 'esbuild', // 使用內建 esbuild，無需額外安裝 terser
-    sourcemap: true, // 生產環境可除錯
+    minify: 'esbuild',
+    sourcemap: true,
   },
-  // 開發時可搭配 npm run dev:client 預覽
   server: {
     port: 5173,
     proxy: {
