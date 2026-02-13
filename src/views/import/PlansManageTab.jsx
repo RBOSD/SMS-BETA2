@@ -3,6 +3,8 @@ import { apiFetch } from '../../api/api';
 import { useToast } from '../../context/ToastContext';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import PaginationBar from '../../components/users/PaginationBar';
+import PlanModal from '../../components/import/PlanModal';
+import PlanImportModal from '../../components/import/PlanImportModal';
 
 const INSPECTION_NAMES = { '1': '年度定期檢查', '2': '特別檢查', '3': '例行性檢查', '4': '臨時檢查', '5': '調查' };
 const BUSINESS_NAMES = {
@@ -30,6 +32,10 @@ export default function PlansManageTab() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({});
   const [planSchedules, setPlanSchedules] = useState({});
+  const [planModalOpen, setPlanModalOpen] = useState(false);
+  const [planModalMode, setPlanModalMode] = useState('create');
+  const [planModalPlan, setPlanModalPlan] = useState(null);
+  const [planImportOpen, setPlanImportOpen] = useState(false);
 
   const loadPlans = useCallback(
     async (pageNum = 1) => {
@@ -164,12 +170,19 @@ export default function PlansManageTab() {
     setConfirmOpen(true);
   };
 
-  const openPlanModal = () => {
-    showToast('請使用嵌入版進行計畫新增/編輯，或稍後實作 PlanModal', 'info');
+  const openPlanModal = (plan = null) => {
+    if (plan) {
+      setPlanModalMode('edit');
+      setPlanModalPlan(plan);
+    } else {
+      setPlanModalMode('create');
+      setPlanModalPlan(null);
+    }
+    setPlanModalOpen(true);
   };
 
   const openPlanImport = () => {
-    showToast('請使用嵌入版進行整批匯入，或稍後實作 PlanImportModal', 'info');
+    setPlanImportOpen(true);
   };
 
   const yearOptions = [...new Set(plans.map((p) => p.year).filter(Boolean))].sort((a, b) => b.localeCompare(a));
@@ -286,7 +299,7 @@ export default function PlansManageTab() {
                   <td style={{ padding: 12, textAlign: 'center' }}>{p.issue_count || 0}</td>
                   <td style={{ padding: 12 }}>{p.created_at ? new Date(p.created_at).toISOString().slice(0, 10) : '-'}</td>
                   <td style={{ padding: 12 }}>
-                    <button className="btn btn-outline" style={{ padding: '2px 6px', marginRight: 4 }} onClick={openPlanModal} title="編輯">
+                    <button className="btn btn-outline" style={{ padding: '2px 6px', marginRight: 4 }} onClick={() => openPlanModal(p)} title="編輯">
                       ✏️
                     </button>
                     <button className="btn btn-danger" style={{ padding: '2px 6px' }} onClick={() => deletePlan(p)} title="刪除">
@@ -304,6 +317,27 @@ export default function PlansManageTab() {
       </div>
 
       <ConfirmModal open={confirmOpen} {...confirmConfig} />
+
+      <PlanModal
+        open={planModalOpen}
+        mode={planModalMode}
+        planId={planModalPlan?.id}
+        plan={planModalPlan}
+        onClose={() => setPlanModalOpen(false)}
+        onSuccess={() => {
+          setPlanModalOpen(false);
+          loadPlans(page);
+        }}
+      />
+
+      <PlanImportModal
+        open={planImportOpen}
+        onClose={() => setPlanImportOpen(false)}
+        onSuccess={() => {
+          setPlanImportOpen(false);
+          loadPlans(1);
+        }}
+      />
     </div>
   );
 }
