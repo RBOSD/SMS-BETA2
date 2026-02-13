@@ -5,6 +5,7 @@ import AppSidebar from './AppSidebar';
 import SearchView from '../../views/SearchView';
 import CalendarView from '../../views/CalendarView';
 import EmbedView from '../../views/EmbedView';
+import UsersView from '../../views/UsersView';
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -35,10 +36,7 @@ export default function Layout() {
             <Route path="/import/schedule" element={<EmbedView view="importView" tab="plans" sub="schedule" />} />
             <Route path="/import/manage" element={<EmbedView view="importView" tab="plans" sub="manage" />} />
             <Route path="/users" element={<Navigate to="/users/list" replace />} />
-            <Route path="/users/list" element={<EmbedView view="usersView" tab="users" />} />
-            <Route path="/users/logs" element={<EmbedView view="usersView" tab="logs" />} />
-            <Route path="/users/actions" element={<EmbedView view="usersView" tab="actions" />} />
-            <Route path="/users/system" element={<EmbedView view="usersView" tab="system" />} />
+            <Route path="/users/:tab" element={<UsersView />} />
           </Routes>
         </main>
       </div>
