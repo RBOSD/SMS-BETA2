@@ -95,20 +95,8 @@ const { validatePassword } = require('./utils/validation');
 app.use(protectHtmlPages);
 app.use(protectViewTemplates);
 
-// 靜態檔案服務（主流專業架構：build 後優先使用 dist）
-const distPath = path.join(__dirname, 'dist');
-if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath));
-  // SPA fallback：React 路由需回傳 index.html（靜態資源不攔截，讓其 fallback 到 public）
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api')) return next();
-    if (req.path.startsWith('/css/') || req.path.startsWith('/js/') || req.path.startsWith('/views/') ||
-        req.path.match(/\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
-      return next();
-    }
-    res.sendFile(path.join(distPath, 'index.html'));
-  });
-}
+// 靜態檔案服務：使用 public 版本（含左側選單細項、完整功能）
+// 註：若需使用 React 版，可取消下方 dist 區塊並執行 npm run build
 app.use(express.static(path.join(__dirname, 'public')));
 
 // 為所有 API 路由提供 CSRF token
