@@ -53,7 +53,7 @@ const protectViewTemplates = (req, res, next) => {
         if (req.path === '/views/users-view.html') {
             return isAdmin ? next() : deny();
         }
-        if (req.path === '/views/import-view.html' || req.path === '/views/plans-view.html') {
+        if (req.path === '/views/import-view.html') {
             return (isAdmin || role === 'manager') ? next() : deny();
         }
         return next();

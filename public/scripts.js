@@ -1335,7 +1335,7 @@
             }
         }
 
-        // --- 開立事項建檔功能（已移除單筆模式，只保留批次模式） ---
+        // --- 開立事項建檔功能（批次模式） ---
         let createMode = 'batch'; // 固定為批次模式
         
         // 初始化開立事項建檔頁面
@@ -4411,7 +4411,6 @@
             document.getElementById('editHandling').value = handling;
             document.getElementById('editReview').value = review;
             // replyDate 從資料中讀取，不需要輸入框
-            // responseDate 已移除，不再在審查頁面設定
             
             // 顯示第N次機構辦理情形（只讀，作為參考）
             // 撰寫第N次審查時，右側顯示第N次機構辦理情形
@@ -4627,7 +4626,6 @@
             const review = document.getElementById('editReview').value.trim();
             // 機構回復日期從資料中讀取（已在辦理情形階段填寫）
             const replyDate = currentEditItem ? (currentEditItem['reply_date_r' + round] || '') : '';
-            // responseDate 已移除，不再在審查頁面設定（改為在開立事項建檔頁面批次設定）
             
             if (!id) {
                 showToast('找不到事項 ID', 'error');

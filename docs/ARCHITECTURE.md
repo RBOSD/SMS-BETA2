@@ -8,7 +8,6 @@
 
 - **載入方式**：多個 `<script>` 標籤依序載入
 - **載入順序**：core → utils → auth → navigation → 各視圖 → modals → scripts → main
-- **備註**：`entry.js` 為模組依賴順序參考，目前未使用於載入
 
 ### 靜態檔案服務
 
