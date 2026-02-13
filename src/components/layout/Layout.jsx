@@ -6,6 +6,7 @@ import SearchView from '../../views/SearchView';
 import CalendarView from '../../views/CalendarView';
 import EmbedView from '../../views/EmbedView';
 import UsersView from '../../views/UsersView';
+import ImportView from '../../views/ImportView';
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -30,11 +31,7 @@ export default function Layout() {
             <Route path="/search" element={<SearchView />} />
             <Route path="/calendar" element={<CalendarView />} />
             <Route path="/import" element={<Navigate to="/import/batch" replace />} />
-            <Route path="/import/batch" element={<EmbedView view="importView" tab="issues" sub="import" />} />
-            <Route path="/import/create" element={<EmbedView view="importView" tab="issues" sub="create" />} />
-            <Route path="/import/year-edit" element={<EmbedView view="importView" tab="issues" sub="year-edit" />} />
-            <Route path="/import/schedule" element={<EmbedView view="importView" tab="plans" sub="schedule" />} />
-            <Route path="/import/manage" element={<EmbedView view="importView" tab="plans" sub="manage" />} />
+            <Route path="/import/:sub" element={<ImportView />} />
             <Route path="/users" element={<Navigate to="/users/list" replace />} />
             <Route path="/users/:tab" element={<UsersView />} />
           </Routes>
