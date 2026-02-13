@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -20,17 +19,6 @@ const USERS_ROUTES = [
 export default function AppSidebar({ open, onClose }) {
   const location = useLocation();
   const { user } = useAuth();
-  const [importExpanded, setImportExpanded] = useState(
-    location.pathname.startsWith('/import')
-  );
-  const [usersExpanded, setUsersExpanded] = useState(
-    location.pathname.startsWith('/users')
-  );
-
-  useEffect(() => {
-    setImportExpanded(location.pathname.startsWith('/import'));
-    setUsersExpanded(location.pathname.startsWith('/users'));
-  }, [location.pathname]);
 
   const canManage = user && (user.isAdmin === true || user.role === 'manager');
   const canAdmin = user && user.isAdmin === true;
@@ -61,14 +49,10 @@ export default function AppSidebar({ open, onClose }) {
           檢查行程檢索
         </Link>
         {canManage && (
-          <div className={`sidebar-group ${importExpanded ? 'expanded' : ''}`}>
-            <button
-              type="button"
-              className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/import') ? 'active' : ''}`}
-              onClick={() => setImportExpanded((prev) => !prev)}
-            >
+          <div className="sidebar-group expanded">
+            <div className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/import') ? 'active' : ''}`}>
               資料管理
-            </button>
+            </div>
             <div className="sidebar-sub">
               {IMPORT_ROUTES.map((r) => (
                 <Link
@@ -84,14 +68,10 @@ export default function AppSidebar({ open, onClose }) {
           </div>
         )}
         {canAdmin && (
-          <div className={`sidebar-group ${usersExpanded ? 'expanded' : ''}`}>
-            <button
-              type="button"
-              className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/users') ? 'active' : ''}`}
-              onClick={() => setUsersExpanded((prev) => !prev)}
-            >
+          <div className="sidebar-group expanded">
+            <div className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/users') ? 'active' : ''}`}>
               後台管理
-            </button>
+            </div>
             <div className="sidebar-sub">
               {USERS_ROUTES.map((r) => (
                 <Link

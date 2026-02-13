@@ -162,6 +162,10 @@
     font-weight: 600;
 }
 
+.sidebar-btn-parent {
+    cursor: default;
+}
+
 .sidebar-btn-parent.active {
     background: #eff6ff;
     color: var(--primary);
