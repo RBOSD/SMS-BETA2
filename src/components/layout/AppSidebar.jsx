@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -26,6 +26,11 @@ export default function AppSidebar({ open, onClose }) {
   const [usersExpanded, setUsersExpanded] = useState(
     location.pathname.startsWith('/users')
   );
+
+  useEffect(() => {
+    setImportExpanded(location.pathname.startsWith('/import'));
+    setUsersExpanded(location.pathname.startsWith('/users'));
+  }, [location.pathname]);
 
   const canManage = user && (user.isAdmin === true || user.role === 'manager');
   const canAdmin = user && user.isAdmin === true;
@@ -60,7 +65,7 @@ export default function AppSidebar({ open, onClose }) {
             <button
               type="button"
               className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/import') ? 'active' : ''}`}
-              onClick={() => setImportExpanded((e) => !e)}
+              onClick={() => setImportExpanded((prev) => !prev)}
             >
               資料管理
             </button>
@@ -83,7 +88,7 @@ export default function AppSidebar({ open, onClose }) {
             <button
               type="button"
               className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/users') ? 'active' : ''}`}
-              onClick={() => setUsersExpanded((e) => !e)}
+              onClick={() => setUsersExpanded((prev) => !prev)}
             >
               後台管理
             </button>

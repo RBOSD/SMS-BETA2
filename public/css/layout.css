@@ -7,10 +7,10 @@
     min-height: calc(100vh - 60px);
 }
 
-/* Drawer Sidebar */
+/* Drawer Sidebar - 桌面版常駐、手機版抽屜 */
 .filters-panel {
     position: fixed;
-    top: 0;
+    top: var(--header-h, 60px);
     left: 0;
     bottom: 0;
     width: 280px;
@@ -18,16 +18,35 @@
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
     padding: 20px;
     z-index: 1000;
-    transform: translateX(-100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
     gap: 12px;
     overflow-y: auto;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.filters-panel.open {
-    transform: translateX(0);
+/* 桌面：側欄常駐顯示 */
+@media (min-width: 1024px) {
+    .filters-panel {
+        transform: translateX(0);
+    }
+    .app-body {
+        padding-left: 280px;
+    }
+    .sidebar-close-btn {
+        display: none;
+    }
+}
+
+/* 手機：側欄預設隱藏，點擊漢堡選單後滑出 */
+@media (max-width: 1023px) {
+    .filters-panel {
+        top: 0;
+        transform: translateX(-100%);
+    }
+    .filters-panel.open {
+        transform: translateX(0);
+    }
 }
 
 #filterBackdrop {
@@ -44,6 +63,12 @@
 #filterBackdrop.visible {
     display: block;
     opacity: 1;
+}
+
+@media (min-width: 1024px) {
+    #filterBackdrop {
+        display: none !important;
+    }
 }
 
 .sidebar-header {
@@ -80,6 +105,11 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+}
+
+.sidebar-nav a {
+    text-decoration: none;
+    color: inherit;
 }
 
 .sidebar-group {
