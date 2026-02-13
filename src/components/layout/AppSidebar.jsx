@@ -50,13 +50,13 @@ export default function AppSidebar({ open, onClose }) {
           檢查行程檢索
         </Link>
         {canManage && (
-          <div className="sidebar-group expanded">
+          <div className="sidebar-group expanded" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <div className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/import') ? 'active' : ''}`}>
               資料管理
             </div>
-            <div className="sidebar-sub">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginLeft: 12, paddingLeft: 12, borderLeft: '2px solid #e2e8f0' }}>
               {IMPORT_ROUTES.map((r) => (
-                <Link key={r.path} to={r.path} className={subLinkClass(r.path)} onClick={onClose}>
+                <Link key={r.path} to={r.path} className={subLinkClass(r.path)} onClick={onClose} style={{ display: 'block', padding: '10px 14px' }}>
                   {r.label}
                 </Link>
               ))}
@@ -64,13 +64,13 @@ export default function AppSidebar({ open, onClose }) {
           </div>
         )}
         {canAdmin && (
-          <div className="sidebar-group expanded">
+          <div className="sidebar-group expanded" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <div className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/users') ? 'active' : ''}`}>
               後台管理
             </div>
-            <div className="sidebar-sub">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginLeft: 12, paddingLeft: 12, borderLeft: '2px solid #e2e8f0' }}>
               {USERS_ROUTES.map((r) => (
-                <Link key={r.path} to={r.path} className={subLinkClass(r.path)} onClick={onClose}>
+                <Link key={r.path} to={r.path} className={subLinkClass(r.path)} onClick={onClose} style={{ display: 'block', padding: '10px 14px' }}>
                   {r.label}
                 </Link>
               ))}
