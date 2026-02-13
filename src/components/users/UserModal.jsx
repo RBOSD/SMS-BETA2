@@ -156,6 +156,7 @@ export default function UserModal({ open, mode, user, groups, onClose, onSuccess
                 className="filter-input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder={mode === 'create' ? '選填，留空則使用 Aa123456' : ''}
                 autoComplete={mode === 'create' ? 'new-password' : 'off'}
               />
               <button type="button" className="pwd-toggle" onClick={() => {}} aria-label="顯示/隱藏密碼">👁️</button>

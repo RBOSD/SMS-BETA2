@@ -385,7 +385,8 @@
             document.getElementById('uName').value = '';
             e.value = '';
             e.disabled = false;
-            document.getElementById('uPwd').value = '';
+            var pwdEl = document.getElementById('uPwd');
+            if (pwdEl) { pwdEl.value = ''; pwdEl.placeholder = '選填，留空則使用 Aa123456'; }
             document.getElementById('uPwdConfirm').value = '';
             document.getElementById('pwdStrength').innerText = '密碼強度: -';
             document.getElementById('pwdHint').innerText = '(選填，留空則使用預設密碼 Aa123456)';
@@ -398,7 +399,8 @@
             document.getElementById('uName').value = u.name || '';
             e.value = u.username || '';
             e.disabled = false;
-            document.getElementById('uPwd').value = '';
+            var pwdEl = document.getElementById('uPwd');
+            if (pwdEl) { pwdEl.value = ''; pwdEl.placeholder = '留空不改'; }
             document.getElementById('uPwdConfirm').value = '';
             document.getElementById('pwdHint').innerText = '(留空不改)';
             document.getElementById('pwdStrength').innerText = '密碼強度: -';
