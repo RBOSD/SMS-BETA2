@@ -388,7 +388,7 @@
             document.getElementById('uPwd').value = '';
             document.getElementById('uPwdConfirm').value = '';
             document.getElementById('pwdStrength').innerText = '密碼強度: -';
-            document.getElementById('pwdHint').innerText = '';
+            document.getElementById('pwdHint').innerText = '(選填，留空則使用預設密碼 Aa123456)';
             document.getElementById('uRole').value = 'viewer';
         } else {
             var userList = window.userList || [];
@@ -423,13 +423,17 @@
             .filter(function (n) { return Number.isFinite(n); });
         if (!id) {
             if (!email) return window.showToast('請輸入帳號', 'error');
-            if (!pwd) return window.showToast('請輸入密碼', 'error');
-            if (pwd !== pwdConfirm) return window.showToast('密碼與確認密碼不符', 'error');
-            var validation = window.validatePasswordFrontend ? window.validatePasswordFrontend(pwd) : { valid: true };
-            if (!validation.valid) return window.showToast(validation.message || '密碼不符合規定', 'error');
+            // 密碼選填：留空則使用預設密碼 Aa123456，使用者首次登入後須自行更改
+            if (pwd) {
+                if (pwd !== pwdConfirm) return window.showToast('密碼與確認密碼不符', 'error');
+                var validation = window.validatePasswordFrontend ? window.validatePasswordFrontend(pwd) : { valid: true };
+                if (!validation.valid) return window.showToast(validation.message || '密碼不符合規定', 'error');
+            }
+            var payload = { username: email, name: name, role: role, groupIds: groupIds };
+            if (pwd) payload.password = pwd;
             var res = await window.apiFetch('/api/users', {
                 method: 'POST',
-                body: JSON.stringify({ username: email, name: name, password: pwd, role: role, groupIds: groupIds })
+                body: JSON.stringify(payload)
             });
             var j = await res.json().catch(function () { return {}; });
             if (res.ok) {

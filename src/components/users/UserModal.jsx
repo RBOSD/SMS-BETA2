@@ -54,29 +54,29 @@ export default function UserModal({ open, mode, user, groups, onClose, onSuccess
     }
     const gids = Array.from(groupIds);
     if (mode === 'create') {
-      if (!password) {
-        showToast('請輸入密碼', 'error');
-        return;
-      }
-      if (password !== passwordConfirm) {
-        showToast('密碼與確認密碼不符', 'error');
-        return;
-      }
-      const validation = validatePasswordFrontend(password);
-      if (!validation.valid) {
-        showToast(validation.message || '密碼不符合規定', 'error');
-        return;
+      // 密碼選填：留空則使用預設密碼 Aa123456，使用者首次登入後須自行更改
+      if (password) {
+        if (password !== passwordConfirm) {
+          showToast('密碼與確認密碼不符', 'error');
+          return;
+        }
+        const validation = validatePasswordFrontend(password);
+        if (!validation.valid) {
+          showToast(validation.message || '密碼不符合規定', 'error');
+          return;
+        }
       }
       try {
+        const payload = {
+          username: username.trim(),
+          name: name.trim(),
+          role,
+          groupIds: gids,
+        };
+        if (password) payload.password = password;
         const res = await apiFetch('/api/users', {
           method: 'POST',
-          body: JSON.stringify({
-            username: username.trim(),
-            name: name.trim(),
-            password,
-            role,
-            groupIds: gids,
-          }),
+          body: JSON.stringify(payload),
         });
         const j = await res.json().catch(() => ({}));
         if (res.ok) {
@@ -149,7 +149,7 @@ export default function UserModal({ open, mode, user, groups, onClose, onSuccess
             />
           </div>
           <div className="form-group">
-            <label>密碼 {mode === 'edit' && <span style={{ fontWeight: 400, color: '#666', fontSize: 12 }}>(留空不改)</span>}</label>
+            <label>密碼 {mode === 'create' ? <span style={{ fontWeight: 400, color: '#666', fontSize: 12 }}>(選填，留空則使用預設密碼 Aa123456)</span> : <span style={{ fontWeight: 400, color: '#666', fontSize: 12 }}>(留空不改)</span>}</label>
             <div className="pwd-wrapper">
               <input
                 type="password"

@@ -178,12 +178,14 @@ module.exports = function registerUsersRoutes(app) {
             ? groupIds.map(x => parseInt(x, 10)).filter(n => Number.isFinite(n))
             : null;
         try {
-            if (!username || !password) return res.status(400).json({error: 'Username and password required'});
-            const passwordValidation = validatePassword(password);
+            if (!username) return res.status(400).json({error: 'Username required'});
+            // 密碼選填：未填則使用預設密碼 Aa123456，使用者首次登入後須自行更改
+            const effectivePassword = (password && String(password).trim()) ? password : 'Aa123456';
+            const passwordValidation = validatePassword(effectivePassword);
             if (!passwordValidation.valid) {
                 return res.status(400).json({ error: passwordValidation.message });
             }
-            const hash = bcrypt.hashSync(password, 10);
+            const hash = bcrypt.hashSync(effectivePassword, 10);
             const ins = await pool.query(
                 "INSERT INTO users (username, password, name, role, must_change_password) VALUES ($1, $2, $3, $4, $5) RETURNING id",
                 [username, hash, name, safeRole, true]
@@ -373,7 +375,7 @@ module.exports = function registerUsersRoutes(app) {
                         }
                         hash = bcrypt.hashSync(password, 10);
                     } else {
-                        hash = bcrypt.hashSync(`${username}@123456`, 10);
+                        hash = bcrypt.hashSync('Aa123456', 10);
                     }
                     
                     await pool.query(
