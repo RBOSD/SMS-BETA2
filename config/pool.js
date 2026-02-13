@@ -14,14 +14,16 @@ const sslConfig = (() => {
     return { rejectUnauthorized: false };
 })();
 
-// 主應用程式連線池（Supabase 使用 Supavisor/PgBouncer，Session Mode 連線數受限）
-// Supabase 免費方案：直接連線 60，Pooler 200，但 Session Mode 的 pool_size 通常較小
+// 主應用程式連線池
+// Vercel serverless：請使用 Supabase Transaction Mode (port 6543) 連線字串，並增加連線逾時
+// Supabase Dashboard → Project Settings → Database → Connection string → Transaction mode
+const isVercel = !!process.env.VERCEL;
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: process.env.DATABASE_URL ? sslConfig : false,
-    max: 2, // Supabase Session Mode 建議使用較小的連線池（2-3 個）
-    idleTimeoutMillis: 5000, // 快速釋放未使用的連線（5 秒）
-    connectionTimeoutMillis: 2000, // 快速超時，避免等待
+    max: isVercel ? 1 : 2, // Vercel serverless 建議 1，避免連線累積
+    idleTimeoutMillis: isVercel ? 10000 : 5000,
+    connectionTimeoutMillis: isVercel ? 15000 : 2000, // Vercel cold start 需較長逾時
     allowExitOnIdle: false,
 });
 

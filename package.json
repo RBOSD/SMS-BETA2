@@ -9,6 +9,7 @@
     "dev:client": "vite",
     "build": "vite build",
     "build:vercel": "VERCEL=1 vite build",
+    "vercel-build": "npm run build:vercel",
     "build:watch": "vite build --watch",
     "preview": "vite preview"
   },
