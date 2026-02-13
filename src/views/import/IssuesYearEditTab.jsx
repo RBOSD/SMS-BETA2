@@ -8,15 +8,6 @@ import { useToast } from '../../context/ToastContext';
 import { stripHtml } from '../../utils/helpers';
 import DetailDrawer from '../../components/common/DetailDrawer';
 
-function parsePlanValue(value) {
-  if (!value) return { name: '', year: '' };
-  if (value.indexOf('|||') >= 0) {
-    const parts = value.split('|||');
-    return { name: parts[0] || '', year: parts[1] || '' };
-  }
-  return { name: value, year: '' };
-}
-
 function extractNumberFromString(str) {
   if (!str) return null;
   const matches = str.match(/(\d+)(?!.*\d)/);

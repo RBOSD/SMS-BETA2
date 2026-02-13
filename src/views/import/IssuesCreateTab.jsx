@@ -7,17 +7,9 @@ import { apiFetch } from '../../api/api';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
 import { parseItemNumber, ORG_MAP, DIVISION_MAP, INSPECTION_MAP } from '../../utils/parseItemNumber';
+import { parsePlanValue } from '../../utils/helpers';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import BatchHandlingModal from '../../components/import/BatchHandlingModal';
-
-function parsePlanValue(value) {
-  if (!value) return { name: '', year: '' };
-  if (value.indexOf('|||') >= 0) {
-    const parts = value.split('|||');
-    return { name: parts[0] || '', year: parts[1] || '' };
-  }
-  return { name: value, year: '' };
-}
 
 const DIVISION_OPTIONS = ['', '運務', '工務', '機務', '電務', '安全', '審核', '災防', '運轉', '土木', '機電', '土建', '安全管理', '營運', '其他'];
 const INSPECTION_OPTIONS = ['', '定期檢查', '例行性檢查', '特別檢查', '臨時檢查'];

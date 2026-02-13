@@ -7,17 +7,8 @@ import mammoth from 'mammoth';
 import { apiFetch } from '../../api/api';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
-import { stripHtml } from '../../utils/helpers';
+import { stripHtml, parsePlanValue } from '../../utils/helpers';
 import ConfirmModal from '../../components/common/ConfirmModal';
-
-function parsePlanValue(value) {
-  if (!value) return { name: '', year: '' };
-  if (value.indexOf('|||') >= 0) {
-    const parts = value.split('|||');
-    return { name: parts[0] || '', year: parts[1] || '' };
-  }
-  return { name: value, year: '' };
-}
 
 function parseFromHTML(html) {
   const items = [];

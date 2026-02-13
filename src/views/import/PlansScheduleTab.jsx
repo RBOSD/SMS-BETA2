@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { apiFetch } from '../../api/api';
 import { useToast } from '../../context/ToastContext';
 import { escapeHtml } from '../../utils/helpers';
+import { INSPECTION_NAMES } from '../../utils/constants';
 
 const SCHEDULE_PLAN_COLORS = ['#dbeafe', '#dcfce7', '#fef3c7', '#fce7f3', '#e0e7ff', '#d1fae5', '#fed7aa', '#e9d5ff'];
 const SCHEDULE_PLAN_TEXT_COLORS = ['#1e40af', '#166534', '#92400e', '#9d174d', '#3730a3', '#065f46', '#c2410c', '#6b21a8'];
 const RAILWAY_NAMES = { T: '臺鐵', H: '高鐵', A: '林鐵', S: '糖鐵' };
-const INSPECTION_NAMES = { '1': '年度定期檢查', '2': '特別檢查', '3': '例行性檢查', '4': '臨時檢查', '5': '調查' };
 
 function schedulePlanColorIndex(inspectionType) {
   const typeMap = { '1': 0, '2': 1, '3': 2, '4': 3, '5': 4 };

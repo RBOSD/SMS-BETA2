@@ -1,6 +1,16 @@
 /**
- * 工具函數：stripHtml、getKindLabel、getLatestReviewOrHandling、extractKindCodeFromNumber
+ * 工具函數：stripHtml、getKindLabel、getLatestReviewOrHandling、extractKindCodeFromNumber、parsePlanValue
  */
+
+/** 解析計畫選項值（格式：name|||year 或 單一值） */
+export function parsePlanValue(value) {
+  if (!value) return { name: '', year: '' };
+  if (String(value).indexOf('|||') >= 0) {
+    const parts = String(value).split('|||');
+    return { name: parts[0] || '', year: parts[1] || '' };
+  }
+  return { name: value, year: '' };
+}
 
 export function stripHtml(html) {
   if (!html) return '';
