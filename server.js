@@ -138,13 +138,31 @@ setInterval(cleanupOldLogs, 24 * 60 * 60 * 1000); // 每 24 小時執行一次
 // [Modularized] 註冊所有路由（auth, misc, issues, users, admin, options, plans, schedule, templates）
 require('./routes')(app, { csrfProtection });
 
-// React SPA 回退：當 dist 存在時，非 API、非 embed、非靜態檔的 GET 請求回傳 index.html
-if (fs.existsSync(path.join(__dirname, 'dist'))) {
-    app.get('*', (req, res, next) => {
-        if (req.path.startsWith('/api') || req.path.startsWith('/embed') || req.path.startsWith('/css') || req.path.startsWith('/js') || req.path.startsWith('/views')) return next();
-        res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+// Vercel 上 express.static 被忽略，需手動提供 /app/* 靜態檔（React 建置輸出在 public/app/）
+const appStaticPath = path.join(__dirname, 'public', 'app');
+if (fs.existsSync(appStaticPath)) {
+    app.get('/app/*', (req, res) => {
+        const rel = req.path.replace(/^\/app\/?/, '') || 'index.html';
+        const filePath = path.join(appStaticPath, rel);
+        const realPath = path.resolve(filePath);
+        const realApp = path.resolve(appStaticPath);
+        if (realPath.startsWith(realApp) && fs.existsSync(realPath) && fs.statSync(realPath).isFile()) {
+            return res.sendFile(realPath);
+        }
+        res.status(404).end();
     });
 }
+// SPA 回退：非 API、非 embed、非靜態檔的 GET 請求回傳 index.html
+const reactIndexPath = process.env.VERCEL
+    ? path.join(__dirname, 'public', 'app', 'index.html')
+    : path.join(__dirname, 'dist', 'index.html');
+app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/embed') || req.path.startsWith('/css') || req.path.startsWith('/js') || req.path.startsWith('/views') || req.path.startsWith('/app')) return next();
+    if (fs.existsSync(reactIndexPath)) {
+        return res.sendFile(reactIndexPath);
+    }
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 
 

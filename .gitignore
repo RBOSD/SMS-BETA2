@@ -8,6 +8,7 @@ node_modules/
 
 # 建置輸出
 public/dist/
+public/app/
 dist/
 
 # 日誌

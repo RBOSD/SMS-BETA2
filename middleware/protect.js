@@ -17,7 +17,8 @@ const protectHtmlPages = (req, res, next) => {
     if (req.path === '/' || req.path.endsWith('.html')) {
         if (!req.session || !req.session.user) {
             const distPath = require('path').join(__dirname, '..', 'dist');
-            const useReact = require('fs').existsSync(distPath);
+            const reactAppPath = require('path').join(__dirname, '..', 'public', 'app', 'index.html');
+            const useReact = require('fs').existsSync(distPath) || require('fs').existsSync(reactAppPath);
             return res.redirect(useReact ? '/login' : '/login.html');
         }
     }

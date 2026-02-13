@@ -330,9 +330,9 @@
             <div class="form-group"><label>帳號 (Username)</label><input type="text" id="uEmail" class="filter-input" autocomplete="username">
             </div>
             <div class="form-group">
-                <label>密碼 <span style="font-weight:400;color:#666;font-size:12px" id="pwdHint"></span></label>
+                <label>密碼 <span style="font-weight:400;color:#666;font-size:12px" id="pwdHint">(選填，留空則使用預設密碼 Aa123456)</span></label>
                 <div class="pwd-wrapper">
-                    <input type="password" id="uPwd" class="filter-input">
+                    <input type="password" id="uPwd" class="filter-input" placeholder="選填，留空則使用 Aa123456">
                     <button class="pwd-toggle" onclick="togglePwdVisibility('uPwd', this)" aria-label="顯示/隱藏密碼">👁️</button>
                 </div>
             </div>
@@ -548,7 +548,7 @@
     <script src="/js/search-view.js"></script>
     <script src="/js/import-view.js"></script>
     <script src="/js/plans-view.js"></script>
-    <script src="/js/users-view.js"></script>
+    <script src="/js/users-view.js?v=pwd-optional"></script>
     <script src="/js/calendar-view.js"></script>
     <script src="/js/modals.js"></script>
     <script src="/scripts.js"></script>

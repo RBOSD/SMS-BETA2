@@ -8,9 +8,10 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   root: '.',
-  publicDir: 'public',
+  publicDir: process.env.VERCEL ? false : 'public',
+  base: process.env.VERCEL ? '/app/' : '/',
   build: {
-    outDir: 'dist',
+    outDir: process.env.VERCEL ? 'public/app' : 'dist',
     emptyOutDir: true,
     rollupOptions: {
       input: 'index.html',
