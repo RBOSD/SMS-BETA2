@@ -1,6 +1,9 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build:vercel",
   "builds": [{"src": "server.js", "use": "@vercel/node"}],
-  "routes": [{"src": "/(.*)", "dest": "server.js"}]
+  "routes": [{"src": "/(.*)", "dest": "server.js"}],
+  "headers": [
+    {"source": "/(.*)", "headers": [{"key": "Cache-Control", "value": "no-store, no-cache, must-revalidate"}]}
+  ]
 }
