@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import AppHeader from './AppHeader';
 import AppSidebar from './AppSidebar';
 import SearchView from '../../views/SearchView';
+import CalendarView from '../../views/CalendarView';
 import EmbedView from '../../views/EmbedView';
 
 export default function Layout() {
@@ -26,7 +27,7 @@ export default function Layout() {
           <Routes>
             <Route path="/" element={<SearchView />} />
             <Route path="/search" element={<SearchView />} />
-            <Route path="/calendar" element={<EmbedView view="planCalendarView" />} />
+            <Route path="/calendar" element={<CalendarView />} />
             <Route path="/import" element={<Navigate to="/import/batch" replace />} />
             <Route path="/import/batch" element={<EmbedView view="importView" tab="issues" sub="import" />} />
             <Route path="/import/create" element={<EmbedView view="importView" tab="issues" sub="create" />} />
