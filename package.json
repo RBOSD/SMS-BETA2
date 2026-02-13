@@ -11,12 +11,7 @@
     "build:watch": "vite build --watch",
     "preview": "vite preview"
   },
-  "keywords": [
-    "sms",
-    "railway",
-    "issue-tracking",
-    "postgresql"
-  ],
+  "keywords": ["sms", "railway", "issue-tracking", "postgresql"],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -35,7 +30,8 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.30.3",
     "chart.js": "^4.4.1",
-    "chartjs-plugin-datalabels": "^2.2.0"
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "react-chartjs-2": "^5.2.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.7.0",

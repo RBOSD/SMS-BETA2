@@ -20,9 +20,29 @@
     <link rel="stylesheet" href="/css/components.css">
     <link rel="stylesheet" href="/css/views.css">
     <link rel="icon" href="data:,">
+    <style>
+        /* 嵌入模式：隱藏 header 與 sidebar，供 React 版 iframe 使用 */
+        body.embed-mode .app-header,
+        body.embed-mode .filters-panel,
+        body.embed-mode #filterBackdrop { display: none !important; }
+        body.embed-mode .app-body { padding: 0; }
+        body.embed-mode .main-content { padding: 16px; margin: 0; min-height: 100vh; }
+    </style>
 </head>
 
 <body>
+    <script>
+        (function() {
+            var p = new URLSearchParams(window.location.search);
+            if (p.get('embed') === '1') {
+                document.documentElement.classList.add('embed-mode');
+                document.body.classList.add('embed-mode');
+                if (p.get('view')) sessionStorage.setItem('embedView', p.get('view'));
+                if (p.get('tab')) sessionStorage.setItem('embedTab', p.get('tab'));
+                if (p.get('sub')) sessionStorage.setItem('embedSub', p.get('sub'));
+            }
+        })();
+    </script>
     <div id="toast-container"></div>
 
     <header class="app-header">

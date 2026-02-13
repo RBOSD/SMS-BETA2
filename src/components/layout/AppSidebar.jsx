@@ -1,10 +1,43 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+
+const IMPORT_ROUTES = [
+  { path: '/import/batch', label: '批次匯入', embed: 'import:issues:import' },
+  { path: '/import/create', label: '開立事項建檔', embed: 'import:issues:create' },
+  { path: '/import/year-edit', label: '事項修正', embed: 'import:issues:year-edit' },
+  { path: '/import/schedule', label: '行程規劃', embed: 'import:plans:schedule' },
+  { path: '/import/manage', label: '計畫管理', embed: 'import:plans:manage' },
+];
+
+const USERS_ROUTES = [
+  { path: '/users/list', label: '帳號列表', embed: 'users:users' },
+  { path: '/users/logs', label: '登入紀錄', embed: 'users:logs' },
+  { path: '/users/actions', label: '操作歷程', embed: 'users:actions' },
+  { path: '/users/system', label: '系統維護', embed: 'users:system' },
+];
 
 export default function AppSidebar({ open, onClose }) {
   const location = useLocation();
+  const { user } = useAuth();
+  const [importExpanded, setImportExpanded] = useState(
+    location.pathname.startsWith('/import')
+  );
+  const [usersExpanded, setUsersExpanded] = useState(
+    location.pathname.startsWith('/users')
+  );
+
+  const canManage = user && (user.isAdmin === true || user.role === 'manager');
+  const canAdmin = user && user.isAdmin === true;
+
   const linkClass = (path) => {
-    const isActive = location.pathname === path || (path === '/' && location.pathname === '/search');
+    const isActive = location.pathname === path || (path === '/' && (location.pathname === '/' || location.pathname === '/search'));
     return `sidebar-btn ${isActive ? 'active' : ''}`;
+  };
+
+  const subLinkClass = (path) => {
+    const isActive = location.pathname === path;
+    return `sidebar-sub-btn ${isActive ? 'active' : ''}`;
   };
 
   return (
@@ -15,18 +48,60 @@ export default function AppSidebar({ open, onClose }) {
           ×
         </button>
       </div>
-      <Link to="/" className={linkClass('/')} onClick={onClose}>
-        開立事項檢索
-      </Link>
-      <Link to="/calendar" className={linkClass('/calendar')} onClick={onClose}>
-        檢查行程檢索
-      </Link>
-      <Link to="/import" className={linkClass('/import')} onClick={onClose}>
-        資料管理
-      </Link>
-      <Link to="/users" className={linkClass('/users')} onClick={onClose}>
-        後台管理
-      </Link>
+      <nav className="sidebar-nav">
+        <Link to="/" className={linkClass('/')} onClick={onClose}>
+          開立事項檢索
+        </Link>
+        <Link to="/calendar" className={linkClass('/calendar')} onClick={onClose}>
+          檢查行程檢索
+        </Link>
+        {canManage && (
+          <div className={`sidebar-group ${importExpanded ? 'expanded' : ''}`}>
+            <button
+              type="button"
+              className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/import') ? 'active' : ''}`}
+              onClick={() => setImportExpanded((e) => !e)}
+            >
+              資料管理
+            </button>
+            <div className="sidebar-sub">
+              {IMPORT_ROUTES.map((r) => (
+                <Link
+                  key={r.path}
+                  to={r.path}
+                  className={subLinkClass(r.path)}
+                  onClick={onClose}
+                >
+                  {r.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+        {canAdmin && (
+          <div className={`sidebar-group ${usersExpanded ? 'expanded' : ''}`}>
+            <button
+              type="button"
+              className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/users') ? 'active' : ''}`}
+              onClick={() => setUsersExpanded((e) => !e)}
+            >
+              後台管理
+            </button>
+            <div className="sidebar-sub">
+              {USERS_ROUTES.map((r) => (
+                <Link
+                  key={r.path}
+                  to={r.path}
+                  className={subLinkClass(r.path)}
+                  onClick={onClose}
+                >
+                  {r.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </nav>
     </aside>
   );
 }

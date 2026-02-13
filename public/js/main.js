@@ -41,12 +41,21 @@
                     }
                 }
                 document.body.style.display = 'flex';
+                var embedView = sessionStorage.getItem('embedView');
                 var savedView = sessionStorage.getItem('currentView');
-                var targetView = savedView || 'searchView';
+                var targetView = embedView || savedView || 'searchView';
+                var embedTab = sessionStorage.getItem('embedTab');
+                var embedSub = sessionStorage.getItem('embedSub');
                 var viewElement = document.getElementById(targetView);
                 if (!viewElement) targetView = 'searchView';
                 try {
-                    if (typeof window.switchView === 'function') await window.switchView(targetView);
+                    if (embedView && embedTab && typeof window.switchToItem === 'function') {
+                        await window.switchToItem(targetView, embedTab, embedSub || undefined);
+                    } else if (embedView && typeof window.switchToItem === 'function') {
+                        await window.switchToItem(targetView);
+                    } else if (typeof window.switchView === 'function') {
+                        await window.switchView(targetView);
+                    }
                 } catch (viewError) {
                     console.error('切換視圖錯誤:', viewError);
                     var searchViewEl = document.getElementById('searchView');

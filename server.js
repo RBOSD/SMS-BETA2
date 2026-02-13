@@ -95,9 +95,20 @@ const { validatePassword } = require('./utils/validation');
 app.use(protectHtmlPages);
 app.use(protectViewTemplates);
 
-// 靜態檔案服務：使用 public 版本（含左側選單細項、完整功能）
-// 註：若需使用 React 版，可取消下方 dist 區塊並執行 npm run build
-app.use(express.static(path.join(__dirname, 'public')));
+// 嵌入模式：供 React 版 iframe 載入 public 版頁面（/embed?embed=1&view=importView&tab=issues&sub=import）
+app.get('/embed', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// 靜態檔案服務：優先使用 dist（React 版），若無則使用 public
+const distPath = path.join(__dirname, 'dist');
+const publicPath = path.join(__dirname, 'public');
+if (fs.existsSync(distPath)) {
+    app.use(express.static(distPath));
+    app.use(express.static(publicPath)); // public 仍供 /embed、/css、/js、/views 等
+} else {
+    app.use(express.static(publicPath));
+}
 
 // 為所有 API 路由提供 CSRF token
 app.use('/api/', getCsrfToken);
@@ -463,6 +474,14 @@ setInterval(cleanupOldLogs, 24 * 60 * 60 * 1000); // 每 24 小時執行一次
 
 // [Modularized] 註冊所有路由（auth, misc, issues, users, admin, options, plans, schedule, templates）
 require('./routes')(app, { csrfProtection });
+
+// React SPA 回退：當 dist 存在時，非 API、非 embed、非靜態檔的 GET 請求回傳 index.html
+if (fs.existsSync(path.join(__dirname, 'dist'))) {
+    app.get('*', (req, res, next) => {
+        if (req.path.startsWith('/api') || req.path.startsWith('/embed') || req.path.startsWith('/css') || req.path.startsWith('/js') || req.path.startsWith('/views')) return next();
+        res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    });
+}
 
 // --- API Routes（已移至 routes/*.js） ---
 // 以下區塊已移除，改由 routes/index.js 統一註冊
