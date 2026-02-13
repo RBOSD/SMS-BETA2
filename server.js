@@ -99,9 +99,13 @@ app.use(protectViewTemplates);
 const distPath = path.join(__dirname, 'dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
-  // SPA fallback：React 路由需回傳 index.html
+  // SPA fallback：React 路由需回傳 index.html（靜態資源不攔截，讓其 fallback 到 public）
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api')) return next();
+    if (req.path.startsWith('/css/') || req.path.startsWith('/js/') || req.path.startsWith('/views/') ||
+        req.path.match(/\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+      return next();
+    }
     res.sendFile(path.join(distPath, 'index.html'));
   });
 }
