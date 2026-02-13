@@ -14,7 +14,15 @@ export function AuthProvider({ children }) {
       })
       .then((data) => {
         if (data?.isLogin && data?.id) {
-          setUser({ id: data.id, username: data.username, name: data.name, role: data.role, isAdmin: data.isAdmin });
+          const isAdmin = data.isAdmin === true || data.is_admin === true;
+          setUser({
+            id: data.id,
+            username: data.username,
+            name: data.name,
+            role: data.role,
+            isAdmin,
+            groupIds: data.groupIds || [],
+          });
         } else {
           setUser(null);
         }

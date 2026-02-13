@@ -20,8 +20,9 @@ export default function AppSidebar({ open, onClose }) {
   const location = useLocation();
   const { user } = useAuth();
 
-  const canManage = user && (user.isAdmin === true || user.role === 'manager');
-  const canAdmin = user && user.isAdmin === true;
+  const isAdmin = user?.isAdmin === true || user?.is_admin === true;
+  const canManage = user && (isAdmin || user.role === 'manager');
+  const canAdmin = user && isAdmin;
 
   const linkClass = (path) => {
     const isActive = location.pathname === path || (path === '/' && (location.pathname === '/' || location.pathname === '/search'));
@@ -49,40 +50,32 @@ export default function AppSidebar({ open, onClose }) {
           檢查行程檢索
         </Link>
         {canManage && (
-          <>
+          <div className="sidebar-group expanded">
             <div className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/import') ? 'active' : ''}`}>
               資料管理
             </div>
-            {IMPORT_ROUTES.map((r) => (
-              <Link
-                key={r.path}
-                to={r.path}
-                className={subLinkClass(r.path)}
-                onClick={onClose}
-                style={{ marginLeft: 12, paddingLeft: 12, borderLeft: '2px solid #e2e8f0', display: 'block' }}
-              >
-                {r.label}
-              </Link>
-            ))}
-          </>
+            <div className="sidebar-sub">
+              {IMPORT_ROUTES.map((r) => (
+                <Link key={r.path} to={r.path} className={subLinkClass(r.path)} onClick={onClose}>
+                  {r.label}
+                </Link>
+              ))}
+            </div>
+          </div>
         )}
         {canAdmin && (
-          <>
+          <div className="sidebar-group expanded">
             <div className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/users') ? 'active' : ''}`}>
               後台管理
             </div>
-            {USERS_ROUTES.map((r) => (
-              <Link
-                key={r.path}
-                to={r.path}
-                className={subLinkClass(r.path)}
-                onClick={onClose}
-                style={{ marginLeft: 12, paddingLeft: 12, borderLeft: '2px solid #e2e8f0', display: 'block' }}
-              >
-                {r.label}
-              </Link>
-            ))}
-          </>
+            <div className="sidebar-sub">
+              {USERS_ROUTES.map((r) => (
+                <Link key={r.path} to={r.path} className={subLinkClass(r.path)} onClick={onClose}>
+                  {r.label}
+                </Link>
+              ))}
+            </div>
+          </div>
         )}
       </nav>
     </aside>

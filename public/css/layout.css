@@ -150,6 +150,12 @@
     border-radius: 8px;
     transition: all 0.2s;
     font-size: 14px;
+    display: block;
+    box-sizing: border-box;
+}
+
+.sidebar-sub a.sidebar-sub-btn {
+    text-decoration: none;
 }
 
 .sidebar-sub-btn:hover {
