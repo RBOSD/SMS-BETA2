@@ -75,8 +75,8 @@
             <nav class="sidebar-nav">
                 <button class="sidebar-btn active" id="btn-searchView" onclick="switchToItem('searchView')">開立事項檢索</button>
                 <button class="sidebar-btn hidden" id="btn-planCalendarView" onclick="switchToItem('planCalendarView')">檢查行程檢索</button>
-                <div class="sidebar-group hidden" id="sidebarGroupImport">
-                    <button class="sidebar-btn sidebar-btn-parent hidden" id="btn-importView" onclick="toggleSidebarGroup('import')">資料管理</button>
+                <div class="sidebar-group expanded hidden" id="sidebarGroupImport">
+                    <div class="sidebar-btn sidebar-btn-parent hidden" id="btn-importView">資料管理</div>
                     <div class="sidebar-sub" id="sidebarSubImport">
                         <button class="sidebar-sub-btn" data-route="import:issues:import" onclick="switchToItem('importView','issues','import')">批次匯入</button>
                         <button class="sidebar-sub-btn" data-route="import:issues:create" onclick="switchToItem('importView','issues','create')">開立事項建檔</button>
@@ -85,8 +85,8 @@
                         <button class="sidebar-sub-btn" data-route="import:plans:manage" onclick="switchToItem('importView','plans','manage')">計畫管理</button>
                     </div>
                 </div>
-                <div class="sidebar-group hidden" id="sidebarGroupUsers">
-                    <button class="sidebar-btn sidebar-btn-parent hidden" id="btn-usersView" onclick="toggleSidebarGroup('users')">後台管理</button>
+                <div class="sidebar-group expanded hidden" id="sidebarGroupUsers">
+                    <div class="sidebar-btn sidebar-btn-parent hidden" id="btn-usersView">後台管理</div>
                     <div class="sidebar-sub" id="sidebarSubUsers">
                         <button class="sidebar-sub-btn" data-route="users:users" onclick="switchToItem('usersView','users')">帳號列表</button>
                         <button class="sidebar-sub-btn" data-route="users:logs" onclick="switchToItem('usersView','logs')">登入紀錄</button>

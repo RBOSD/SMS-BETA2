@@ -123,7 +123,7 @@
 }
 
 .sidebar-sub {
-    display: none;
+    display: flex;
     flex-direction: column;
     gap: 2px;
     margin-left: 12px;
@@ -133,8 +133,9 @@
     margin-bottom: 6px;
 }
 
+/* 舊版若需收合可加 .sidebar-group:not(.expanded) .sidebar-sub { display: none } */
 .sidebar-group.expanded .sidebar-sub {
-    display: flex;
+    display: flex !important;
 }
 
 .sidebar-sub-btn {

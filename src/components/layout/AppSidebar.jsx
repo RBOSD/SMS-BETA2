@@ -49,42 +49,40 @@ export default function AppSidebar({ open, onClose }) {
           檢查行程檢索
         </Link>
         {canManage && (
-          <div className="sidebar-group expanded">
+          <>
             <div className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/import') ? 'active' : ''}`}>
               資料管理
             </div>
-            <div className="sidebar-sub">
-              {IMPORT_ROUTES.map((r) => (
-                <Link
-                  key={r.path}
-                  to={r.path}
-                  className={subLinkClass(r.path)}
-                  onClick={onClose}
-                >
-                  {r.label}
-                </Link>
-              ))}
-            </div>
-          </div>
+            {IMPORT_ROUTES.map((r) => (
+              <Link
+                key={r.path}
+                to={r.path}
+                className={subLinkClass(r.path)}
+                onClick={onClose}
+                style={{ marginLeft: 12, paddingLeft: 12, borderLeft: '2px solid #e2e8f0', display: 'block' }}
+              >
+                {r.label}
+              </Link>
+            ))}
+          </>
         )}
         {canAdmin && (
-          <div className="sidebar-group expanded">
+          <>
             <div className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/users') ? 'active' : ''}`}>
               後台管理
             </div>
-            <div className="sidebar-sub">
-              {USERS_ROUTES.map((r) => (
-                <Link
-                  key={r.path}
-                  to={r.path}
-                  className={subLinkClass(r.path)}
-                  onClick={onClose}
-                >
-                  {r.label}
-                </Link>
-              ))}
-            </div>
-          </div>
+            {USERS_ROUTES.map((r) => (
+              <Link
+                key={r.path}
+                to={r.path}
+                className={subLinkClass(r.path)}
+                onClick={onClose}
+                style={{ marginLeft: 12, paddingLeft: 12, borderLeft: '2px solid #e2e8f0', display: 'block' }}
+              >
+                {r.label}
+              </Link>
+            ))}
+          </>
         )}
       </nav>
     </aside>
