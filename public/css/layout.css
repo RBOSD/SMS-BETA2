@@ -75,6 +75,68 @@
     color: var(--danger);
 }
 
+/* 側邊欄階層選單 */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sidebar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sidebar-group.hidden {
+    display: none !important;
+}
+
+.sidebar-sub {
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    margin-left: 12px;
+    padding-left: 12px;
+    border-left: 2px solid #e2e8f0;
+    margin-top: 4px;
+    margin-bottom: 6px;
+}
+
+.sidebar-group.expanded .sidebar-sub {
+    display: flex;
+}
+
+.sidebar-sub-btn {
+    width: 100%;
+    text-align: left;
+    padding: 10px 14px;
+    background: transparent;
+    border: none;
+    color: var(--text-sub);
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.sidebar-sub-btn:hover {
+    background: #f1f5f9;
+    color: var(--text-main);
+}
+
+.sidebar-sub-btn.active {
+    background: #eff6ff;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.sidebar-btn-parent.active {
+    background: #eff6ff;
+    color: var(--primary);
+}
+
 /* Main Content */
 .main-content {
     flex: 1;

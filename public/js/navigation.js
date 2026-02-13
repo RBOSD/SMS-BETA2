@@ -1,10 +1,47 @@
 /**
- * 導航：switchView、onToggleSidebar
+ * 導航：switchView、switchToItem、onToggleSidebar、toggleSidebarGroup
  * 依賴：core.js (issuesPage, plansPage)
  * 其他 view 初始化函數由 scripts.js 提供（loadDashboardYearOptions, setupImportListeners 等）
  */
 (function () {
     'use strict';
+
+    function updateSidebarActiveState(viewId, dataTab, subTab, adminTab) {
+        document.querySelectorAll('.sidebar-btn').forEach(function (btn) { btn.classList.remove('active'); });
+        document.querySelectorAll('.sidebar-sub-btn').forEach(function (btn) { btn.classList.remove('active'); });
+        document.querySelectorAll('.sidebar-group').forEach(function (g) { g.classList.remove('expanded'); });
+        var btn = document.getElementById('btn-' + viewId);
+        if (btn) btn.classList.add('active');
+        if (viewId === 'importView') {
+            var groupImport = document.getElementById('sidebarGroupImport');
+            if (groupImport) groupImport.classList.add('expanded');
+            var route = 'import:' + (dataTab || 'issues') + ':' + (subTab || 'import');
+            var subBtn = document.querySelector('.sidebar-sub-btn[data-route="' + route + '"]');
+            if (subBtn) subBtn.classList.add('active');
+        } else if (viewId === 'usersView') {
+            var groupUsers = document.getElementById('sidebarGroupUsers');
+            if (groupUsers) groupUsers.classList.add('expanded');
+            var route = 'users:' + (adminTab || 'users');
+            var subBtn = document.querySelector('.sidebar-sub-btn[data-route="' + route + '"]');
+            if (subBtn) subBtn.classList.add('active');
+        }
+    }
+
+    function toggleSidebarGroup(groupId) {
+        var group = document.getElementById('sidebarGroup' + (groupId === 'import' ? 'Import' : 'Users'));
+        if (!group) return;
+        if (group.classList.contains('expanded')) {
+            group.classList.remove('expanded');
+        } else {
+            group.classList.add('expanded');
+            if (groupId === 'import') {
+                switchToItem('importView', 'issues', 'import');
+            } else {
+                switchToItem('usersView', 'users');
+            }
+        }
+    }
+    window.toggleSidebarGroup = toggleSidebarGroup;
 
     function onToggleSidebar() {
         var panel = document.getElementById('filtersPanel');
@@ -37,11 +74,17 @@
             return;
         }
         viewElement.classList.add('active');
-        document.querySelectorAll('.sidebar-btn').forEach(function (btn) {
-            btn.classList.remove('active');
-        });
-        var btn = document.getElementById('btn-' + viewId);
-        if (btn) btn.classList.add('active');
+        var dataTab = sessionStorage.getItem('currentDataTab') || 'issues';
+        var issuesSub = sessionStorage.getItem('currentIssuesSubTab') || 'import';
+        var plansSub = sessionStorage.getItem('currentPlansSubTab') || 'schedule';
+        var usersTab = sessionStorage.getItem('currentUsersTab') || 'users';
+        if (viewId === 'importView') {
+            updateSidebarActiveState(viewId, dataTab, dataTab === 'issues' ? issuesSub : plansSub, null);
+        } else if (viewId === 'usersView') {
+            updateSidebarActiveState(viewId, null, null, usersTab);
+        } else {
+            updateSidebarActiveState(viewId, null, null, null);
+        }
         window.scrollTo(0, 0);
         var dashboard = document.getElementById('dashboardSection');
         if (dashboard) {
@@ -150,4 +193,44 @@
         }
     }
     window.switchView = switchView;
+
+    async function switchToItem(viewId, dataTab, subTab) {
+        var adminTab = dataTab;
+        if (viewId === 'searchView' || viewId === 'planCalendarView') {
+            sessionStorage.setItem('currentView', viewId);
+            document.querySelectorAll('.sidebar-btn').forEach(function (btn) { btn.classList.remove('active'); });
+            document.querySelectorAll('.sidebar-sub-btn').forEach(function (btn) { btn.classList.remove('active'); });
+            document.querySelectorAll('.sidebar-group').forEach(function (g) { g.classList.remove('expanded'); });
+            var btn = document.getElementById('btn-' + viewId);
+            if (btn) btn.classList.add('active');
+            await switchView(viewId);
+            return;
+        }
+        if (viewId === 'importView') {
+            sessionStorage.setItem('currentDataTab', dataTab || 'issues');
+            sessionStorage.setItem('currentIssuesSubTab', dataTab === 'issues' ? (subTab || 'import') : 'import');
+            sessionStorage.setItem('currentPlansSubTab', dataTab === 'plans' ? (subTab || 'schedule') : 'schedule');
+        } else if (viewId === 'usersView') {
+            adminTab = dataTab || 'users';
+            sessionStorage.setItem('currentUsersTab', adminTab);
+            sessionStorage.setItem('currentAdminTab', adminTab);
+        }
+        await switchView(viewId);
+        updateSidebarActiveState(viewId, dataTab, subTab, adminTab);
+        if (viewId === 'importView') {
+            setTimeout(function () {
+                if (typeof window.switchDataTab === 'function') window.switchDataTab(dataTab || 'issues');
+                if (dataTab === 'issues' && typeof window.switchIssuesSubTab === 'function') {
+                    window.switchIssuesSubTab(subTab || 'import');
+                } else if (dataTab === 'plans' && typeof window.switchPlansSubTab === 'function') {
+                    window.switchPlansSubTab(subTab || 'schedule');
+                }
+            }, 250);
+        } else if (viewId === 'usersView') {
+            setTimeout(function () {
+                if (typeof window.switchAdminTab === 'function') window.switchAdminTab(adminTab || 'users');
+            }, 250);
+        }
+    }
+    window.switchToItem = switchToItem;
 })();

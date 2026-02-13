@@ -26,7 +26,7 @@
     <div id="toast-container"></div>
 
     <header class="app-header">
-        <div class="brand" onclick="switchView('searchView')" title="回到開立事項檢索">
+        <div class="brand" onclick="switchToItem('searchView')" title="回到開立事項檢索">
             <button class="filter-toggle-btn" onclick="event.stopPropagation();onToggleSidebar()"
                 title="開啟選單" aria-label="開啟選單">☰</button>
             <div class="brand-icon">🚄</div>
@@ -52,14 +52,29 @@
                 <div class="sidebar-title">功能選單</div>
                 <button class="sidebar-close-btn" onclick="onToggleSidebar()" aria-label="關閉選單">×</button>
             </div>
-            <button class="sidebar-btn active" id="btn-searchView" onclick="switchView('searchView')">
-                開立事項檢索</button>
-            <button class="sidebar-btn hidden" id="btn-planCalendarView" onclick="switchView('planCalendarView')">
-                檢查行程檢索</button>
-            <button class="sidebar-btn hidden" id="btn-importView" onclick="switchView('importView')">
-                資料管理</button>
-            <button class="sidebar-btn hidden" id="btn-usersView" onclick="switchView('usersView')">
-                後台管理</button>
+            <nav class="sidebar-nav">
+                <button class="sidebar-btn active" id="btn-searchView" onclick="switchToItem('searchView')">開立事項檢索</button>
+                <button class="sidebar-btn hidden" id="btn-planCalendarView" onclick="switchToItem('planCalendarView')">檢查行程檢索</button>
+                <div class="sidebar-group hidden" id="sidebarGroupImport">
+                    <button class="sidebar-btn sidebar-btn-parent hidden" id="btn-importView" onclick="toggleSidebarGroup('import')">資料管理</button>
+                    <div class="sidebar-sub" id="sidebarSubImport">
+                        <button class="sidebar-sub-btn" data-route="import:issues:import" onclick="switchToItem('importView','issues','import')">批次匯入</button>
+                        <button class="sidebar-sub-btn" data-route="import:issues:create" onclick="switchToItem('importView','issues','create')">開立事項建檔</button>
+                        <button class="sidebar-sub-btn" data-route="import:issues:year-edit" onclick="switchToItem('importView','issues','year-edit')">事項修正</button>
+                        <button class="sidebar-sub-btn" data-route="import:plans:schedule" onclick="switchToItem('importView','plans','schedule')">行程規劃</button>
+                        <button class="sidebar-sub-btn" data-route="import:plans:manage" onclick="switchToItem('importView','plans','manage')">計畫管理</button>
+                    </div>
+                </div>
+                <div class="sidebar-group hidden" id="sidebarGroupUsers">
+                    <button class="sidebar-btn sidebar-btn-parent hidden" id="btn-usersView" onclick="toggleSidebarGroup('users')">後台管理</button>
+                    <div class="sidebar-sub" id="sidebarSubUsers">
+                        <button class="sidebar-sub-btn" data-route="users:users" onclick="switchToItem('usersView','users')">帳號列表</button>
+                        <button class="sidebar-sub-btn" data-route="users:logs" onclick="switchToItem('usersView','logs')">登入紀錄</button>
+                        <button class="sidebar-sub-btn" data-route="users:actions" onclick="switchToItem('usersView','actions')">操作歷程</button>
+                        <button class="sidebar-sub-btn" data-route="users:system" onclick="switchToItem('usersView','system')">系統維護</button>
+                    </div>
+                </div>
+            </nav>
         </aside>
 
         <div id="filterBackdrop" onclick="onToggleSidebar()"></div>

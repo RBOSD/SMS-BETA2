@@ -1,19 +1,5 @@
-<div class="content-header">
-    <div class="content-title">資料管理</div>
-</div>
-
-<div class="admin-tabs">
-    <button class="admin-tab-btn active" onclick="switchDataTab('issues')">開立事項管理</button>
-    <button class="admin-tab-btn" onclick="switchDataTab('plans')">檢查計畫</button>
-</div>
-
 <!-- Tab 1: 開立事項管理 -->
 <div id="tab-data-issues">
-    <div class="admin-tabs" style="margin-bottom:20px; border-bottom:2px solid #e2e8f0;">
-        <button class="admin-tab-btn active" onclick="switchIssuesSubTab('import')">批次匯入</button>
-        <button class="admin-tab-btn" onclick="switchIssuesSubTab('create')">開立事項建檔</button>
-        <button class="admin-tab-btn" onclick="switchIssuesSubTab('year-edit')">事項修正</button>
-    </div>
 
     <!-- Sub-tab 1: Word Import -->
     <div id="subtab-issues-import">
@@ -350,11 +336,6 @@
 
 <!-- Tab: 檢查計畫（合併管理與規劃） -->
 <div id="tab-data-plans" class="hidden">
-    <div class="admin-tabs" style="margin-bottom:20px; border-bottom:2px solid #e2e8f0;">
-        <button class="admin-tab-btn active" onclick="switchPlansSubTab('schedule')">行程規劃</button>
-        <button class="admin-tab-btn" onclick="switchPlansSubTab('manage')">計畫管理</button>
-    </div>
-
     <!-- Sub-tab 1: 行程規劃（月曆型） -->
     <div id="subtab-plans-schedule">
     <div class="main-card">

@@ -565,16 +565,22 @@
                     
                     const btnCalendar = document.getElementById('btn-planCalendarView');
                     if (btnCalendar) btnCalendar.classList.remove('hidden');
+                    const groupImport = document.getElementById('sidebarGroupImport');
+                    const groupUsers = document.getElementById('sidebarGroupUsers');
                     if (isAdmin || data.role === 'manager') {
                         const btnImport = document.getElementById('btn-importView');
                         if (btnImport) btnImport.classList.remove('hidden');
+                        if (groupImport) groupImport.classList.remove('hidden');
                         const btnUsers = document.getElementById('btn-usersView');
                         if (btnUsers) btnUsers.classList.toggle('hidden', !isAdmin);
+                        if (groupUsers) groupUsers.classList.toggle('hidden', !isAdmin);
                     } else {
                         const btnImport = document.getElementById('btn-importView');
                         const btnUsers = document.getElementById('btn-usersView');
                         if (btnImport) btnImport.classList.add('hidden');
                         if (btnUsers) btnUsers.classList.add('hidden');
+                        if (groupImport) groupImport.classList.add('hidden');
+                        if (groupUsers) groupUsers.classList.add('hidden');
                     }
                 } else {
                     // 未登入或資料不完整，重定向到登入頁
