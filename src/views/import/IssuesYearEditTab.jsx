@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { apiFetch } from '../../api/api';
 import { useToast } from '../../context/ToastContext';
 import { stripHtml } from '../../utils/helpers';
-import DetailDrawer from '../../components/common/DetailDrawer';
+import IssueFullEditDrawer from '../../components/import/IssueFullEditDrawer';
 
 function extractNumberFromString(str) {
   if (!str) return null;
@@ -233,7 +233,7 @@ export default function IssuesYearEditTab() {
         </div>
       )}
 
-      <DetailDrawer
+      <IssueFullEditDrawer
         open={drawerOpen}
         issue={selectedIssue}
         onClose={handleCloseDrawer}
