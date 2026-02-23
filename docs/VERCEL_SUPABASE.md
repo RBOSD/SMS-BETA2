@@ -1,5 +1,23 @@
 # Vercel + Supabase 部署設定
 
+## Vercel Session 環境變數設定位置
+
+**路徑：** [vercel.com](https://vercel.com) → 選擇專案 → **Settings** → **Environment Variables**
+
+| 變數名稱 | 用途 | 取得方式 |
+|----------|------|----------|
+| `SESSION_SECRET` | Session 簽章密鑰（必填） | 本機執行 `openssl rand -base64 32` 產生 |
+| `REDIS_URL` 或 `KV_URL` | Session 持久化儲存（選填） | 安裝 Upstash Redis 後自動注入 |
+| `DATABASE_URL` | 資料庫連線（業務資料用） | Supabase Dashboard → Connect → Transaction mode |
+
+**產生 SESSION_SECRET：**
+```bash
+openssl rand -base64 32
+```
+將輸出結果貼到 Vercel 的 `SESSION_SECRET` 欄位，長度至少 32 字元。
+
+---
+
 ## 連線逾時問題
 
 若出現 `Error: timeout exceeded when trying to connect`，程式已做以下處理：
@@ -22,10 +40,12 @@
 
 ### 步驟
 
-1. Vercel → **Marketplace** → 搜尋 **Upstash Redis** → 安裝
-2. 安裝後會自動注入 `KV_URL` 或 `REDIS_URL`
-3. 在 Vercel 環境變數確認有 `REDIS_URL` 或 `KV_URL`（Redis 連線字串）
-4. 重新部署
+1. [vercel.com](https://vercel.com) → 選擇專案 → **Integrations**（或 **Marketplace**）
+2. 搜尋 **Upstash Redis** → 點擊 **Add Integration** → 選擇專案
+3. 安裝後會自動在 **Settings → Environment Variables** 注入 `KV_URL` 或 `REDIS_URL`
+4. 確認路徑：**Settings** → **Environment Variables**，應可看到 `REDIS_URL` 或 `KV_URL`
+5. 若未出現，可至 [Upstash Console](https://console.upstash.com/) 建立 Redis 資料庫，複製連線字串手動新增
+6. 重新部署
 
 程式會自動偵測：當 `VERCEL=1` 且 `REDIS_URL`/`KV_URL` 存在時，使用 Redis 作為 session store。
 
@@ -84,7 +104,7 @@ Vercel 為 serverless 環境，**必須**使用 Supabase 的 **Transaction mode*
 
 - 連線字串必須包含 `:6543/`（Transaction mode）
 - 程式會自動附加 `?pgbouncer=true` 以關閉 prepared statements
-- 連線逾時已設為 25 秒，以因應 Vercel cold start
+- 連線逾時已設為 60 秒，以因應 Vercel cold start
 
 ## Supabase 專案暫停（Free 方案）
 

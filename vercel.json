@@ -4,6 +4,5 @@
   "buildCommand": "VERCEL=1 npm run build:vercel",
   "builds": [{ "src": "server.js", "use": "@vercel/node" }],
   "rewrites": [{ "source": "/(.*)", "destination": "/server.js" }],
-  "headers": [{ "source": "/(.*)", "headers": [{ "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" }] }],
-  "functions": { "server.js": { "maxDuration": 60 } }
+  "headers": [{ "source": "/(.*)", "headers": [{ "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" }] }]
 }
