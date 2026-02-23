@@ -273,7 +273,7 @@ export default function IssueFullEditDrawer({ open, issue, onClose, onRefresh })
             &times;
           </button>
         </div>
-        <div className="drawer-body" style={{ overflowY: 'auto', paddingBottom: 100 }}>
+        <div className="drawer-body" style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
           {canEdit ? (
             <>
               <div style={{ marginBottom: 24 }}>
@@ -443,22 +443,32 @@ export default function IssueFullEditDrawer({ open, issue, onClose, onRefresh })
                   })}
                 </div>
               </div>
-
-              <div style={{ display: 'flex', gap: 12, paddingTop: 16, borderTop: '1px solid #e2e8f0', position: 'sticky', bottom: 0, background: '#fff', marginTop: 8 }}>
-                <button className="btn btn-primary" style={{ flex: 1, padding: 12 }} onClick={handleSave} disabled={saveLoading}>
-                  {saveLoading ? '儲存中...' : '💾 儲存全部'}
-                </button>
-                {canDelete && (
-                  <button className="btn btn-danger" style={{ padding: 12 }} onClick={handleDeleteClick}>
-                    🗑️ 刪除
-                  </button>
-                )}
-              </div>
             </>
           ) : (
             <div style={{ color: '#94a3b8', textAlign: 'center', padding: 40 }}>無編輯權限</div>
           )}
         </div>
+        {canEdit && (
+          <div
+            style={{
+              flexShrink: 0,
+              padding: '20px 32px',
+              borderTop: '1px solid var(--border)',
+              background: '#fff',
+              display: 'flex',
+              gap: 12,
+            }}
+          >
+            <button className="btn btn-primary" style={{ flex: 1, padding: 12 }} onClick={handleSave} disabled={saveLoading}>
+              {saveLoading ? '儲存中...' : '💾 儲存全部'}
+            </button>
+            {canDelete && (
+              <button className="btn btn-danger" style={{ padding: 12 }} onClick={handleDeleteClick}>
+                🗑️ 刪除
+              </button>
+            )}
+          </div>
+        )}
       </div>
       <ConfirmModal
         open={deleteConfirmOpen}
