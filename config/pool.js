@@ -39,7 +39,7 @@ const pool = new Pool({
     ssl: connectionString ? sslConfig : false,
     max: isVercel ? 1 : 2, // Vercel serverless 建議 1，避免連線累積
     idleTimeoutMillis: isVercel ? 10000 : 5000,
-    connectionTimeoutMillis: isVercel ? 30000 : 2000, // Vercel cold start 需較長逾時（30 秒）
+    connectionTimeoutMillis: isVercel ? 60000 : 2000, // Vercel cold start 需較長逾時（60 秒）
     allowExitOnIdle: false,
 });
 

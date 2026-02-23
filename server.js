@@ -17,6 +17,7 @@ app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 
 // Session store：Vercel 可選用 Redis（REDIS_URL）避免 Supabase 連線逾時
+// 若 Vercel 且無 Redis，改用 MemoryStore 避免 DB 連線逾時導致 500
 const redisUrl = process.env.REDIS_URL || process.env.KV_URL;
 let sessionStore;
 
@@ -33,17 +34,24 @@ if (process.env.VERCEL && redisUrl) {
 }
 
 if (!sessionStore) {
-    try {
-        sessionStore = new pgSession({
-            pool,
-            tableName: 'session',
-            createTableIfMissing: true,
-            pruneSessionInterval: false
-        });
-    } catch (storeError) {
-        console.warn('Session store initialization warning:', storeError?.message || storeError);
-        if (process.env.NODE_ENV !== 'production') {
-            sessionStore = undefined;
+    // Vercel 且無 Redis：使用 MemoryStore，避免 Supabase 連線逾時導致 Internal Server Error
+    // 注意：MemoryStore 在 serverless 下 session 不跨請求持久化，冷啟動後需重新登入
+    if (process.env.VERCEL) {
+        sessionStore = undefined; // express-session 預設使用 MemoryStore
+        console.warn('[Vercel] 未設定 REDIS_URL，session 使用記憶體儲存（冷啟動後需重新登入）。建議安裝 Upstash Redis 以持久化 session。');
+    } else {
+        try {
+            sessionStore = new pgSession({
+                pool,
+                tableName: 'session',
+                createTableIfMissing: false, // initDB 已建立 session 表，避免首次請求觸發建表連線
+                pruneSessionInterval: false
+            });
+        } catch (storeError) {
+            console.warn('Session store initialization warning:', storeError?.message || storeError);
+            if (process.env.NODE_ENV !== 'production') {
+                sessionStore = undefined;
+            }
         }
     }
 }

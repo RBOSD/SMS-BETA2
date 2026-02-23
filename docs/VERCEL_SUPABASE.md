@@ -2,7 +2,17 @@
 
 ## 連線逾時問題
 
-若出現 `Error: timeout exceeded when trying to connect`，可嘗試以下兩種解法。
+若出現 `Error: timeout exceeded when trying to connect`，程式已做以下處理：
+
+1. **Vercel 且未設定 Redis**：自動改用 MemoryStore（記憶體 session），網站可正常載入
+   - 注意：session 不跨請求持久化，冷啟動後需重新登入
+   - 建議安裝 Upstash Redis 並設定 `REDIS_URL` 以持久化 session
+
+2. **Vercel 且已設定 Redis**：使用 Redis 作為 session store，不依賴 Supabase 連線
+
+3. **PostgreSQL 連線**：逾時已提高至 60 秒，以因應 cold start
+
+若仍出現逾時，可嘗試以下解法。
 
 ---
 
