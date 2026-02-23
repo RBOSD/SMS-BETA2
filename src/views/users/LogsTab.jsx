@@ -54,9 +54,9 @@ export default function LogsTab() {
       showToast('無資料可匯出', 'error');
       return;
     }
-    let csv = '\uFEFF時間,帳號,IP位址\n';
+    let csv = '\uFEFF時間,帳號,姓名,IP位址\n';
     data.forEach((row) => {
-      csv += `"${new Date(row.login_time).toLocaleString('zh-TW')}","${row.username || ''}","${row.ip_address || ''}"\n`;
+      csv += `"${new Date(row.login_time).toLocaleString('zh-TW')}","${row.username || ''}","${row.user_name || ''}","${row.ip_address || ''}"\n`;
     });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
@@ -122,7 +122,7 @@ export default function LogsTab() {
       <div style={{ marginBottom: 24 }}>
         <h3 style={{ margin: '0 0 8px 0', fontWeight: 700, fontSize: 18, color: '#334155' }}>登入紀錄</h3>
         <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>
-          查看系統使用者的登入紀錄，包含登入時間、帳號和 IP 位址。可匯出資料或清理舊紀錄。
+          查看系統使用者的登入紀錄，包含登入時間、帳號、姓名和 IP 位址。可匯出資料或清理舊紀錄。
         </p>
       </div>
       <div
@@ -191,19 +191,20 @@ export default function LogsTab() {
             <tr>
               <th style={{ padding: 16 }}>時間</th>
               <th>帳號</th>
+              <th>姓名</th>
               <th>IP 位址</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={3} style={{ padding: 30, textAlign: 'center', color: '#64748b' }}>
+                <td colSpan={4} style={{ padding: 30, textAlign: 'center', color: '#64748b' }}>
                   ⏳ 載入紀錄中...
                 </td>
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={3} style={{ padding: 30, textAlign: 'center', color: '#64748b' }}>
+                <td colSpan={4} style={{ padding: 30, textAlign: 'center', color: '#64748b' }}>
                   查無資料
                 </td>
               </tr>
@@ -214,6 +215,7 @@ export default function LogsTab() {
                     {new Date(l.login_time).toLocaleString('zh-TW')}
                   </td>
                   <td data-label="帳號">{l.username || ''}</td>
+                  <td data-label="姓名">{l.user_name || '-'}</td>
                   <td data-label="IP">{l.ip_address || '-'}</td>
                 </tr>
               ))

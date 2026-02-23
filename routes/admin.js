@@ -13,23 +13,25 @@ module.exports = function registerAdminRoutes(app) {
             const { page = 1, pageSize = 50, q } = req.query;
             const limit = parseInt(pageSize);
             const offset = (parseInt(page) - 1) * limit;
-            let where = ["action='LOGIN'"];
+            let where = ["l.action='LOGIN'"];
             let params = [];
             let idx = 1;
             if (q) {
                 where.push(`(
-                    COALESCE(username, '') LIKE $${idx} OR 
-                    COALESCE(ip_address, '') LIKE $${idx} OR 
-                    COALESCE(details, '') LIKE $${idx} OR
-                    COALESCE(CAST(login_time AS TEXT), '') LIKE $${idx} OR
-                    COALESCE(CAST(created_at AS TEXT), '') LIKE $${idx}
+                    COALESCE(l.username, '') LIKE $${idx} OR 
+                    COALESCE(u.name, '') LIKE $${idx} OR 
+                    COALESCE(l.ip_address, '') LIKE $${idx} OR 
+                    COALESCE(l.details, '') LIKE $${idx} OR
+                    COALESCE(CAST(l.login_time AS TEXT), '') LIKE $${idx} OR
+                    COALESCE(CAST(l.created_at AS TEXT), '') LIKE $${idx}
                 )`);
                 params.push(`%${q}%`);
                 idx++;
             }
             const whereClause = where.join(' AND ');
-            const countQuery = `SELECT COUNT(*) FROM logs WHERE ${whereClause}`;
-            const dataQuery = `SELECT * FROM logs WHERE ${whereClause} ORDER BY login_time DESC LIMIT $${idx} OFFSET $${idx + 1}`;
+            const fromJoin = `logs l LEFT JOIN users u ON l.username = u.username`;
+            const countQuery = `SELECT COUNT(*) FROM ${fromJoin} WHERE ${whereClause}`;
+            const dataQuery = `SELECT l.*, u.name AS user_name FROM ${fromJoin} WHERE ${whereClause} ORDER BY l.login_time DESC LIMIT $${idx} OFFSET $${idx + 1}`;
             const countResult = await pool.query(countQuery, params);
             const total = parseInt(countResult.rows[0].count);
             const pages = Math.ceil(total / limit);
@@ -46,23 +48,25 @@ module.exports = function registerAdminRoutes(app) {
             const { page = 1, pageSize = 50, q } = req.query;
             const limit = parseInt(pageSize);
             const offset = (parseInt(page) - 1) * limit;
-            let where = ["action!='LOGIN'"];
+            let where = ["l.action!='LOGIN'"];
             let params = [];
             let idx = 1;
             if (q) {
                 where.push(`(
-                    COALESCE(username, '') LIKE $${idx} OR 
-                    COALESCE(action, '') LIKE $${idx} OR 
-                    COALESCE(details, '') LIKE $${idx} OR
-                    COALESCE(ip_address, '') LIKE $${idx} OR
-                    COALESCE(CAST(created_at AS TEXT), '') LIKE $${idx}
+                    COALESCE(l.username, '') LIKE $${idx} OR 
+                    COALESCE(u.name, '') LIKE $${idx} OR 
+                    COALESCE(l.action, '') LIKE $${idx} OR 
+                    COALESCE(l.details, '') LIKE $${idx} OR
+                    COALESCE(l.ip_address, '') LIKE $${idx} OR
+                    COALESCE(CAST(l.created_at AS TEXT), '') LIKE $${idx}
                 )`);
                 params.push(`%${q}%`);
                 idx++;
             }
             const whereClause = where.join(' AND ');
-            const countQuery = `SELECT COUNT(*) FROM logs WHERE ${whereClause}`;
-            const dataQuery = `SELECT * FROM logs WHERE ${whereClause} ORDER BY created_at DESC LIMIT $${idx} OFFSET $${idx + 1}`;
+            const fromJoin = `logs l LEFT JOIN users u ON l.username = u.username`;
+            const countQuery = `SELECT COUNT(*) FROM ${fromJoin} WHERE ${whereClause}`;
+            const dataQuery = `SELECT l.*, u.name AS user_name FROM ${fromJoin} WHERE ${whereClause} ORDER BY l.created_at DESC LIMIT $${idx} OFFSET $${idx + 1}`;
             const countResult = await pool.query(countQuery, params);
             const total = parseInt(countResult.rows[0].count);
             const pages = Math.ceil(total / limit);
