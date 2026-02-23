@@ -2,7 +2,7 @@
  * 檢查計畫整批匯入 Modal（Excel .xlsx）
  */
 import { useRef, useEffect } from 'react';
-import * as XLSX from 'xlsx';
+import { read, utils, writeFileXLSX } from 'xlsx';
 import { apiFetch } from '../../api/api';
 import { useToast } from '../../context/ToastContext';
 
@@ -116,10 +116,10 @@ export default function PlanImportModal({ open, onClose, onSuccess }) {
     reader.onload = async (e) => {
       try {
         const buf = e.target.result;
-        const wb = XLSX.read(buf, { type: 'array' });
+        const wb = read(buf, { type: 'array' });
         const sheetName = wb.SheetNames.includes('匯入') ? '匯入' : wb.SheetNames[0];
         const ws = wb.Sheets[sheetName];
-        const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+        const rows = utils.sheet_to_json(ws, { defval: '' });
 
         const { validData, invalidRows } = parsePlansImportRows(rows);
         if (validData.length === 0) {
@@ -198,15 +198,15 @@ export default function PlanImportModal({ open, onClose, onSuccess }) {
       /* 忽略，改用預設範例 */
     }
     try {
-      const wb = XLSX.utils.book_new();
+      const wb = utils.book_new();
       const sheet1 = [
         ['年度', '計畫名稱', '鐵路機構', '檢查類別', '業務類型', '規劃檢查幾次'],
         ['113', '上半年定期檢查', '臺鐵', '年度定期檢查', '運轉', '2'],
         ['113', '特別檢查', '高鐵', '特別檢查', '營運／災防審核', '1'],
       ];
-      const ws = XLSX.utils.aoa_to_sheet(sheet1);
-      XLSX.utils.book_append_sheet(wb, ws, '匯入');
-      XLSX.writeFile(wb, '檢查計畫匯入範例.xlsx');
+      const ws = utils.aoa_to_sheet(sheet1);
+      utils.book_append_sheet(wb, ws, '匯入');
+      writeFileXLSX(wb, '檢查計畫匯入範例.xlsx');
       showToast('已下載範例檔', 'success');
     } catch (e) {
       showToast('下載範例檔失敗：' + (e.message || '未知錯誤'), 'error');

@@ -3,7 +3,6 @@
  * 使用 mammoth 解析 Word，簡化版表格解析
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
-import mammoth from 'mammoth';
 import { apiFetch } from '../../api/api';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
@@ -136,6 +135,7 @@ export default function IssuesImportTab() {
     setStatusMsg('Word 解析中...');
     try {
       const buf = await file.arrayBuffer();
+      const { default: mammoth } = await import('mammoth');
       const result = await mammoth.convertToHtml({ arrayBuffer: buf });
       const items = parseFromHTML(result.value);
       if (items.length === 0) {
