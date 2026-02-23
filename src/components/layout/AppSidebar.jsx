@@ -2,18 +2,18 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const IMPORT_ROUTES = [
-  { path: '/import/batch', label: '批次匯入', embed: 'import:issues:import' },
-  { path: '/import/create', label: '開立事項建檔', embed: 'import:issues:create' },
-  { path: '/import/year-edit', label: '事項修正', embed: 'import:issues:year-edit' },
-  { path: '/import/schedule', label: '行程規劃', embed: 'import:plans:schedule' },
-  { path: '/import/manage', label: '計畫管理', embed: 'import:plans:manage' },
+  { path: '/import/batch', label: '批次匯入' },
+  { path: '/import/create', label: '開立事項建檔' },
+  { path: '/import/year-edit', label: '事項修正' },
+  { path: '/import/schedule', label: '行程規劃' },
+  { path: '/import/manage', label: '計畫管理' },
 ];
 
 const USERS_ROUTES = [
-  { path: '/users/list', label: '帳號列表', embed: 'users:users' },
-  { path: '/users/logs', label: '登入紀錄', embed: 'users:logs' },
-  { path: '/users/actions', label: '操作歷程', embed: 'users:actions' },
-  { path: '/users/system', label: '系統維護', embed: 'users:system' },
+  { path: '/users/list', label: '帳號列表' },
+  { path: '/users/logs', label: '登入紀錄' },
+  { path: '/users/actions', label: '操作歷程' },
+  { path: '/users/system', label: '系統維護' },
 ];
 
 export default function AppSidebar({ open, onClose }) {

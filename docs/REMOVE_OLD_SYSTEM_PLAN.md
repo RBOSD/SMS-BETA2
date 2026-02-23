@@ -90,21 +90,21 @@ npm start
 ## 三、檢查清單
 
 ### 刪除前
-- [ ] 已建立備份分支或備份
-- [ ] 確認目前使用 React 版（非 public 舊版）
-- [ ] 已執行 `npm run build` 且成功
+- [x] 已建立備份分支或備份
+- [x] 確認目前使用 React 版（非 public 舊版）
+- [x] 已執行 `npm run build` 且成功
 
 ### 刪除後
-- [ ] `public/css/` 仍存在
-- [ ] `public/` 資料夾仍存在
-- [ ] `npm run build` 成功
-- [ ] `npm start` 可正常啟動
-- [ ] 登入功能正常
-- [ ] 開立事項檢索正常
-- [ ] 檢查行程檢索正常
-- [ ] 資料管理各分頁正常
-- [ ] 後台管理各分頁正常
-- [ ] 無瀏覽器 console 錯誤
+- [x] `public/css/` 仍存在
+- [x] `public/` 資料夾仍存在
+- [x] `npm run build` 成功
+- [x] `npm start` 可正常啟動
+- [x] 登入功能正常
+- [x] 開立事項檢索正常
+- [x] 檢查行程檢索正常
+- [x] 資料管理各分頁正常
+- [x] 後台管理各分頁正常
+- [x] 無瀏覽器 console 錯誤
 
 ### 選用優化（可稍後進行）
 - [ ] 將 `public/css/` 移至 `src/assets/css/` 並更新 `index.css` 引用
