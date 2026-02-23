@@ -217,8 +217,17 @@ export default function PlanImportModal({ open, onClose, onSuccess }) {
   if (!open) return null;
 
   const modalContent = (
-    <div className="modal-overlay" style={{ display: 'flex', zIndex: 10000 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-box" style={{ maxWidth: 600, width: '95%' }} onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay" style={{ display: 'flex', zIndex: 10000, pointerEvents: 'none' }}>
+      <div
+        style={{ position: 'absolute', inset: 0, pointerEvents: 'auto' }}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <div
+        className="modal-box"
+        style={{ maxWidth: 600, width: '95%', position: 'relative', zIndex: 1, pointerEvents: 'auto' }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3 style={{ marginTop: 0 }}>整批匯入檢查計畫（Excel）</h3>
         <div className="form-group">
           <label>選擇匯入檔案（.xlsx）</label>
