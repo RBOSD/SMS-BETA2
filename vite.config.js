@@ -7,12 +7,18 @@ import react from '@vitejs/plugin-react';
 import commonjs from 'vite-plugin-commonjs';
 
 export default defineConfig({
-  plugins: [react(), commonjs()],
+  plugins: [
+    commonjs({
+      filter: (id) => id.includes('node_modules'),
+    }),
+    react(),
+  ],
   root: '.',
   publicDir: process.env.VERCEL ? false : 'public',
   base: process.env.VERCEL ? '/app/' : '/',
   optimizeDeps: {
-    include: ['xlsx', 'mammoth', 'chart.js', 'chartjs-plugin-datalabels', 'react-chartjs-2'],
+    include: ['xlsx', 'mammoth', 'react-chartjs-2'],
+    exclude: ['chart.js', 'chartjs-plugin-datalabels'],
   },
   build: {
     outDir: process.env.VERCEL ? 'public/app' : 'dist',
@@ -22,6 +28,7 @@ export default defineConfig({
       input: 'index.html',
       output: {
         format: 'es',
+        inlineDynamicImports: true,
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash][extname]',
