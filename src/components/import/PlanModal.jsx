@@ -152,7 +152,7 @@ export default function PlanModal({ open, mode, planId, plan, onClose, onSuccess
   if (!open) return null;
 
   return (
-    <div className="modal-overlay" style={{ display: 'flex' }} onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="modal-overlay" style={{ display: 'flex', zIndex: 10000 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal-box plan-edit-modal" style={{ maxWidth: 600, width: '95%' }}>
         <div className="plan-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h3 style={{ margin: 0 }}>{mode === 'create' ? '新增檢查計畫' : '編輯檢查計畫'}</h3>

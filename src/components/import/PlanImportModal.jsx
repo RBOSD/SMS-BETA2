@@ -216,7 +216,7 @@ export default function PlanImportModal({ open, onClose, onSuccess }) {
   if (!open) return null;
 
   return (
-    <div className="modal-overlay" style={{ display: 'flex' }} onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="modal-overlay" style={{ display: 'flex', zIndex: 10000 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal-box" style={{ maxWidth: 600, width: '95%' }}>
         <h3 style={{ marginTop: 0 }}>整批匯入檢查計畫（Excel）</h3>
         <div className="form-group">
