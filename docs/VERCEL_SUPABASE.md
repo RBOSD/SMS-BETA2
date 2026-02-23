@@ -2,7 +2,14 @@
 
 ## 連線逾時問題
 
-若出現 `Error: timeout exceeded when trying to connect`，通常是 **DATABASE_URL 使用了錯誤的連線模式**。
+若出現 `Error: timeout exceeded when trying to connect`，**幾乎一定是** `DATABASE_URL` 使用了 **port 5432**（Direct/Session）而非 **port 6543**（Transaction）。
+
+### 快速檢查
+
+1. Vercel → Settings → Environment Variables
+2. 查看 `DATABASE_URL` 的值
+3. **必須包含 `:6543`**（例如 `...@xxx.supabase.com:6543/postgres`）
+4. 若為 `:5432`，請改為 Transaction mode 連線字串
 
 ## 正確設定
 
@@ -48,10 +55,19 @@ Vercel 為 serverless 環境，**必須**使用 Supabase 的 **Transaction mode*
 - 程式會自動附加 `?pgbouncer=true` 以關閉 prepared statements
 - 連線逾時已設為 25 秒，以因應 Vercel cold start
 
+## Supabase 專案暫停（Free 方案）
+
+Free 方案專案 **7 天無活動會自動暫停**。恢復時需要較長冷啟動時間，可能導致連線逾時。
+
+**處理方式：**
+1. 登入 Supabase Dashboard，確認專案狀態（若顯示 Paused 請點擊 Restore）
+2. 恢復後等待 1–2 分鐘再重試
+3. 可設定定期 ping（如 cron）保持專案活躍
+
 ## 常見錯誤
 
 | 錯誤 | 原因 |
 |------|------|
-| timeout exceeded when trying to connect | 使用 Direct (5432) 或 Session mode，應改用 Transaction (6543) |
+| timeout exceeded when trying to connect | ① 使用 Direct (5432) 應改用 Transaction (6543) ② Supabase 專案暫停中 ③ Vercel 函數逾時 |
 | prepared statement does not exist | 未附加 pgbouncer=true（程式已自動處理） |
 | Connection refused | 防火牆或 Supabase 專案已暫停 |

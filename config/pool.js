@@ -23,6 +23,12 @@ const rawUrl = process.env.DATABASE_URL;
 const connectionString = (isVercel && process.env.DATABASE_POOLER_URL)
     ? process.env.DATABASE_POOLER_URL
     : rawUrl;
+
+// Vercel 除錯：若未使用 port 6543，連線會逾時
+if (isVercel && connectionString && !connectionString.includes(':6543')) {
+    console.error('[Vercel] DATABASE_URL 必須使用 Transaction mode (port 6543)，目前可能使用 5432。請至 Supabase Dashboard → Connect → Transaction mode 取得正確連線字串。');
+}
+
 // Transaction mode (port 6543) 不支援 prepared statements，附加 pgbouncer=true
 const finalUrl = connectionString && connectionString.includes(':6543')
     ? (connectionString.includes('?') ? `${connectionString}&pgbouncer=true` : `${connectionString}?pgbouncer=true`)
@@ -33,7 +39,7 @@ const pool = new Pool({
     ssl: connectionString ? sslConfig : false,
     max: isVercel ? 1 : 2, // Vercel serverless 建議 1，避免連線累積
     idleTimeoutMillis: isVercel ? 10000 : 5000,
-    connectionTimeoutMillis: isVercel ? 25000 : 2000, // Vercel cold start 需較長逾時（25 秒）
+    connectionTimeoutMillis: isVercel ? 30000 : 2000, // Vercel cold start 需較長逾時（30 秒）
     allowExitOnIdle: false,
 });
 
