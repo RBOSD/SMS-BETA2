@@ -187,7 +187,7 @@ export default function PlanModal({ open, mode, planId, plan, onClose, onSuccess
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
             <div className="form-group">
               <label>年度（民國） <span style={{ color: '#ef4444' }}>*</span></label>
-              <input type="text" className="filter-input" placeholder="例如: 113" value={year} onChange={(e) => setYear(e.target.value)} disabled={mode === 'edit'} />
+              <input type="text" className="filter-input" placeholder="例如: 113" value={year} onChange={(e) => setYear(e.target.value)} disabled={mode === 'edit'} autoFocus />
             </div>
             <div className="form-group">
               <label>計畫名稱 <span style={{ color: '#ef4444' }}>*</span></label>

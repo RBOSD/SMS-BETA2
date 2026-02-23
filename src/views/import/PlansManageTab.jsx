@@ -161,14 +161,15 @@ export default function PlansManageTab() {
   };
 
   const openPlanModal = (plan = null) => {
-    if (plan) {
-      setPlanModalMode('edit');
-      setPlanModalPlan(plan);
-    } else {
-      setPlanModalMode('create');
-      setPlanModalPlan(null);
-    }
+    setPlanModalPlan(plan);
+    setPlanModalMode(plan ? 'edit' : 'create');
     setPlanModalOpen(true);
+  };
+
+  const closePlanModal = () => {
+    setPlanModalOpen(false);
+    setPlanModalPlan(null);
+    setPlanModalMode('create');
   };
 
   const openPlanImport = () => {
@@ -309,13 +310,14 @@ export default function PlansManageTab() {
       <ConfirmModal open={confirmOpen} {...confirmConfig} />
 
       <PlanModal
+        key={planModalPlan ? `edit-${planModalPlan.id}` : 'create'}
         open={planModalOpen}
         mode={planModalMode}
         planId={planModalPlan?.id}
         plan={planModalPlan}
-        onClose={() => setPlanModalOpen(false)}
+        onClose={closePlanModal}
         onSuccess={() => {
-          setPlanModalOpen(false);
+          closePlanModal();
           loadPlans(page);
         }}
       />

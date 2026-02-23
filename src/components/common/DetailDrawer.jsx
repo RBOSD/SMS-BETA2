@@ -20,13 +20,13 @@ function getEditRound(issue) {
   return 1;
 }
 
-export default function DetailDrawer({ open, issue, onClose, onRefresh }) {
+export default function DetailDrawer({ open, issue, onClose, onRefresh, openInEditMode = false }) {
   const { user } = useAuth();
   const showToast = useToast();
   const canEdit = user && (user.isAdmin === true || user.role === 'manager');
   const canDelete = canEdit;
 
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(openInEditMode);
   const [round, setRound] = useState(1);
   const [status, setStatus] = useState('');
   const [review, setReview] = useState('');
@@ -49,8 +49,12 @@ export default function DetailDrawer({ open, issue, onClose, onRefresh }) {
   }, [issue]);
 
   useEffect(() => {
-    if (!open) setEditMode(false);
-  }, [open]);
+    if (!open) {
+      setEditMode(openInEditMode);
+    } else {
+      setEditMode(openInEditMode);
+    }
+  }, [open, openInEditMode]);
 
   if (!issue) return null;
 
