@@ -25,16 +25,19 @@
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 桌面：側欄常駐顯示 */
+/* 桌面：側欄可切換顯示/隱藏 */
 @media (min-width: 1024px) {
     .filters-panel {
+        transform: translateX(-100%);
+    }
+    .filters-panel.open {
         transform: translateX(0);
     }
-    .app-body {
-        padding-left: 280px;
+    .app-body.sidebar-closed {
+        padding-left: 0;
     }
-    .sidebar-close-btn {
-        display: none;
+    .app-body.sidebar-open {
+        padding-left: 280px;
     }
 }
 

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-export default function AppHeader({ onToggleSidebar }) {
+export default function AppHeader({ sidebarOpen, onToggleSidebar }) {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -19,8 +19,8 @@ export default function AppHeader({ onToggleSidebar }) {
         <button
           className="filter-toggle-btn"
           onClick={(e) => { e.stopPropagation(); onToggleSidebar(); }}
-          title="開啟選單"
-          aria-label="開啟選單"
+          title={sidebarOpen ? '收合選單' : '展開選單'}
+          aria-label={sidebarOpen ? '收合選單' : '展開選單'}
         >
           ☰
         </button>

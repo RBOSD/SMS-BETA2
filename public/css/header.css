@@ -65,11 +65,7 @@
     color: var(--primary);
 }
 
-@media (min-width: 1024px) {
-    .filter-toggle-btn {
-        display: none;
-    }
-}
+/* 桌面與手機皆顯示漢堡按鈕，供使用者切換側欄顯示/隱藏 */
 
 /* User Menu */
 .user-menu-container {
