@@ -626,7 +626,7 @@
             var logsTableBody = document.getElementById('logsTableBody');
             if (logsTableBody) {
                 logsTableBody.innerHTML = (window.currentLogs.login || []).map(function (l) {
-                    return '<tr><td data-label="時間" style="padding:12px;">' + new Date(l.login_time).toLocaleString('zh-TW') + '</td><td data-label="帳號">' + (l.username || '') + '</td><td data-label="IP">' + (l.ip_address || '-') + '</td></tr>';
+                    return '<tr><td data-label="時間" style="padding:12px;">' + new Date(l.login_time).toLocaleString('zh-TW') + '</td><td data-label="帳號">' + (l.username || '') + '</td><td data-label="姓名">' + (l.user_name || '-') + '</td><td data-label="IP">' + (l.ip_address || '-') + '</td></tr>';
                 }).join('');
             }
             if (typeof window.renderPagination === 'function') {
@@ -685,7 +685,7 @@
             if (actionsTableBody) {
                 var escapeHtml = window.escapeHtml || function (s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
                 actionsTableBody.innerHTML = (window.currentLogs.action || []).map(function (l) {
-                    return '<tr><td data-label="時間" style="padding:12px;white-space:nowrap;">' + new Date(l.created_at).toLocaleString('zh-TW') + '</td><td data-label="帳號">' + (l.username || '') + '</td><td data-label="動作"><span class="badge new">' + (l.action || '') + '</span></td><td data-label="詳細內容"><div style="font-size:12px;color:#666;">' + escapeHtml(l.details || '') + '</div></td></tr>';
+                    return '<tr><td data-label="時間" style="padding:12px;white-space:nowrap;">' + new Date(l.created_at).toLocaleString('zh-TW') + '</td><td data-label="帳號">' + (l.username || '') + '</td><td data-label="姓名">' + (l.user_name || '-') + '</td><td data-label="動作"><span class="badge new">' + (l.action || '') + '</span></td><td data-label="詳細內容"><div style="font-size:12px;color:#666;">' + escapeHtml(l.details || '') + '</div></td></tr>';
                 }).join('');
             }
             if (typeof window.renderPagination === 'function') {
@@ -707,14 +707,14 @@
         }
         var csvContent = '\uFEFF';
         if (type === 'login') {
-            csvContent += '時間,帳號,IP位址\n';
+            csvContent += '時間,帳號,姓名,IP位址\n';
             data.forEach(function (row) {
-                csvContent += '"' + new Date(row.login_time).toLocaleString('zh-TW') + '","' + (row.username || '') + '","' + (row.ip_address || '') + '"\n';
+                csvContent += '"' + new Date(row.login_time).toLocaleString('zh-TW') + '","' + (row.username || '') + '","' + (row.user_name || '') + '","' + (row.ip_address || '') + '"\n';
             });
         } else {
-            csvContent += '時間,帳號,動作,詳細內容\n';
+            csvContent += '時間,帳號,姓名,動作,詳細內容\n';
             data.forEach(function (row) {
-                csvContent += '"' + new Date(row.created_at).toLocaleString('zh-TW') + '","' + (row.username || '') + '","' + (row.action || '') + '","' + (row.details || '').replace(/"/g, '""') + '"\n';
+                csvContent += '"' + new Date(row.created_at).toLocaleString('zh-TW') + '","' + (row.username || '') + '","' + (row.user_name || '') + '","' + (row.action || '') + '","' + (row.details || '').replace(/"/g, '""') + '"\n';
             });
         }
         var link = document.createElement('a');
