@@ -1,9 +1,10 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import IssuesImportTab from './import/IssuesImportTab';
 import IssuesCreateTab from './import/IssuesCreateTab';
 import IssuesYearEditTab from './import/IssuesYearEditTab';
 import PlansScheduleTab from './import/PlansScheduleTab';
 import PlansManageTab from './import/PlansManageTab';
+import PlanFormPage from './import/PlanFormPage';
 
 const ISSUES_SUB_TABS = [
   { id: 'batch', path: '/import/batch', label: '批次匯入' },
@@ -18,12 +19,18 @@ const PLANS_SUB_TABS = [
 
 export default function ImportView() {
   const { sub } = useParams();
+  const [searchParams] = useSearchParams();
   const activeSub = sub || 'batch';
   const navigate = useNavigate();
+
+  const formAction = searchParams.get('action');
+  const formPlanId = searchParams.get('id');
+  const showPlanForm = activeSub === 'manage' && (formAction === 'new' || (formAction === 'edit' && formPlanId));
 
   const isIssues = ['batch', 'create', 'year-edit'].includes(activeSub);
   const isPlans = ['schedule', 'manage'].includes(activeSub);
   const renderContent = () => {
+    if (showPlanForm) return <PlanFormPage />;
     switch (activeSub) {
       case 'batch':
         return <IssuesImportTab />;

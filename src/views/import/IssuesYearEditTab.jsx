@@ -238,7 +238,6 @@ export default function IssuesYearEditTab() {
         issue={selectedIssue}
         onClose={handleCloseDrawer}
         onRefresh={handleRefresh}
-        openInEditMode
       />
     </div>
   );

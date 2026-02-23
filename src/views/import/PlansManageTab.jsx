@@ -1,23 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../api/api';
 import { useToast } from '../../context/ToastContext';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import PaginationBar from '../../components/users/PaginationBar';
-import PlanFormPage from './PlanFormPage';
 import PlanImportModal from '../../components/import/PlanImportModal';
 import { INSPECTION_NAMES, BUSINESS_NAMES } from '../../utils/constants';
 
 export default function PlansManageTab() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const formAction = searchParams.get('action');
-  const formPlanId = searchParams.get('id');
-
-  // 全頁表單模式（避免 modal 無法輸入問題）
-  if (formAction === 'new' || (formAction === 'edit' && formPlanId)) {
-    return <PlanFormPage />;
-  }
   const showToast = useToast();
   const [plans, setPlans] = useState([]);
   const [total, setTotal] = useState(0);
