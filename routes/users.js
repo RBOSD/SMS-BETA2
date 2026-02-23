@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { pool } = require('../config/pool');
 const { isAdminUser } = require('../db/helpers');
 const { requireAuth, requireAdmin, requireAdminOrManager } = require('../middleware/auth');

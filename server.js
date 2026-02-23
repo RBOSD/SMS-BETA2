@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
 const session = require('express-session');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 require('dotenv').config();
 
