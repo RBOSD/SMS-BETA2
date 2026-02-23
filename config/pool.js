@@ -15,15 +15,25 @@ const sslConfig = (() => {
 })();
 
 // 主應用程式連線池
-// Vercel serverless：請使用 Supabase Transaction Mode (port 6543) 連線字串，並增加連線逾時
-// Supabase Dashboard → Project Settings → Database → Connection string → Transaction mode
+// Vercel serverless：必須使用 Supabase Transaction Mode (port 6543) 連線字串
+// Supabase Dashboard → Connect → Transaction mode
 const isVercel = !!process.env.VERCEL;
+const rawUrl = process.env.DATABASE_URL;
+// Vercel：可選用 DATABASE_POOLER_URL（Transaction mode），若未設則用 DATABASE_URL
+const connectionString = (isVercel && process.env.DATABASE_POOLER_URL)
+    ? process.env.DATABASE_POOLER_URL
+    : rawUrl;
+// Transaction mode (port 6543) 不支援 prepared statements，附加 pgbouncer=true
+const finalUrl = connectionString && connectionString.includes(':6543')
+    ? (connectionString.includes('?') ? `${connectionString}&pgbouncer=true` : `${connectionString}?pgbouncer=true`)
+    : connectionString;
+
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.DATABASE_URL ? sslConfig : false,
+    connectionString: finalUrl,
+    ssl: connectionString ? sslConfig : false,
     max: isVercel ? 1 : 2, // Vercel serverless 建議 1，避免連線累積
     idleTimeoutMillis: isVercel ? 10000 : 5000,
-    connectionTimeoutMillis: isVercel ? 15000 : 2000, // Vercel cold start 需較長逾時
+    connectionTimeoutMillis: isVercel ? 25000 : 2000, // Vercel cold start 需較長逾時（25 秒）
     allowExitOnIdle: false,
 });
 
