@@ -2,6 +2,7 @@
  * 檢查計畫整批匯入 Modal（Excel .xlsx）
  */
 import { useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { read, utils, writeFileXLSX } from 'xlsx';
 import { apiFetch } from '../../api/api';
 import { useToast } from '../../context/ToastContext';
@@ -215,9 +216,9 @@ export default function PlanImportModal({ open, onClose, onSuccess }) {
 
   if (!open) return null;
 
-  return (
+  const modalContent = (
     <div className="modal-overlay" style={{ display: 'flex', zIndex: 10000 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-box" style={{ maxWidth: 600, width: '95%' }}>
+      <div className="modal-box" style={{ maxWidth: 600, width: '95%' }} onClick={(e) => e.stopPropagation()}>
         <h3 style={{ marginTop: 0 }}>整批匯入檢查計畫（Excel）</h3>
         <div className="form-group">
           <label>選擇匯入檔案（.xlsx）</label>
@@ -243,4 +244,6 @@ export default function PlanImportModal({ open, onClose, onSuccess }) {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
