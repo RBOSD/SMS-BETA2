@@ -4,15 +4,9 @@
  */
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import commonjs from 'vite-plugin-commonjs';
 
 export default defineConfig({
-  plugins: [
-    commonjs({
-      filter: (id) => id.includes('node_modules'),
-    }),
-    react(),
-  ],
+  plugins: [react()],
   root: '.',
   publicDir: process.env.VERCEL ? false : 'public',
   base: process.env.VERCEL ? '/app/' : '/',
@@ -35,7 +29,7 @@ export default defineConfig({
       },
     },
     minify: 'esbuild',
-    sourcemap: true,
+    sourcemap: false,
     commonjsOptions: {
       include: [/node_modules/],
       transformMixedEsModules: false,
