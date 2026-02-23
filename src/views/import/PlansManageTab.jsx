@@ -1,13 +1,23 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { apiFetch } from '../../api/api';
 import { useToast } from '../../context/ToastContext';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import PaginationBar from '../../components/users/PaginationBar';
-import PlanModal from '../../components/import/PlanModal';
+import PlanFormPage from './PlanFormPage';
 import PlanImportModal from '../../components/import/PlanImportModal';
 import { INSPECTION_NAMES, BUSINESS_NAMES } from '../../utils/constants';
 
 export default function PlansManageTab() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const formAction = searchParams.get('action');
+  const formPlanId = searchParams.get('id');
+
+  // 全頁表單模式（避免 modal 無法輸入問題）
+  if (formAction === 'new' || (formAction === 'edit' && formPlanId)) {
+    return <PlanFormPage />;
+  }
   const showToast = useToast();
   const [plans, setPlans] = useState([]);
   const [total, setTotal] = useState(0);
@@ -22,9 +32,6 @@ export default function PlansManageTab() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({});
   const [planSchedules, setPlanSchedules] = useState({});
-  const [planModalOpen, setPlanModalOpen] = useState(false);
-  const [planModalMode, setPlanModalMode] = useState('create');
-  const [planModalPlan, setPlanModalPlan] = useState(null);
   const [planImportOpen, setPlanImportOpen] = useState(false);
 
   const loadPlans = useCallback(
@@ -160,16 +167,12 @@ export default function PlansManageTab() {
     setConfirmOpen(true);
   };
 
-  const openPlanModal = (plan = null) => {
-    setPlanModalPlan(plan);
-    setPlanModalMode(plan ? 'edit' : 'create');
-    setPlanModalOpen(true);
-  };
-
-  const closePlanModal = () => {
-    setPlanModalOpen(false);
-    setPlanModalPlan(null);
-    setPlanModalMode('create');
+  const openPlanForm = (plan = null) => {
+    if (plan) {
+      navigate('/import/manage?action=edit&id=' + plan.id);
+    } else {
+      navigate('/import/manage?action=new');
+    }
   };
 
   const openPlanImport = () => {
@@ -186,7 +189,7 @@ export default function PlansManageTab() {
           <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>管理檢查計畫資料，可新增、編輯、刪除檢查計畫，並支援 Excel 整批匯入。</p>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <button className="btn btn-primary" onClick={openPlanModal}>
+          <button className="btn btn-primary" onClick={() => openPlanForm()}>
             ➕ 新增計畫
           </button>
           <button className="btn btn-outline" onClick={openPlanImport}>
@@ -290,7 +293,7 @@ export default function PlansManageTab() {
                   <td style={{ padding: 12, textAlign: 'center' }}>{p.issue_count || 0}</td>
                   <td style={{ padding: 12 }}>{p.created_at ? new Date(p.created_at).toISOString().slice(0, 10) : '-'}</td>
                   <td style={{ padding: 12 }}>
-                    <button className="btn btn-outline" style={{ padding: '2px 6px', marginRight: 4 }} onClick={() => openPlanModal(p)} title="編輯">
+                    <button className="btn btn-outline" style={{ padding: '2px 6px', marginRight: 4 }} onClick={() => openPlanForm(p)} title="編輯">
                       ✏️
                     </button>
                     <button className="btn btn-danger" style={{ padding: '2px 6px' }} onClick={() => deletePlan(p)} title="刪除">
@@ -308,19 +311,6 @@ export default function PlansManageTab() {
       </div>
 
       <ConfirmModal open={confirmOpen} {...confirmConfig} />
-
-      <PlanModal
-        key={planModalPlan ? `edit-${planModalPlan.id}` : 'create'}
-        open={planModalOpen}
-        mode={planModalMode}
-        planId={planModalPlan?.id}
-        plan={planModalPlan}
-        onClose={closePlanModal}
-        onSuccess={() => {
-          closePlanModal();
-          loadPlans(page);
-        }}
-      />
 
       <PlanImportModal
         open={planImportOpen}

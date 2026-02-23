@@ -163,11 +163,21 @@ module.exports = function registerPlansRoutes(app) {
         try {
             if (req.params.id === 'by-name') return res.status(404).json({error: 'Invalid route'});
             const result = await pool.query(
-                "SELECT id, plan_name AS name, year, created_at, updated_at, planned_count, business FROM inspection_plan_schedule WHERE id = $1",
+                "SELECT id, plan_name AS name, year, created_at, updated_at, planned_count, business, railway, inspection_type, owner_group_id, COALESCE(owner_group_ids, ARRAY[]::INTEGER[]) AS owner_group_ids FROM inspection_plan_schedule WHERE id = $1",
                 [req.params.id]
             );
             if (result.rows.length === 0) return res.status(404).json({error: 'Plan not found'});
-            const row = result.rows[0];
+            let row = result.rows[0];
+            const headerRes = await pool.query(
+                "SELECT planned_count, business, railway, inspection_type, owner_group_id, COALESCE(owner_group_ids, ARRAY[]::INTEGER[]) AS owner_group_ids FROM inspection_plan_schedule WHERE plan_name = $1 AND year = $2 AND inspection_seq = '00' LIMIT 1",
+                [row.name, row.year]
+            );
+            if (headerRes.rows.length > 0) {
+                const h = headerRes.rows[0];
+                row = { ...row, planned_count: h.planned_count ?? row.planned_count, business: h.business ?? row.business, railway: h.railway, inspection_type: h.inspection_type, owner_group_id: h.owner_group_id };
+                const gids = Array.isArray(h.owner_group_ids) && h.owner_group_ids.length > 0 ? h.owner_group_ids : (h.owner_group_id != null ? [h.owner_group_id] : []);
+                row.owner_group_ids = gids.map(x => parseInt(x, 10)).filter(n => Number.isFinite(n));
+            }
             const scheduleCountRes = await pool.query(
                 "SELECT COUNT(*) AS cnt FROM inspection_plan_schedule WHERE plan_name = $1 AND year = $2 AND (plan_number IS NULL OR plan_number <> '(手動)')",
                 [row.name, row.year]
