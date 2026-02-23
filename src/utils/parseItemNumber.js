@@ -1,6 +1,6 @@
 /**
  * 編號解析工具：parseItemNumber、ORG_MAP、DIVISION_MAP、INSPECTION_MAP、KIND_MAP
- * 與 public/scripts.js 保持一致
+ * 與原編號解析邏輯一致
  */
 
 function normalizeCodeString(str) {

@@ -82,7 +82,7 @@ app.use(session({
 }));
 
 // [Modularized] 使用 middleware 與 db helpers
-const { protectHtmlPages, protectViewTemplates } = require('./middleware/protect');
+const { protectHtmlPages } = require('./middleware/protect');
 const { requireAuth, requireAdmin, requireAdminOrManager } = require('./middleware/auth');
 const { csrfProtection, getCsrfToken, verifyCsrf } = require('./middleware/csrf');
 const { loginLimiter, apiLimiter, geminiLimiter } = require('./middleware/rateLimit');
@@ -93,7 +93,6 @@ const { validatePassword } = require('./utils/validation');
 
 // 應用路由保護（在靜態檔案服務之前）
 app.use(protectHtmlPages);
-app.use(protectViewTemplates);
 
 // 靜態檔案服務：僅使用新架構（dist 或 Vercel 的 public/app），不 fallback 至 public
 const distPath = process.env.VERCEL
@@ -148,7 +147,7 @@ if (fs.existsSync(appStaticPath)) {
 // SPA：非 API、非靜態檔的 GET 請求回傳 React index.html（不 fallback 至舊版）
 const reactIndexPath = path.join(distPath, 'index.html');
 app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api') || req.path.startsWith('/css') || req.path.startsWith('/js') || req.path.startsWith('/views') || req.path.startsWith('/app')) return next();
+    if (req.path.startsWith('/api') || req.path.startsWith('/app')) return next();
     if (fs.existsSync(reactIndexPath)) {
         return res.sendFile(reactIndexPath);
     }
