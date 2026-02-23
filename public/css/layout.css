@@ -125,6 +125,22 @@
     display: none !important;
 }
 
+.sidebar-group-toggle {
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+}
+
+.sidebar-group-toggle:hover {
+    background: #f1f5f9;
+}
+
+.sidebar-group-toggle span:first-child {
+    font-size: 10px;
+    color: var(--text-sub);
+}
+
 .sidebar-sub {
     display: flex;
     flex-direction: column;

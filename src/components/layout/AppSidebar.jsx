@@ -1,5 +1,8 @@
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+
+const SIDEBAR_EXPANDED_KEY = 'sms-sidebar-groups-expanded';
 
 const IMPORT_ROUTES = [
   { path: '/import/batch', label: '批次匯入' },
@@ -16,9 +19,27 @@ const USERS_ROUTES = [
   { path: '/users/system', label: '系統維護' },
 ];
 
+function loadExpandedState() {
+  try {
+    const s = localStorage.getItem(SIDEBAR_EXPANDED_KEY);
+    if (s) {
+      const o = JSON.parse(s);
+      return { import: o.import !== false, users: o.users !== false };
+    }
+  } catch (_) {}
+  return { import: true, users: true };
+}
+
 export default function AppSidebar({ open, onClose }) {
   const location = useLocation();
   const { user } = useAuth();
+  const [expanded, setExpanded] = useState(loadExpandedState);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SIDEBAR_EXPANDED_KEY, JSON.stringify(expanded));
+    } catch (_) {}
+  }, [expanded]);
 
   const isAdmin = user?.isAdmin === true || user?.is_admin === true;
   const canManage = user && (isAdmin || user.role === 'manager');
@@ -32,6 +53,10 @@ export default function AppSidebar({ open, onClose }) {
   const subLinkClass = (path) => {
     const isActive = location.pathname === path;
     return `sidebar-sub-btn ${isActive ? 'active' : ''}`;
+  };
+
+  const toggleGroup = (key) => {
+    setExpanded((p) => ({ ...p, [key]: !p[key] }));
   };
 
   return (
@@ -50,31 +75,49 @@ export default function AppSidebar({ open, onClose }) {
           檢查行程檢索
         </Link>
         {canManage && (
-          <div className="sidebar-group expanded" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <div className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/import') ? 'active' : ''}`}>
-              資料管理
+          <div className={`sidebar-group ${expanded.import ? 'expanded' : 'collapsed'}`}>
+            <div
+              className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/import') ? 'active' : ''} sidebar-group-toggle`}
+              onClick={() => toggleGroup('import')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && toggleGroup('import')}
+            >
+              <span>{expanded.import ? '▼' : '▶'}</span>
+              <span>資料管理</span>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginLeft: 12, paddingLeft: 12, borderLeft: '2px solid #e2e8f0' }}>
-              {IMPORT_ROUTES.map((r) => (
-                <Link key={r.path} to={r.path} className={subLinkClass(r.path)} onClick={onClose} style={{ display: 'block', padding: '10px 14px' }}>
-                  {r.label}
-                </Link>
-              ))}
-            </div>
+            {expanded.import && (
+              <div className="sidebar-sub">
+                {IMPORT_ROUTES.map((r) => (
+                  <Link key={r.path} to={r.path} className={subLinkClass(r.path)} onClick={onClose}>
+                    {r.label}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         )}
         {canAdmin && (
-          <div className="sidebar-group expanded" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <div className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/users') ? 'active' : ''}`}>
-              後台管理
+          <div className={`sidebar-group ${expanded.users ? 'expanded' : 'collapsed'}`}>
+            <div
+              className={`sidebar-btn sidebar-btn-parent ${location.pathname.startsWith('/users') ? 'active' : ''} sidebar-group-toggle`}
+              onClick={() => toggleGroup('users')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && toggleGroup('users')}
+            >
+              <span>{expanded.users ? '▼' : '▶'}</span>
+              <span>後台管理</span>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginLeft: 12, paddingLeft: 12, borderLeft: '2px solid #e2e8f0' }}>
-              {USERS_ROUTES.map((r) => (
-                <Link key={r.path} to={r.path} className={subLinkClass(r.path)} onClick={onClose} style={{ display: 'block', padding: '10px 14px' }}>
-                  {r.label}
-                </Link>
-              ))}
-            </div>
+            {expanded.users && (
+              <div className="sidebar-sub">
+                {USERS_ROUTES.map((r) => (
+                  <Link key={r.path} to={r.path} className={subLinkClass(r.path)} onClick={onClose}>
+                    {r.label}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </nav>
