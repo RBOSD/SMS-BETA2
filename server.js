@@ -19,24 +19,40 @@ const PORT = process.env.PORT || 3000;
 // 僅在本機環境才載入並使用 pg session store
 const isVercel = process.env.VERCEL === '1' || process.env.VERCEL === 'true' || !!process.env.VERCEL;
 const redisUrl = process.env.REDIS_URL || process.env.KV_URL;
+const upstashRestUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+const upstashRestToken = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
 let sessionStore;
 
 if (isVercel) {
     // Vercel：只用 Redis 或 MemoryStore，絕不連線 PostgreSQL 做 session
-    if (redisUrl) {
+    // 優先 1：Upstash REST API（Vercel Integrations 常用）
+    if (upstashRestUrl && upstashRestToken) {
+        try {
+            const { Redis } = require('@upstash/redis');
+            const { UpstashSessionStore } = require('./utils/upstashSessionStore');
+            const redis = new Redis({ url: upstashRestUrl, token: upstashRestToken });
+            sessionStore = new UpstashSessionStore({ redis, ttl: 30 * 24 * 60 * 60 }); // 30 天
+            console.log('[Vercel] Session store: Upstash Redis (REST API)');
+        } catch (e) {
+            console.warn('Upstash REST session store init failed:', e?.message);
+        }
+    }
+    // 優先 2：Redis 協定 URL（rediss://...）
+    if (!sessionStore && redisUrl) {
         try {
             const { createClient } = require('redis');
             const { RedisStore } = require('connect-redis');
             const redisClient = createClient({ url: redisUrl });
             redisClient.connect().catch((e) => console.warn('Redis connect:', e?.message));
             sessionStore = new RedisStore({ client: redisClient });
+            console.log('[Vercel] Session store: Redis (TCP)');
         } catch (e) {
             console.warn('Redis session store init failed:', e?.message);
         }
     }
     if (!sessionStore) {
         sessionStore = undefined; // express-session 預設使用 MemoryStore
-        console.warn('[Vercel] 未設定 REDIS_URL，session 使用記憶體儲存。建議安裝 Upstash Redis 以持久化 session。');
+        console.warn('[Vercel] 未設定 Redis，session 使用記憶體儲存。建議安裝 Upstash Redis 以持久化 session。');
     }
 } else {
     // 本機：使用 PostgreSQL session store（延遲載入，避免 Vercel 載入此模組）
