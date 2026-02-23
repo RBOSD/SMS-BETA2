@@ -95,19 +95,12 @@ const { validatePassword } = require('./utils/validation');
 app.use(protectHtmlPages);
 app.use(protectViewTemplates);
 
-// 嵌入模式：供 React 版 iframe 載入 public 版頁面（/embed?embed=1&view=importView&tab=issues&sub=import）
-app.get('/embed', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// 靜態檔案服務：優先使用 dist（React 版），若無則使用 public
-const distPath = path.join(__dirname, 'dist');
-const publicPath = path.join(__dirname, 'public');
+// 靜態檔案服務：僅使用新架構（dist 或 Vercel 的 public/app），不 fallback 至 public
+const distPath = process.env.VERCEL
+    ? path.join(__dirname, 'public', 'app')
+    : path.join(__dirname, 'dist');
 if (fs.existsSync(distPath)) {
     app.use(express.static(distPath));
-    app.use(express.static(publicPath)); // public 仍供 /embed、/css、/js、/views 等
-} else {
-    app.use(express.static(publicPath));
 }
 
 // 為所有 API 路由提供 CSRF token
@@ -152,16 +145,14 @@ if (fs.existsSync(appStaticPath)) {
         res.status(404).end();
     });
 }
-// SPA 回退：非 API、非 embed、非靜態檔的 GET 請求回傳 index.html
-const reactIndexPath = process.env.VERCEL
-    ? path.join(__dirname, 'public', 'app', 'index.html')
-    : path.join(__dirname, 'dist', 'index.html');
+// SPA：非 API、非靜態檔的 GET 請求回傳 React index.html（不 fallback 至舊版）
+const reactIndexPath = path.join(distPath, 'index.html');
 app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api') || req.path.startsWith('/embed') || req.path.startsWith('/css') || req.path.startsWith('/js') || req.path.startsWith('/views') || req.path.startsWith('/app')) return next();
+    if (req.path.startsWith('/api') || req.path.startsWith('/css') || req.path.startsWith('/js') || req.path.startsWith('/views') || req.path.startsWith('/app')) return next();
     if (fs.existsSync(reactIndexPath)) {
         return res.sendFile(reactIndexPath);
     }
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.status(500).send('React 建置檔未找到，請先執行：npm run build');
 });
 
 

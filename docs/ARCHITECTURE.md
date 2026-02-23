@@ -11,8 +11,8 @@
 
 ### 靜態檔案服務
 
-- **優先順序**：若有 `dist/` 資料夾，Express 會優先從 `dist/` 提供
-- **Fallback**：若無 `dist/` 或檔案不存在，則從 `public/` 提供
+- **僅使用新架構**：若有 `dist/`（或 Vercel 的 `public/app/`），Express 從該處提供
+- **無 fallback**：若建置檔不存在，回傳錯誤，不退回舊版 `public/`
 
 ### 專案結構
 
