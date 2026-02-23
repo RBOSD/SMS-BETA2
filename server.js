@@ -8,37 +8,48 @@ const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
 const bcrypt = require('bcrypt');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-require('dotenv').config(); 
+require('dotenv').config();
 
 const app = express();
 
-app.set('trust proxy', 1); 
+app.set('trust proxy', 1);
 
 const PORT = process.env.PORT || 3000;
 
-// Session store 使用 pool（Supabase Session Mode）
-const sessionPool = pool;
+// Session store：Vercel 可選用 Redis（REDIS_URL）避免 Supabase 連線逾時
+const redisUrl = process.env.REDIS_URL || process.env.KV_URL;
+let sessionStore;
+
+if (process.env.VERCEL && redisUrl) {
+    try {
+        const { createClient } = require('redis');
+        const { RedisStore } = require('connect-redis');
+        const redisClient = createClient({ url: redisUrl });
+        redisClient.connect().catch((e) => console.warn('Redis connect:', e?.message));
+        sessionStore = new RedisStore({ client: redisClient });
+    } catch (e) {
+        console.warn('Redis session store init failed:', e?.message);
+    }
+}
+
+if (!sessionStore) {
+    try {
+        sessionStore = new pgSession({
+            pool,
+            tableName: 'session',
+            createTableIfMissing: true,
+            pruneSessionInterval: false
+        });
+    } catch (storeError) {
+        console.warn('Session store initialization warning:', storeError?.message || storeError);
+        if (process.env.NODE_ENV !== 'production') {
+            sessionStore = undefined;
+        }
+    }
+}
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
-
-// [Modified] Session Configuration（必須在路由保護之前，才能使用 req.session）
-let sessionStore;
-try {
-    sessionStore = new pgSession({
-        pool: sessionPool, // 使用獨立的 session 連線池
-        tableName: 'session',
-        createTableIfMissing: true,
-        pruneSessionInterval: false // 手動控制清理，避免初始化問題
-    });
-} catch (storeError) {
-    console.warn('Session store initialization warning:', storeError?.message || storeError);
-    // 如果 session store 初始化失敗，使用記憶體 store（僅開發環境）
-    if (process.env.NODE_ENV !== 'production') {
-        console.warn('Falling back to memory store for development');
-        sessionStore = undefined;
-    }
-}
 
 app.use(session({
     store: sessionStore,

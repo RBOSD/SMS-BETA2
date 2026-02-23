@@ -2,7 +2,28 @@
 
 ## 連線逾時問題
 
-若出現 `Error: timeout exceeded when trying to connect`，**幾乎一定是** `DATABASE_URL` 使用了 **port 5432**（Direct/Session）而非 **port 6543**（Transaction）。
+若出現 `Error: timeout exceeded when trying to connect`，可嘗試以下兩種解法。
+
+---
+
+## 解法 A：使用 Redis 作為 Session Store（建議）
+
+若 Supabase 連線持續逾時，可改用 **Upstash Redis** 儲存 session，資料庫僅用於業務資料。
+
+### 步驟
+
+1. Vercel → **Marketplace** → 搜尋 **Upstash Redis** → 安裝
+2. 安裝後會自動注入 `KV_URL` 或 `REDIS_URL`
+3. 在 Vercel 環境變數確認有 `REDIS_URL` 或 `KV_URL`（Redis 連線字串）
+4. 重新部署
+
+程式會自動偵測：當 `VERCEL=1` 且 `REDIS_URL`/`KV_URL` 存在時，使用 Redis 作為 session store。
+
+---
+
+## 解法 B：修正 Supabase 連線字串
+
+若堅持使用 PostgreSQL 儲存 session，`DATABASE_URL` 必須使用 **port 6543**（Transaction mode）。
 
 ### 快速檢查
 
