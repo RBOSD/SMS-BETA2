@@ -44,7 +44,13 @@ module.exports = function registerAuthRoutes(app) {
         } catch (e) {
             console.error("Login Error:", e);
             logError(e, 'Login error', req).catch(() => {});
-            res.status(500).json({ error: 'System error' });
+            const msg = e?.message || String(e);
+            const isTimeout = msg.includes('timeout') || msg.includes('ETIMEDOUT');
+            const isConn = msg.includes('connect') || msg.includes('ECONNREFUSED') || msg.includes('ENOTFOUND');
+            const errMsg = isTimeout || isConn
+                ? '資料庫連線逾時或失敗，請確認 Supabase 專案未暫停且 DATABASE_URL 使用 port 6543。詳見 docs/VERCEL_SUPABASE.md'
+                : 'System error';
+            res.status(500).json({ error: errMsg });
         }
     });
 
