@@ -1,7 +1,7 @@
 /**
- * 檢查計畫新增/編輯 Modal
+ * 檢查計畫新增/編輯 Modal（使用原生 <dialog> 確保表單可互動）
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { apiFetch } from '../../api/api';
 import { useToast } from '../../context/ToastContext';
@@ -37,6 +37,7 @@ const BUSINESS_OPTIONS = [
 export default function PlanModal({ open, mode, planId, plan, onClose, onSuccess }) {
   const showToast = useToast();
   const { user: currentUser } = useAuth();
+  const dialogRef = useRef(null);
   const [groups, setGroups] = useState([]);
   const [ownerGroupIds, setOwnerGroupIds] = useState([]);
   const [year, setYear] = useState('');
@@ -46,6 +47,17 @@ export default function PlanModal({ open, mode, planId, plan, onClose, onSuccess
   const [business, setBusiness] = useState('');
   const [plannedCount, setPlannedCount] = useState('');
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const el = dialogRef.current;
+    if (!el) return;
+    if (open) {
+      el.showModal();
+    } else {
+      el.close();
+    }
+    return () => { try { el.close(); } catch (_) {} };
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -150,20 +162,21 @@ export default function PlanModal({ open, mode, planId, plan, onClose, onSuccess
     }
   };
 
-  if (!open) return null;
-
   const modalContent = (
-    <div className="modal-overlay" style={{ display: 'flex', zIndex: 10000, pointerEvents: 'none' }}>
-      <div
-        style={{ position: 'absolute', inset: 0, pointerEvents: 'auto', cursor: 'default' }}
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      <div
-        className="modal-box plan-edit-modal"
-        style={{ maxWidth: 600, width: '95%', position: 'relative', zIndex: 1, pointerEvents: 'auto' }}
-        onClick={(e) => e.stopPropagation()}
-      >
+    <dialog
+      ref={dialogRef}
+      onCancel={(e) => { e.preventDefault(); onClose(); }}
+      style={{
+        maxWidth: 600,
+        width: '95%',
+        border: '1px solid var(--border)',
+        borderRadius: 16,
+        padding: 0,
+        boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+      }}
+      className="plan-edit-modal"
+    >
+      <div style={{ padding: '24px 24px 0 24px' }}>
         <div className="plan-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h3 style={{ margin: 0 }}>{mode === 'create' ? '新增檢查計畫' : '編輯檢查計畫'}</h3>
           <button onClick={onClose} style={{ border: 'none', background: 'none', fontSize: 24, color: '#64748b', cursor: 'pointer' }} aria-label="關閉">
@@ -231,16 +244,16 @@ export default function PlanModal({ open, mode, planId, plan, onClose, onSuccess
             </div>
           </div>
         </div>
-        <div className="plan-modal-footer" style={{ display: 'flex', gap: 12, marginTop: 24 }}>
-          <button className="btn btn-primary" onClick={handleSubmit} disabled={saving}>
+        <div className="plan-modal-footer" style={{ display: 'flex', gap: 12, marginTop: 24, paddingBottom: 24 }}>
+          <button className="btn btn-primary" onClick={handleSubmit} disabled={saving} type="button">
             {saving ? '儲存中...' : '儲存'}
           </button>
-          <button className="btn btn-outline" onClick={onClose}>
+          <button className="btn btn-outline" onClick={onClose} type="button">
             取消
           </button>
         </div>
       </div>
-    </div>
+    </dialog>
   );
 
   return createPortal(modalContent, document.body);
