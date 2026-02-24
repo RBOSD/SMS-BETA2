@@ -122,7 +122,7 @@ export default function ActionsTab() {
     <div className="main-card">
       <div style={{ marginBottom: 24 }}>
         <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>
-          查看系統使用者的操作歷程紀錄，包含操作時間、帳號、姓名、動作和詳細內容。可匯出資料或清理舊紀錄。
+          查看系統使用者的操作紀錄，包含操作時間、帳號、姓名、動作和詳細內容。可匯出資料或清理舊紀錄。
         </p>
       </div>
       <div

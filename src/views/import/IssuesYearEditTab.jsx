@@ -1,5 +1,5 @@
 /**
- * 開立事項修正 - 完整 React 改寫
+ * 事項修正 - 完整 React 改寫
  * 選擇計畫後可查看並編輯該計畫下所有事項
  */
 import { useState, useEffect, useCallback } from 'react';

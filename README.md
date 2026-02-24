@@ -59,7 +59,7 @@ npm start
 | `/import/year-edit` | 事項修正 |
 | `/import/schedule` | 行程規劃 |
 | `/import/manage` | 計畫管理 |
-| `/users/*` | 後台管理（帳號、群組、紀錄、系統維護） |
+| `/users/*` | 後台管理（帳號管理、登入紀錄、操作紀錄、系統維護） |
 
 ## 專案結構
 

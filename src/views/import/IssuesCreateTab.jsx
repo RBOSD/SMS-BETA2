@@ -1,5 +1,5 @@
 /**
- * 開立事項建檔 - 完整 React 改寫
+ * 事項新增 - 完整 React 改寫
  * 功能、版型、顏色、字體、字型與原版一致
  */
 import { useState, useEffect, useCallback } from 'react';

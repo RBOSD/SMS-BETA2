@@ -1677,7 +1677,7 @@
             z-index: 1;
         }
         
-        /* 修正開立事項建檔頁面的重疊問題 */
+        /* 修正事項新增頁面的重疊問題 */
         /* 確保單筆模式容器有正確的 overflow 設定 */
         #createSingleMode {
             position: relative;
