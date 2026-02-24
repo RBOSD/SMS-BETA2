@@ -1,10 +1,11 @@
-/* Layout */
+/* Layout - 預留 header 高度，避免內容被遮住 */
 .app-body {
     display: flex;
     flex: 1;
     flex-direction: column;
     position: relative;
-    min-height: calc(100vh - 60px);
+    margin-top: var(--header-h, 60px);
+    min-height: calc(100vh - var(--header-h, 60px));
 }
 
 /* Drawer Sidebar - 桌面版常駐、手機版抽屜 */
