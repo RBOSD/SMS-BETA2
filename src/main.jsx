@@ -11,3 +11,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </React.StrictMode>
 );
+if (typeof window.__clearLoadTimeout === 'function') window.__clearLoadTimeout();

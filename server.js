@@ -178,6 +178,9 @@ if (fs.existsSync(appStaticPath)) {
         const realPath = path.resolve(filePath);
         const realApp = path.resolve(appStaticPath);
         if (realPath.startsWith(realApp) && fs.existsSync(realPath) && fs.statSync(realPath).isFile()) {
+            if (rel === 'index.html' || rel.endsWith('.html')) {
+                res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+            }
             return res.sendFile(realPath);
         }
         res.status(404).end();
@@ -188,6 +191,7 @@ const reactIndexPath = path.join(distPath, 'index.html');
 app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api') || req.path.startsWith('/app')) return next();
     if (fs.existsSync(reactIndexPath)) {
+        res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
         return res.sendFile(reactIndexPath);
     }
     res.status(500).send('React 建置檔未找到，請先執行：npm run build');

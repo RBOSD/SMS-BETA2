@@ -15,8 +15,22 @@
 </head>
 <body>
   <div id="root">
-    <div id="app-loading" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f1f5f9;color:#64748b;font-family:system-ui,sans-serif;font-size:16px;">載入中...</div>
+    <div id="app-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#f1f5f9;color:#64748b;font-family:system-ui,sans-serif;font-size:16px;gap:12px;">
+      <span>載入中...</span>
+    </div>
   </div>
+  <script>
+    (function(){
+      var t=setTimeout(function(){
+        var el=document.getElementById('app-loading');
+        if(el&&el.closest('#root')&&el.textContent.indexOf('載入中')>=0){
+          el.innerHTML='<span style="color:#475569;margin-bottom:8px;">載入逾時或版本已更新</span><span style="color:#94a3b8;font-size:14px;">請點擊下方按鈕重新整理頁面</span><button onclick="location.reload(true)" style="margin-top:12px;padding:10px 20px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:15px;">重新整理</button>';
+          el.style.flexDirection='column';
+        }
+      },10000);
+      window.__clearLoadTimeout=function(){clearTimeout(t);};
+    })();
+  </script>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>
