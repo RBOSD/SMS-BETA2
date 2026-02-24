@@ -5,7 +5,6 @@ import { apiFetch } from '../api/api';
 import { stripHtml, getLatestReviewOrHandling, extractKindCodeFromNumber, getKindLabel } from '../utils/helpers';
 import DashboardCharts from '../components/search/DashboardCharts';
 import DetailDrawer from '../components/common/DetailDrawer';
-import PreviewModal from '../components/common/PreviewModal';
 import ConfirmModal from '../components/common/ConfirmModal';
 
 const SORT_FIELD_MAP = { year: 'year', number: 'number', unit: 'unit', status: 'status', content: 'created_at', latest: 'created_at' };
@@ -45,9 +44,7 @@ export default function SearchView() {
   const [latestCreatedAt, setLatestCreatedAt] = useState(null);
   const [dashboardOpen, setDashboardOpen] = useState(true);
   const [drawerIssue, setDrawerIssue] = useState(null);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewContent, setPreviewContent] = useState('');
-  const [previewTitle, setPreviewTitle] = useState('');
+  const [expandedContentId, setExpandedContentId] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({});
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -497,21 +494,29 @@ export default function SearchView() {
                         {badge}
                       </div>
                     </td>
-                    <td data-label="事項內容">
-                      <div className="text-content">
-                        {snippet}
+                    <td data-label="事項內容" style={{ verticalAlign: 'top' }}>
+                      <div className="text-content" style={{ whiteSpace: expandedContentId === item.id ? 'pre-wrap' : undefined, maxWidth: expandedContentId === item.id ? 'none' : undefined, lineHeight: 1.6 }}>
+                        {expandedContentId === item.id ? stripHtml(fullContent) : snippet}
                         {showMore && (
-                          <a
-                            href="#"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setPreviewContent(fullContent);
-                              setPreviewTitle(`編號 ${item.number} 內容`);
-                              setPreviewOpen(true);
-                            }}
-                          >
-                            ...更多
-                          </a>
+                          expandedContentId === item.id ? (
+                            <a
+                              href="#"
+                              onClick={(e) => { e.stopPropagation(); setExpandedContentId(null); }}
+                              style={{ display: 'inline-block', marginTop: 6 }}
+                            >
+                              收合
+                            </a>
+                          ) : (
+                            <a
+                              href="#"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedContentId(item.id);
+                              }}
+                            >
+                              ...更多
+                            </a>
+                          )
                         )}
                       </div>
                     </td>
@@ -573,7 +578,6 @@ export default function SearchView() {
       </div>
 
       <DetailDrawer open={!!drawerIssue} issue={drawerIssue} onClose={() => setDrawerIssue(null)} onRefresh={() => loadIssues(page)} />
-      <PreviewModal open={previewOpen} title={previewTitle} content={previewContent} onClose={() => setPreviewOpen(false)} />
       <ConfirmModal
         open={confirmOpen}
         message={confirmConfig.message}
