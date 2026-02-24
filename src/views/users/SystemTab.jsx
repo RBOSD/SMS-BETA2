@@ -216,7 +216,7 @@ export default function SystemTab() {
         </div>
         <div style={{ background: '#f8fafc', padding: 20, borderRadius: 12, marginBottom: 20, border: '1px solid #e2e8f0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <div style={{ width: 28, height: 28, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14 }}>1</div>
+            <div style={{ width: 28, height: 28, background: 'var(--header-bg)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14 }}>1</div>
             <label style={{ fontWeight: 600, color: '#475569', fontSize: 14, margin: 0 }}>選擇匯出資料類型</label>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginLeft: 36 }}>
@@ -226,7 +226,7 @@ export default function SystemTab() {
               { value: 'both', label: '匯出開立事項與檢查計畫（合併）', sub: '同時匯出開立事項和檢查計畫' },
               { value: 'users', label: '僅匯出帳號', sub: '匯出系統帳號（不含密碼）' },
             ].map((opt) => (
-              <label key={opt.value} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: 12, background: 'white', borderRadius: 8, border: `2px solid ${exportDataType === opt.value ? '#2563eb' : '#e2e8f0'}` }}>
+              <label key={opt.value} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: 12, background: 'white', borderRadius: 8, border: `2px solid ${exportDataType === opt.value ? 'var(--primary)' : '#e2e8f0'}` }}>
                 <input type="radio" name="exportDataType" value={opt.value} checked={exportDataType === opt.value} onChange={() => setExportDataType(opt.value)} />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600, color: '#334155', fontSize: 14 }}>{opt.label}</div>
@@ -239,15 +239,15 @@ export default function SystemTab() {
         {(exportDataType === 'issues' || exportDataType === 'both') && (
           <div style={{ background: '#f8fafc', padding: 20, borderRadius: 12, marginBottom: 20, border: '1px solid #e2e8f0' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-              <div style={{ width: 28, height: 28, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14 }}>2</div>
+              <div style={{ width: 28, height: 28, background: 'var(--header-bg)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14 }}>2</div>
               <label style={{ fontWeight: 600, color: '#475569', fontSize: 14, margin: 0 }}>選擇匯出內容（開立事項）</label>
             </div>
             <div style={{ display: 'flex', gap: 16, marginLeft: 36, flexWrap: 'wrap' }}>
-              <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: 'white', borderRadius: 8, border: `2px solid ${exportScope === 'latest' ? '#2563eb' : '#e2e8f0'}` }}>
+              <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: 'white', borderRadius: 8, border: `2px solid ${exportScope === 'latest' ? 'var(--primary)' : '#e2e8f0'}` }}>
                 <input type="radio" name="exportScope" value="latest" checked={exportScope === 'latest'} onChange={() => setExportScope('latest')} />
                 <div style={{ fontWeight: 600, color: '#334155', fontSize: 14 }}>僅匯出最新進度</div>
               </label>
-              <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: 'white', borderRadius: 8, border: `2px solid ${exportScope === 'full' ? '#2563eb' : '#e2e8f0'}` }}>
+              <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: 'white', borderRadius: 8, border: `2px solid ${exportScope === 'full' ? 'var(--primary)' : '#e2e8f0'}` }}>
                 <input type="radio" name="exportScope" value="full" checked={exportScope === 'full'} onChange={() => setExportScope('full')} />
                 <div style={{ fontWeight: 600, color: '#334155', fontSize: 14 }}>匯出完整歷程</div>
               </label>
@@ -256,11 +256,11 @@ export default function SystemTab() {
         )}
         <div style={{ background: '#f8fafc', padding: 20, borderRadius: 12, marginBottom: 24, border: '1px solid #e2e8f0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <div style={{ width: 28, height: 28, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14 }}>3</div>
+            <div style={{ width: 28, height: 28, background: 'var(--header-bg)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14 }}>3</div>
             <label style={{ fontWeight: 600, color: '#475569', fontSize: 14, margin: 0 }}>選擇檔案格式</label>
           </div>
           <div style={{ display: 'flex', gap: 16, marginLeft: 36, flexWrap: 'wrap' }}>
-            <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: 'white', borderRadius: 8, border: `2px solid ${exportFormat === 'excel' ? '#2563eb' : '#e2e8f0'}` }}>
+            <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: 'white', borderRadius: 8, border: `2px solid ${exportFormat === 'excel' ? 'var(--primary)' : '#e2e8f0'}` }}>
               <input type="radio" name="exportFormat" value="excel" checked={exportFormat === 'excel'} onChange={() => setExportFormat('excel')} />
               <div>
                 <div style={{ fontWeight: 600, color: '#334155', fontSize: 14 }}>Excel (.xlsx)</div>
@@ -268,7 +268,7 @@ export default function SystemTab() {
               </div>
             </label>
             {isAdmin && (
-              <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: 'white', borderRadius: 8, border: `2px solid ${exportFormat === 'json' ? '#2563eb' : '#e2e8f0'}` }}>
+              <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: 'white', borderRadius: 8, border: `2px solid ${exportFormat === 'json' ? 'var(--primary)' : '#e2e8f0'}` }}>
                 <input type="radio" name="exportFormat" value="json" checked={exportFormat === 'json'} onChange={() => setExportFormat('json')} />
                 <div>
                   <div style={{ fontWeight: 600, color: '#334155', fontSize: 14 }}>JSON (備份用)</div>

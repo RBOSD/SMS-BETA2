@@ -529,7 +529,7 @@ export default function IssuesCreateTab() {
 
       <div style={{ marginTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center', padding: 12, background: '#f8fafc', borderRadius: 8 }}>
-          <label style={{ fontSize: 13, color: '#2563eb', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+          <label style={{ fontSize: 13, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
             <input type="checkbox" checked={continuousMode} onChange={(e) => setContinuousMode(e.target.checked)} />
             連續新增模式 (儲存後自動新增新列，保留計畫與機構)
           </label>

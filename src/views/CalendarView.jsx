@@ -405,7 +405,7 @@ export default function CalendarView() {
                               display: 'block',
                               height: '100%',
                               width: pct + '%',
-                              background: '#2563eb',
+                              background: 'var(--primary)',
                               borderRadius: 4,
                             }}
                           />

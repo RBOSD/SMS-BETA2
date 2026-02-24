@@ -372,10 +372,10 @@ export default function PlansScheduleTab() {
                 : dayList.length === 0
                   ? '當日尚無排程'
                   : dayList.map((s) => (
-                      <div key={s.id} style={{ marginBottom: 10, padding: 10, background: '#f1f5f9', borderRadius: 6, borderLeft: '3px solid #3b82f6' }}>
+                      <div key={s.id} style={{ marginBottom: 10, padding: 10, background: '#f1f5f9', borderRadius: 6, borderLeft: '3px solid var(--primary)' }}>
                         <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 6, color: '#334155' }}>
                           {s.plan_name || '-'}
-                          {s.plan_number && <span style={{ marginLeft: 8, fontSize: 12, color: '#3b82f6' }}>[{s.plan_number}]</span>}
+                          {s.plan_number && <span style={{ marginLeft: 8, fontSize: 12, color: 'var(--primary)' }}>[{s.plan_number}]</span>}
                         </div>
                         <div style={{ color: '#64748b', fontSize: 12 }}>
                           📅 {(s.start_date || '').slice(0, 10)}
