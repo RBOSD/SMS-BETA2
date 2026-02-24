@@ -336,7 +336,6 @@ export default function PlansScheduleTab() {
   return (
     <div className="main-card">
       <div style={{ marginBottom: 20 }}>
-        <h3 style={{ margin: '0 0 8px 0', fontWeight: 700, fontSize: 18, color: '#334155' }}>📅 檢查行程規劃</h3>
         <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>以月曆排程規劃檢查日期，填寫檢查行程後，系統會自動取號。</p>
       </div>
       <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'flex-start' }}>

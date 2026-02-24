@@ -350,7 +350,6 @@ export default function IssuesCreateTab() {
   return (
     <div className="main-card" style={{ width: '100%' }}>
       <div style={{ marginBottom: 20 }}>
-        <h3 style={{ margin: '0 0 8px 0', fontWeight: 700, fontSize: 18, color: '#334155' }}>📝 開立事項建檔</h3>
         <p style={{ margin: 0, fontSize: 13, color: '#64748b' }}>
           選擇計畫後，可連續輸入多筆事項。系統會自動根據編號判斷年度、機構與分組。可同時新增事項內容及多次辦理情形。
         </p>

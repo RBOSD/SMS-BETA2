@@ -194,12 +194,15 @@ export default function PlanFormPage() {
     );
   }
 
+  const labelStyle = { display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 };
+  const groupBoxStyle = { border: '1px solid var(--border)', borderRadius: 10, padding: 10, background: '#f8fafc', maxHeight: 180, overflow: 'auto' };
+
   return (
     <div className="main-card">
       <div style={{ maxWidth: 600 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
           <div className="form-group">
-            <label>年度（民國） <span style={{ color: '#ef4444' }}>*</span></label>
+            <label style={labelStyle}>年度（民國） <span style={{ color: '#ef4444' }}>*</span></label>
             <input
               type="text"
               className="filter-input"
@@ -207,47 +210,64 @@ export default function PlanFormPage() {
               value={year}
               onChange={(e) => setYear(e.target.value)}
               disabled={isEdit}
+              style={{ width: '100%' }}
             />
           </div>
           <div className="form-group">
-            <label>計畫名稱 <span style={{ color: '#ef4444' }}>*</span></label>
+            <label style={labelStyle}>計畫名稱 <span style={{ color: '#ef4444' }}>*</span></label>
             <input
               type="text"
               className="filter-input"
               placeholder="例如: 上半年定期檢查"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              style={{ width: '100%' }}
             />
           </div>
         </div>
 
         <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', marginBottom: 8 }}>
-            適用群組（可多選）<span style={{ color: '#ef4444' }}>*</span>
-          </label>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px 20px', padding: '10px 0' }}>
-            {groups.map((g) => (
-              <label key={g.id} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 13 }}>
-                <input
-                  type="checkbox"
-                  checked={ownerGroupIds.includes(parseInt(g.id, 10))}
-                  onChange={() => toggleGroup(g.id)}
-                  disabled={isEdit}
-                />
-                <span>{g.name || '群組 ' + g.id}</span>
-              </label>
-            ))}
+          <label style={{ ...labelStyle, marginBottom: 8 }}>適用群組（可多選）<span style={{ color: '#ef4444' }}>*</span></label>
+          <div style={groupBoxStyle}>
+            {groups.length === 0 ? (
+              <div style={{ color: '#64748b', fontSize: 13 }}>尚無群組</div>
+            ) : (
+              groups.map((g) => (
+                <label
+                  key={g.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '8px 10px',
+                    borderRadius: 8,
+                    cursor: isEdit ? 'default' : 'pointer',
+                    background: ownerGroupIds.includes(parseInt(g.id, 10)) ? '#eff6ff' : 'transparent',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={ownerGroupIds.includes(parseInt(g.id, 10))}
+                    onChange={() => toggleGroup(g.id)}
+                    disabled={isEdit}
+                    style={{ width: 16, height: 16, cursor: isEdit ? 'default' : 'pointer' }}
+                  />
+                  <span style={{ fontSize: 14, color: '#334155' }}>{g.name || '群組 ' + g.id}</span>
+                </label>
+              ))
+            )}
           </div>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
           <div className="form-group">
-            <label>鐵路機構 <span style={{ color: '#ef4444' }}>*</span></label>
+            <label style={labelStyle}>鐵路機構 <span style={{ color: '#ef4444' }}>*</span></label>
             <select
               className="filter-select"
               value={railway}
               onChange={(e) => setRailway(e.target.value)}
               disabled={isEdit}
+              style={{ width: '100%' }}
             >
               {RAILWAY_OPTIONS.map((o) => (
                 <option key={o.value || 'empty'} value={o.value}>
@@ -257,12 +277,13 @@ export default function PlanFormPage() {
             </select>
           </div>
           <div className="form-group">
-            <label>檢查類別 <span style={{ color: '#ef4444' }}>*</span></label>
+            <label style={labelStyle}>檢查類別 <span style={{ color: '#ef4444' }}>*</span></label>
             <select
               className="filter-select"
               value={inspectionType}
               onChange={(e) => setInspectionType(e.target.value)}
               disabled={isEdit}
+              style={{ width: '100%' }}
             >
               {INSPECTION_OPTIONS.map((o) => (
                 <option key={o.value || 'empty'} value={o.value}>
@@ -275,8 +296,8 @@ export default function PlanFormPage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
           <div className="form-group">
-            <label>業務類型</label>
-            <select className="filter-select" value={business} onChange={(e) => setBusiness(e.target.value)}>
+            <label style={labelStyle}>業務類型</label>
+            <select className="filter-select" value={business} onChange={(e) => setBusiness(e.target.value)} style={{ width: '100%' }}>
               {BUSINESS_OPTIONS.map((o) => (
                 <option key={o.value || 'empty'} value={o.value}>
                   {o.label}
@@ -285,7 +306,7 @@ export default function PlanFormPage() {
             </select>
           </div>
           <div className="form-group">
-            <label>規劃檢查幾次</label>
+            <label style={labelStyle}>規劃檢查幾次</label>
             <input
               type="number"
               className="filter-input"
@@ -293,11 +314,12 @@ export default function PlanFormPage() {
               placeholder="僅填數字"
               value={plannedCount}
               onChange={(e) => setPlannedCount(e.target.value)}
+              style={{ width: '100%' }}
             />
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div style={{ display: 'flex', gap: 12, marginTop: 24, paddingTop: 16, borderTop: '1px solid #e2e8f0' }}>
           <button className="btn btn-primary" onClick={handleSubmit} disabled={saving}>
             {saving ? '儲存中...' : '儲存'}
           </button>

@@ -176,7 +176,6 @@ export default function PlansManageTab() {
     <div className="main-card">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
         <div style={{ flex: 1, minWidth: 200 }}>
-          <h3 style={{ margin: '0 0 8px 0', fontWeight: 700, fontSize: 18, color: '#334155' }}>檢查計畫管理</h3>
           <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>管理檢查計畫資料，可新增、編輯、刪除檢查計畫，並支援 Excel 整批匯入。</p>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>

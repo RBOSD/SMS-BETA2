@@ -117,7 +117,6 @@ export default function IssuesYearEditTab() {
   return (
     <div className="main-card">
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ margin: '0 0 8px 0', color: '#334155', fontSize: 18 }}>📝 開立事項修正</h3>
         <p style={{ color: '#64748b', fontSize: 13, margin: 0 }}>
           選擇檢查計畫後，可查看該計畫下的所有事項，點選後可編輯該事項的全部內容，包括所有審查及回復紀錄。
         </p>

@@ -209,9 +209,9 @@ export default function IssuesImportTab() {
     return (
       <div className="main-card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
-          <h3 style={{ margin: 0, fontWeight: 700, fontSize: 18, color: '#334155' }}>
+          <div style={{ fontWeight: 600, fontSize: 15, color: '#334155' }}>
             解析結果預覽 ({stagedData.length} 筆) <span className="badge new" style={{ marginLeft: 8 }}>Word 匯入</span>
-          </h3>
+          </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button className="btn btn-outline" onClick={cancelImport}>
               取消
@@ -263,8 +263,7 @@ export default function IssuesImportTab() {
   return (
     <div className="main-card" style={{ marginBottom: 30 }}>
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ margin: '0 0 8px 0', fontWeight: 700, fontSize: 18, color: '#334155' }}>📝 例行作業區 (Word 解析)</h3>
-        <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>用於新增新的審查紀錄。請選擇本次的作業階段。</p>
+        <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>例行作業區 (Word 解析)。用於新增新的審查紀錄，請選擇本次的作業階段。</p>
       </div>
 
       <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: 16, borderRadius: 8, marginBottom: 24 }}>
