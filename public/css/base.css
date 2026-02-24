@@ -26,7 +26,7 @@ body {
 }
 
 body {
-    display: none; /* JS 載入後會改為 flex */
+    display: flex;
     font-family: 'Inter', 'Noto Sans TC', sans-serif;
     background-color: var(--bg-body);
     flex-direction: column;

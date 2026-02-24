@@ -4,8 +4,3 @@
 @import '../public/css/layout.css';
 @import '../public/css/components.css';
 @import '../public/css/views.css';
-
-/* React 掛載後 body 改為 flex 顯示（原 base.css 為 display:none 等 JS 載入） */
-body {
-  display: flex !important;
-}
