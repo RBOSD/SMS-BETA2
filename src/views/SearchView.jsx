@@ -499,23 +499,35 @@ export default function SearchView() {
                         {expandedContentId === item.id ? stripHtml(fullContent) : snippet}
                         {showMore && (
                           expandedContentId === item.id ? (
-                            <a
-                              href="#"
-                              onClick={(e) => { e.stopPropagation(); setExpandedContentId(null); }}
-                              style={{ display: 'inline-block', marginTop: 6 }}
-                            >
-                              收合
-                            </a>
-                          ) : (
-                            <a
-                              href="#"
+                            <button
+                              type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setExpandedContentId(item.id);
+                                const scrollY = window.scrollY;
+                                setExpandedContentId(null);
+                                requestAnimationFrame(() => {
+                                  requestAnimationFrame(() => { window.scrollTo(0, scrollY); });
+                                });
                               }}
+                              style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--primary)', fontSize: 'inherit', display: 'inline-block', marginTop: 6, fontFamily: 'inherit' }}
+                            >
+                              收合
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const scrollY = window.scrollY;
+                                setExpandedContentId(item.id);
+                                requestAnimationFrame(() => {
+                                  requestAnimationFrame(() => { window.scrollTo(0, scrollY); });
+                                });
+                              }}
+                              style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--primary)', fontSize: 'inherit', fontFamily: 'inherit' }}
                             >
                               ...更多
-                            </a>
+                            </button>
                           )
                         )}
                       </div>
