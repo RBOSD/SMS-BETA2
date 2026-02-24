@@ -14,23 +14,21 @@
 
 ## 二、舊系統遺留
 
-### 2.1 資料庫遷移邏輯（保留）
+### 2.1 已移除（2025-02-23）
 
-- **`db/init.js:259-271`**：Legacy admin 遷移（將舊 `role='admin'` 使用者對應至 admin 群組）
-- **`db/init.js:171`**：`inspection_plans` 表遷移至 `inspection_plan_schedule`
-- **建議**：若所有部署皆已完成遷移，可評估移除；否則建議保留
+- **`public/css/views.css`**：移除 `td[data-label="管理功能"]` 舊標籤相容樣式
+- **`public/css/layout.css`**：移除舊版收合註解
+- **`README.md`**：更新 `public/` 描述，移除「舊版 HTML（備援）」說明
 
-### 2.2 CSS 相容性
+### 2.2 建置產物清理
 
-- **`public/css/views.css:780`**：`/* 相容舊的標籤 */`，`td[data-label="管理功能"]` 樣式
-- **說明**：目前 `src/` 中無使用 `data-label="管理功能"`，可能為舊版 HTML 備援
-- **建議**：若確認不再使用可移除；否則保留以相容舊資料
+- **`dist/`**、**`public/dist/`**、**`public/app/`**：可執行 `npm run clean` 刪除舊建置
+- 執行 `npm run build` 可重新產生乾淨的 React 建置
 
-### 2.3 專案結構說明
+### 2.3 資料庫遷移邏輯（保留）
 
-- **`README.md:73`**：註明 `public/` 含「舊版 HTML（備援）」
-- **現況**：`public/` 下未發現 `.html` 檔案，可能已移除或改由 React 取代
-- **建議**：更新 README 描述以符合現況
+- **`db/init.js`**：Legacy admin 遷移、`inspection_plans` 表遷移
+- **說明**：為升級既有環境所需，新安裝不受影響；若所有部署皆已完成遷移，可評估移除
 
 ---
 

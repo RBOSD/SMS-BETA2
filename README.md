@@ -70,7 +70,7 @@ npm start
 │   ├── context/      # React Context（Auth、Toast）
 │   ├── utils/        # 工具函數、常數
 │   └── views/        # 頁面元件
-├── public/           # 靜態資源、舊版 HTML（備援）
+├── public/           # 靜態資源（CSS 等）
 ├── server.js         # Express 後端
 └── vite.config.js    # Vite 設定
 ```

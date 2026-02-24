@@ -8,6 +8,7 @@
     "dev": "nodemon server.js",
     "dev:client": "vite",
     "build": "vite build",
+    "clean": "node scripts/clean-old-system.js",
     "build:vercel": "VERCEL=1 vite build",
     "vercel-build": "npm run build:vercel",
     "build:watch": "vite build --watch",
