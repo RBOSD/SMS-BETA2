@@ -198,9 +198,11 @@ export default function PlanFormPage() {
   const groupBoxStyle = { border: '1px solid var(--border)', borderRadius: 10, padding: 10, background: '#f8fafc', maxHeight: 180, overflow: 'auto' };
 
   return (
-    <div className="main-card" style={{ maxWidth: 520, margin: '0 auto' }}>
-      <div style={{ width: '100%' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+    <div className="main-card form-card-unified">
+      {/* 基本資訊 */}
+      <div className="form-section">
+        <div className="form-section-title">基本資訊</div>
+        <div className="form-grid">
           <div className="form-group">
             <label style={labelStyle}>年度（民國） <span style={{ color: '#ef4444' }}>*</span></label>
             <input
@@ -225,41 +227,46 @@ export default function PlanFormPage() {
             />
           </div>
         </div>
+      </div>
 
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ ...labelStyle, marginBottom: 8 }}>適用群組（可多選）<span style={{ color: '#ef4444' }}>*</span></label>
-          <div style={groupBoxStyle}>
-            {groups.length === 0 ? (
-              <div style={{ color: '#64748b', fontSize: 13 }}>尚無群組</div>
-            ) : (
-              groups.map((g) => (
-                <label
-                  key={g.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    padding: '8px 10px',
-                    borderRadius: 8,
-                    cursor: isEdit ? 'default' : 'pointer',
-                    background: ownerGroupIds.includes(parseInt(g.id, 10)) ? '#eff6ff' : 'transparent',
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={ownerGroupIds.includes(parseInt(g.id, 10))}
-                    onChange={() => toggleGroup(g.id)}
-                    disabled={isEdit}
-                    style={{ width: 16, height: 16, cursor: isEdit ? 'default' : 'pointer' }}
-                  />
-                  <span style={{ fontSize: 14, color: '#334155' }}>{g.name || '群組 ' + g.id}</span>
-                </label>
-              ))
-            )}
-          </div>
+      {/* 適用群組 */}
+      <div className="form-section">
+        <div className="form-section-title">適用群組（可多選）<span style={{ color: '#ef4444' }}>*</span></div>
+        <div style={groupBoxStyle}>
+          {groups.length === 0 ? (
+            <div style={{ color: '#64748b', fontSize: 13 }}>尚無群組</div>
+          ) : (
+            groups.map((g) => (
+              <label
+                key={g.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '8px 10px',
+                  borderRadius: 8,
+                  cursor: isEdit ? 'default' : 'pointer',
+                  background: ownerGroupIds.includes(parseInt(g.id, 10)) ? '#eff6ff' : 'transparent',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={ownerGroupIds.includes(parseInt(g.id, 10))}
+                  onChange={() => toggleGroup(g.id)}
+                  disabled={isEdit}
+                  style={{ width: 16, height: 16, cursor: isEdit ? 'default' : 'pointer' }}
+                />
+                <span style={{ fontSize: 14, color: '#334155' }}>{g.name || '群組 ' + g.id}</span>
+              </label>
+            ))
+          )}
         </div>
+      </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+      {/* 檢查設定 */}
+      <div className="form-section">
+        <div className="form-section-title">檢查設定</div>
+        <div className="form-grid">
           <div className="form-group">
             <label style={labelStyle}>鐵路機構 <span style={{ color: '#ef4444' }}>*</span></label>
             <select
@@ -292,9 +299,6 @@ export default function PlanFormPage() {
               ))}
             </select>
           </div>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
           <div className="form-group">
             <label style={labelStyle}>業務類型</label>
             <select className="filter-select" value={business} onChange={(e) => setBusiness(e.target.value)} style={{ width: '100%' }}>
@@ -318,15 +322,15 @@ export default function PlanFormPage() {
             />
           </div>
         </div>
+      </div>
 
-        <div style={{ display: 'flex', gap: 12, marginTop: 24, paddingTop: 16, borderTop: '1px solid #e2e8f0' }}>
-          <button className="btn btn-primary" onClick={handleSubmit} disabled={saving}>
-            {saving ? '儲存中...' : '儲存'}
-          </button>
-          <button className="btn btn-outline" onClick={() => navigate('/import/manage')}>
-            取消
-          </button>
-        </div>
+      <div className="form-actions">
+        <button className="btn btn-primary" onClick={handleSubmit} disabled={saving}>
+          {saving ? '儲存中...' : '儲存'}
+        </button>
+        <button className="btn btn-outline" onClick={() => navigate('/import/manage')}>
+          取消
+        </button>
       </div>
     </div>
   );

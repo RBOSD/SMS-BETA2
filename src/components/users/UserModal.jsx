@@ -130,100 +130,109 @@ export default function UserModal({ open, mode, user, groups, onClose, onSuccess
       style={{ display: 'flex' }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="modal-box form-modal-unified" style={{ maxWidth: 520, padding: 24 }}>
+      <div className="modal-box form-modal-unified" style={{ padding: 24 }}>
         <h3 style={{ margin: '0 0 24px 0', fontWeight: 700, fontSize: 18, color: '#334155' }}>{mode === 'create' ? '新增使用者' : '編輯使用者'}</h3>
-        <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-            <div className="form-group">
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>姓名 <span style={{ color: '#ef4444' }}>*</span></label>
-              <input type="text" className="filter-input" value={name} onChange={(e) => setName(e.target.value)} autoComplete="off" style={{ width: '100%' }} />
-            </div>
-            <div className="form-group">
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>帳號 <span style={{ color: '#ef4444' }}>*</span></label>
-              <input
-                type="text"
-                className="filter-input"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                autoComplete="username"
-                readOnly={mode === 'edit'}
-                style={{ width: '100%' }}
-              />
-            </div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-            <div className="form-group">
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>密碼 {mode === 'create' ? <span style={{ fontWeight: 400, color: '#64748b', fontSize: 12 }}>(選填)</span> : <span style={{ fontWeight: 400, color: '#64748b', fontSize: 12 }}>(留空不改)</span>}</label>
-              <div className="pwd-wrapper">
+        <form onSubmit={handleSubmit} className="form-card-unified">
+          <div className="form-section">
+            <div className="form-section-title">帳號資訊</div>
+            <div className="form-grid">
+              <div className="form-group">
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>姓名 <span style={{ color: '#ef4444' }}>*</span></label>
+                <input type="text" className="filter-input" value={name} onChange={(e) => setName(e.target.value)} autoComplete="off" style={{ width: '100%' }} />
+              </div>
+              <div className="form-group">
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>帳號 <span style={{ color: '#ef4444' }}>*</span></label>
                 <input
-                  type="password"
+                  type="text"
                   className="filter-input"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={mode === 'create' ? '選填，留空則使用 Aa123456' : ''}
-                  autoComplete={mode === 'create' ? 'new-password' : 'off'}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  autoComplete="username"
+                  readOnly={mode === 'edit'}
                   style={{ width: '100%' }}
                 />
-                <button type="button" className="pwd-toggle" onClick={() => {}} aria-label="顯示/隱藏密碼">👁️</button>
-              </div>
-            </div>
-            <div className="form-group">
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>確認密碼</label>
-              <div className="pwd-wrapper">
-                <input
-                  type="password"
-                  className="filter-input"
-                  value={passwordConfirm}
-                  onChange={(e) => setPasswordConfirm(e.target.value)}
-                  autoComplete="new-password"
-                  style={{ width: '100%' }}
-                />
-                <button type="button" className="pwd-toggle" onClick={() => {}} aria-label="顯示/隱藏確認密碼">👁️</button>
               </div>
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-            <div className="form-group">
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>權限</label>
-              <select className="filter-select" value={role} onChange={(e) => setRole(e.target.value)} style={{ width: '100%' }}>
-                {ROLE_OPTIONS.map((r) => (
-                  <option key={r.value} value={r.value}>{r.label}</option>
-                ))}
-              </select>
-            </div>
-            <div className="form-group">
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>適用群組（可多選）</label>
-              <div style={{ border: '1px solid var(--border)', borderRadius: 10, padding: 10, background: '#f8fafc', maxHeight: 180, overflow: 'auto' }}>
-                {!groups || groups.length === 0 ? (
-                  <div style={{ color: '#64748b', fontSize: 13 }}>尚無群組</div>
-                ) : (
-                  groups.map((g) => (
-                    <label
-                      key={g.id}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 10,
-                        padding: '8px 10px',
-                        borderRadius: 8,
-                        cursor: 'pointer',
-                        background: groupIds.has(parseInt(g.id, 10)) ? '#eff6ff' : 'transparent',
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={groupIds.has(parseInt(g.id, 10))}
-                        onChange={(e) => toggleGroup(parseInt(g.id, 10), e.target.checked)}
-                        style={{ width: 16, height: 16, cursor: 'pointer' }}
-                      />
-                      <span style={{ fontSize: 14, color: '#334155' }}>{g.name || '群組 ' + g.id}</span>
-                    </label>
-                  ))
-                )}
+          <div className="form-section">
+            <div className="form-section-title">密碼設定</div>
+            <div className="form-grid">
+              <div className="form-group">
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>密碼 {mode === 'create' ? <span style={{ fontWeight: 400, color: '#64748b', fontSize: 12 }}>(選填)</span> : <span style={{ fontWeight: 400, color: '#64748b', fontSize: 12 }}>(留空不改)</span>}</label>
+                <div className="pwd-wrapper">
+                  <input
+                    type="password"
+                    className="filter-input"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={mode === 'create' ? '選填，留空則使用 Aa123456' : ''}
+                    autoComplete={mode === 'create' ? 'new-password' : 'off'}
+                    style={{ width: '100%' }}
+                  />
+                  <button type="button" className="pwd-toggle" onClick={() => {}} aria-label="顯示/隱藏密碼">👁️</button>
+                </div>
+              </div>
+              <div className="form-group">
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>確認密碼</label>
+                <div className="pwd-wrapper">
+                  <input
+                    type="password"
+                    className="filter-input"
+                    value={passwordConfirm}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                    autoComplete="new-password"
+                    style={{ width: '100%' }}
+                  />
+                  <button type="button" className="pwd-toggle" onClick={() => {}} aria-label="顯示/隱藏確認密碼">👁️</button>
+                </div>
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 12, marginTop: 24, paddingTop: 16, borderTop: '1px solid #e2e8f0' }}>
+          <div className="form-section">
+            <div className="form-section-title">權限與群組</div>
+            <div className="form-grid">
+              <div className="form-group">
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>權限</label>
+                <select className="filter-select" value={role} onChange={(e) => setRole(e.target.value)} style={{ width: '100%' }}>
+                  {ROLE_OPTIONS.map((r) => (
+                    <option key={r.value} value={r.value}>{r.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#475569', marginBottom: 6 }}>適用群組（可多選）</label>
+                <div style={{ border: '1px solid var(--border)', borderRadius: 10, padding: 10, background: '#f8fafc', maxHeight: 180, overflow: 'auto' }}>
+                  {!groups || groups.length === 0 ? (
+                    <div style={{ color: '#64748b', fontSize: 13 }}>尚無群組</div>
+                  ) : (
+                    groups.map((g) => (
+                      <label
+                        key={g.id}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 10,
+                          padding: '8px 10px',
+                          borderRadius: 8,
+                          cursor: 'pointer',
+                          background: groupIds.has(parseInt(g.id, 10)) ? '#eff6ff' : 'transparent',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={groupIds.has(parseInt(g.id, 10))}
+                          onChange={(e) => toggleGroup(parseInt(g.id, 10), e.target.checked)}
+                          style={{ width: 16, height: 16, cursor: 'pointer' }}
+                        />
+                        <span style={{ fontSize: 14, color: '#334155' }}>{g.name || '群組 ' + g.id}</span>
+                      </label>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="form-actions">
             <button type="submit" className="btn btn-primary">儲存</button>
             <button type="button" className="btn btn-outline" onClick={onClose}>取消</button>
           </div>

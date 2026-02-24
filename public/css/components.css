@@ -694,4 +694,50 @@
             font-size: 13px;
             margin-bottom: 8px;
             color: #475569;
-        }
+        }
+
+        /* 統一表單卡片 - 全寬自適應，任何解析度不需橫向捲動 */
+        .form-card-unified {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+        .form-card-unified .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .form-card-unified .form-section {
+            background: #fafbfc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #eef1f5;
+        }
+        .form-card-unified .form-section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-card-unified .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+        /* Modal 響應式寬度：小螢幕不溢出、不需橫向捲動 */
+        .form-modal-unified {
+            width: calc(100vw - 48px) !important;
+            max-width: 560px !important;
+            max-height: calc(100vh - 48px);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
