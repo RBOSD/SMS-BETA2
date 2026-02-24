@@ -1,3 +1,5 @@
+import { escapeHtml } from '../../utils/helpers';
+
 export default function PreviewModal({ open, title, content, onClose }) {
   if (!open) return null;
 
@@ -18,7 +20,7 @@ export default function PreviewModal({ open, title, content, onClose }) {
             ×
           </button>
         </div>
-        <div id="previewContent" style={{ marginTop: 12 }} dangerouslySetInnerHTML={{ __html: content || '(無內容)' }} />
+        <div id="previewContent" style={{ marginTop: 12 }} dangerouslySetInnerHTML={{ __html: escapeHtml(content || '(無內容)') }} />
       </div>
     </div>
   );
