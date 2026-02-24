@@ -23,7 +23,7 @@ function getEditRound(issue) {
 }
 
 export default function DetailDrawer({ open, issue, onClose, onRefresh, openInEditMode = false }) {
-  const { user } = useAuth();
+  const { user, aiEnabled } = useAuth();
   const showToast = useToast();
   const canEdit = user && (user.isAdmin === true || user.role === 'manager');
   const canDelete = canEdit;
@@ -347,9 +347,11 @@ export default function DetailDrawer({ open, issue, onClose, onRefresh, openInEd
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                           <div style={{ fontSize: 13, color: '#475569', fontWeight: 600 }}>審查意見</div>
-                          <button type="button" className="btn btn-ai" style={{ padding: '4px 10px', fontSize: 11 }} onClick={runAi} disabled={aiLoading}>
-                            {aiLoading ? 'AI 分析中...' : '🤖 AI 智能分析'}
-                          </button>
+                          {aiEnabled && (
+                            <button type="button" className="btn btn-ai" style={{ padding: '4px 10px', fontSize: 11 }} onClick={runAi} disabled={aiLoading}>
+                              {aiLoading ? 'AI 分析中...' : '🤖 AI 智能分析'}
+                            </button>
+                          )}
                         </div>
                         {aiResult && (
                           <div style={{ background: '#f0f9ff', padding: 16, borderRadius: 8, border: '1px solid #bae6fd', marginBottom: 16 }}>

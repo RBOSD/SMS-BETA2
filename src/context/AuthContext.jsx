@@ -4,14 +4,12 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [aiEnabled, setAiEnabled] = useState(true);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const refreshAuth = () => {
     fetch('/api/auth/me', { credentials: 'include' })
-      .then((res) => {
-        if (res.ok) return res.json();
-        return null;
-      })
+      .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.isLogin && data?.id) {
           const isAdmin = data.isAdmin === true || data.is_admin === true;
@@ -23,12 +21,18 @@ export function AuthProvider({ children }) {
             isAdmin,
             groupIds: data.groupIds || [],
           });
+          setAiEnabled(data.aiEnabled !== false);
         } else {
           setUser(null);
+          setAiEnabled(true);
         }
       })
-      .catch(() => setUser(null))
+      .catch(() => { setUser(null); setAiEnabled(true); })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    refreshAuth();
   }, []);
 
   const login = async (username, password) => {
@@ -41,6 +45,7 @@ export function AuthProvider({ children }) {
     const data = await res.json();
     if (data.success) {
       setUser(data.user);
+      refreshAuth();
       return { success: true, mustChangePassword: data.mustChangePassword };
     }
     return { success: false, message: data.error || data.message || '登入失敗' };
@@ -52,7 +57,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, aiEnabled, refreshAuth }}>
       {children}
     </AuthContext.Provider>
   );

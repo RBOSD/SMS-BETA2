@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { apiFetch } from '../../api/api';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -20,6 +20,39 @@ export default function SystemTab() {
   const userTemplateRef = useState(null)[0];
 
   const isAdmin = user?.isAdmin === true;
+  const { aiEnabled, refreshAuth } = useAuth();
+  const [aiEnabledLocal, setAiEnabledLocal] = useState(true);
+  const [aiSettingLoading, setAiSettingLoading] = useState(false);
+
+  useEffect(() => {
+    setAiEnabledLocal(aiEnabled !== false);
+  }, [aiEnabled]);
+
+  const toggleAiEnabled = async () => {
+    if (!isAdmin) return;
+    const nextVal = !aiEnabledLocal;
+    setAiSettingLoading(true);
+    setAiEnabledLocal(nextVal);
+    try {
+      const res = await apiFetch('/api/settings', {
+        method: 'PUT',
+        body: JSON.stringify({ aiEnabled: nextVal }),
+      });
+      const j = await res.json().catch(() => ({}));
+      if (res.ok) {
+        refreshAuth?.();
+        showToast(nextVal ? 'AI 審查功能已開啟' : 'AI 審查功能已關閉', 'success');
+      } else {
+        setAiEnabledLocal(!nextVal);
+        showToast(j.error || '更新失敗', 'error');
+      }
+    } catch (e) {
+      setAiEnabledLocal(!nextVal);
+      showToast('更新失敗: ' + (e.message || ''), 'error');
+    } finally {
+      setAiSettingLoading(false);
+    }
+  };
 
   const downloadPlanTemplate = async () => {
     try {
@@ -183,6 +216,28 @@ export default function SystemTab() {
           提供系統資料匯出、匯入範例檔管理。
         </p>
       </div>
+
+      {isAdmin && (
+        <div className="detail-card" style={{ marginBottom: 30 }}>
+          <div style={{ marginBottom: 16 }}>
+            <h4 style={{ margin: '0 0 8px 0', fontWeight: 600, color: '#334155', fontSize: 16 }}>🤖 AI 審查功能</h4>
+            <p style={{ color: '#64748b', fontSize: 13, margin: 0 }}>開啟後，審查事項時可顯示「AI 智能分析」按鈕；關閉後，其他模組將不顯示此功能。</p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+              <input
+                type="checkbox"
+                checked={aiEnabledLocal}
+                onChange={toggleAiEnabled}
+                disabled={aiSettingLoading}
+                style={{ width: 18, height: 18 }}
+              />
+              <span style={{ fontWeight: 500, color: '#334155' }}>{aiEnabledLocal ? '已開啟' : '已關閉'}</span>
+            </label>
+            {aiSettingLoading && <span style={{ fontSize: 13, color: '#64748b' }}>更新中...</span>}
+          </div>
+        </div>
+      )}
 
       <div className="detail-card" style={{ marginBottom: 30 }}>
         <div style={{ marginBottom: 16 }}>

@@ -92,7 +92,13 @@ module.exports = function registerAuthRoutes(app) {
                 const groupIds = Array.isArray(latestUser.group_ids)
                     ? latestUser.group_ids.map(x => parseInt(x, 10)).filter(n => Number.isFinite(n))
                     : [];
-                res.json({ isLogin: true, id: latestUser.id, username: latestUser.username, name: latestUser.name, role: latestUser.role, isAdmin, groupIds });
+                let aiEnabled = true;
+                try {
+                    const setRes = await pool.query("SELECT value FROM system_settings WHERE key = 'ai_enabled'");
+                    const val = setRes.rows[0]?.value;
+                    aiEnabled = val === 'true' || val === '1';
+                } catch (_) {}
+                res.json({ isLogin: true, id: latestUser.id, username: latestUser.username, name: latestUser.name, role: latestUser.role, isAdmin, groupIds, aiEnabled });
             } catch (e) {
                 console.error("Auth check db error:", e);
                 res.json({ isLogin: false });

@@ -4,6 +4,7 @@
  */
 module.exports = function registerAllRoutes(app, { csrfProtection }) {
     require('./auth')(app);
+    require('./settings')(app);
     require('./misc')(app, { csrfProtection });
     require('./issues')(app);
     require('./users')(app);

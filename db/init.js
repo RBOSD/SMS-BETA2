@@ -193,6 +193,15 @@ async function initDB() {
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )`);
 
+                await client.query(`CREATE TABLE IF NOT EXISTS system_settings (
+                    key TEXT PRIMARY KEY,
+                    value TEXT NOT NULL,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )`);
+                try {
+                    await client.query(`INSERT INTO system_settings (key, value) VALUES ('ai_enabled', 'true') ON CONFLICT (key) DO NOTHING`);
+                } catch (e) {}
+
                 const newColumns = [];
                 for (let i = 2; i <= 30; i++) {
                     newColumns.push({ name: `handling${i}`, type: 'TEXT' });
