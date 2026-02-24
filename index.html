@@ -21,13 +21,19 @@
   </div>
   <script>
     (function(){
+      var isMobile=/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      var timeoutMs=isMobile?25000:12000;
       var t=setTimeout(function(){
         var el=document.getElementById('app-loading');
         if(el&&el.closest('#root')&&el.textContent.indexOf('載入中')>=0){
-          el.innerHTML='<span style="color:#475569;margin-bottom:8px;">載入逾時或版本已更新</span><span style="color:#94a3b8;font-size:14px;">請點擊下方按鈕重新整理頁面</span><button onclick="location.reload(true)" style="margin-top:12px;padding:10px 20px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:15px;">重新整理</button>';
+          el.innerHTML='<span style="color:#475569;margin-bottom:8px;">載入逾時或版本已更新</span><span style="color:#94a3b8;font-size:14px;">請點擊下方按鈕重新整理頁面</span><button id="reload-btn" style="margin-top:12px;padding:10px 20px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:15px;">重新整理</button>';
           el.style.flexDirection='column';
+          document.getElementById('reload-btn').onclick=function(){
+            var u=location.pathname||'/';
+            location.replace(u+(u.indexOf('?')>=0?'&':'?')+'nocache='+Date.now());
+          };
         }
-      },10000);
+      },timeoutMs);
       window.__clearLoadTimeout=function(){clearTimeout(t);};
     })();
   </script>
