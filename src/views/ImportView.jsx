@@ -8,7 +8,7 @@ import PlanFormPage from './import/PlanFormPage';
 
 const SUB_TITLES = {
   batch: '批次匯入',
-  create: '開立事項建檔',
+  create: '事項新增',
   'year-edit': '事項修正',
   schedule: '行程規劃',
   manage: '計畫管理',

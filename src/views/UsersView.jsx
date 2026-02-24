@@ -6,9 +6,9 @@ import ActionsTab from './users/ActionsTab';
 import SystemTab from './users/SystemTab';
 
 const TAB_TITLES = {
-  list: '帳號與群組管理',
+  list: '帳號管理',
   logs: '登入紀錄',
-  actions: '操作歷程',
+  actions: '操作紀錄',
   system: '系統維護',
 };
 

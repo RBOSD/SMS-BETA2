@@ -6,16 +6,16 @@ const SIDEBAR_EXPANDED_KEY = 'sms-sidebar-groups-expanded';
 
 const IMPORT_ROUTES = [
   { path: '/import/batch', label: '批次匯入' },
-  { path: '/import/create', label: '開立事項建檔' },
+  { path: '/import/create', label: '事項新增' },
   { path: '/import/year-edit', label: '事項修正' },
   { path: '/import/schedule', label: '行程規劃' },
   { path: '/import/manage', label: '計畫管理' },
 ];
 
 const USERS_ROUTES = [
-  { path: '/users/list', label: '帳號列表' },
+  { path: '/users/list', label: '帳號管理' },
   { path: '/users/logs', label: '登入紀錄' },
-  { path: '/users/actions', label: '操作歷程' },
+  { path: '/users/actions', label: '操作紀錄' },
   { path: '/users/system', label: '系統維護' },
 ];
 

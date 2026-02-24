@@ -55,7 +55,7 @@ npm start
 | `/` | 開立事項檢索 |
 | `/calendar` | 檢查行程檢索 |
 | `/import/batch` | 批次匯入（Word 解析） |
-| `/import/create` | 開立事項建檔 |
+| `/import/create` | 事項新增 |
 | `/import/year-edit` | 事項修正 |
 | `/import/schedule` | 行程規劃 |
 | `/import/manage` | 計畫管理 |
