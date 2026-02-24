@@ -37,9 +37,9 @@ const finalUrl = connectionString && connectionString.includes(':6543')
 const pool = new Pool({
     connectionString: finalUrl,
     ssl: connectionString ? sslConfig : false,
-    max: isVercel ? 1 : 2, // Vercel serverless 建議 1，避免連線累積
-    idleTimeoutMillis: isVercel ? 10000 : 5000,
-    connectionTimeoutMillis: isVercel ? 60000 : 2000, // Vercel cold start 需較長逾時（60 秒）
+    max: isVercel ? 1 : 10, // Vercel serverless 建議 1；本機可提高以並行處理
+    idleTimeoutMillis: isVercel ? 10000 : 30000,
+    connectionTimeoutMillis: isVercel ? 15000 : 5000, // 15 秒足夠，過長會讓失敗請求等太久
     allowExitOnIdle: false,
 });
 

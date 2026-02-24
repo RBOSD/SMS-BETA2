@@ -163,6 +163,12 @@ setInterval(cleanupOldLogs, 24 * 60 * 60 * 1000); // 每 24 小時執行一次
 // [Modularized] 註冊所有路由（auth, misc, issues, users, admin, options, plans, schedule, templates）
 require('./routes')(app, { csrfProtection });
 
+// Vercel serverless：跳過完整 initDB 以加速 cold start（DB 已由本機或首次部署初始化）
+const runInitDB = !isVercel;
+if (runInitDB) {
+    initDB().catch(err => console.error('Database initialization failed:', err));
+}
+
 // Vercel 上 express.static 被忽略，需手動提供 /app/* 靜態檔（React 建置輸出在 public/app/）
 const appStaticPath = path.join(__dirname, 'public', 'app');
 if (fs.existsSync(appStaticPath)) {
@@ -189,12 +195,7 @@ app.get('*', (req, res, next) => {
 
 
 
-// 1. 初始化資料庫 (維持異步執行)
-initDB().catch(err => {
-    console.error('Database initialization failed during startup:', err);
-});
-
-// 2. 判斷環境：只有在「非」生產環境（本機）才執行監聽
+// 1. 判斷環境：只有在「非」生產環境（本機）才執行監聽
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
         console.log(`【本機模式】伺服器運行於: http://localhost:${PORT}`);

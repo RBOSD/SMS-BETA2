@@ -1,10 +1,13 @@
 const { pool, isAdminUser } = require('../db/helpers');
 
+/** 優先使用 session 快取的 isAdmin，避免每次請求都查 DB */
 const requireAdmin = async (req, res, next) => {
     try {
         if (!req.session || !req.session.user) return res.status(403).json({ error: 'Denied' });
+        if (req.session.user.isAdmin === true) return next();
         const ok = await isAdminUser(req.session.user.id, pool);
         if (!ok) return res.status(403).json({ error: 'Denied' });
+        req.session.user.isAdmin = true;
         return next();
     } catch (e) {
         return res.status(403).json({ error: 'Denied' });
@@ -14,10 +17,12 @@ const requireAdmin = async (req, res, next) => {
 const requireAdminOrManager = async (req, res, next) => {
     try {
         if (!req.session || !req.session.user) return res.status(403).json({ error: 'Denied' });
-        const role = req.session.user.role;
+        const { role, isAdmin } = req.session.user;
         if (role === 'manager') return next();
+        if (isAdmin === true) return next();
         const ok = await isAdminUser(req.session.user.id, pool);
         if (!ok) return res.status(403).json({ error: 'Denied' });
+        req.session.user.isAdmin = true;
         return next();
     } catch (e) {
         return res.status(403).json({ error: 'Denied' });
