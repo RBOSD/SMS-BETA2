@@ -41,10 +41,10 @@
     }
 }
 
-/* 手機：側欄預設隱藏，點擊漢堡選單後滑出 */
+/* 手機：側欄預設隱藏，點擊漢堡選單後滑出，與標題區視覺連接 */
 @media (max-width: 1023px) {
     .filters-panel {
-        top: 0;
+        top: var(--header-h, 60px);
         transform: translateX(-100%);
     }
     .filters-panel.open {
@@ -54,9 +54,11 @@
 
 #filterBackdrop {
     position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(2px);
+    top: var(--header-h, 60px);
+    left: 280px;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.12);
     z-index: 999;
     display: none;
     opacity: 0;

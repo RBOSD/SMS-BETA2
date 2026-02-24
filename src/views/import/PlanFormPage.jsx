@@ -198,8 +198,8 @@ export default function PlanFormPage() {
   const groupBoxStyle = { border: '1px solid var(--border)', borderRadius: 10, padding: 10, background: '#f8fafc', maxHeight: 180, overflow: 'auto' };
 
   return (
-    <div className="main-card">
-      <div style={{ maxWidth: 600 }}>
+    <div className="main-card" style={{ maxWidth: 520, margin: '0 auto' }}>
+      <div style={{ width: '100%' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
           <div className="form-group">
             <label style={labelStyle}>年度（民國） <span style={{ color: '#ef4444' }}>*</span></label>
