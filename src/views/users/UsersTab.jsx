@@ -1,17 +1,18 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../api/api';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { escapeHtml } from '../../utils/helpers';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import PaginationBar from '../../components/users/PaginationBar';
-import UserModal from '../../components/users/UserModal';
 import GroupRenameModal from '../../components/users/GroupRenameModal';
 import UserImportModal from '../../components/users/UserImportModal';
 
 const ROLE_NAMES = { manager: '資料管理者', viewer: '檢視人員' };
 
 export default function UsersTab() {
+  const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   const showToast = useToast();
   const [users, setUsers] = useState([]);
@@ -26,9 +27,6 @@ export default function UsersTab() {
   const [selectedGroupId, setSelectedGroupId] = useState(null);
   const [groupSearch, setGroupSearch] = useState('');
   const [allUsers, setAllUsers] = useState([]);
-  const [userModalOpen, setUserModalOpen] = useState(false);
-  const [userModalMode, setUserModalMode] = useState('create');
-  const [userModalUser, setUserModalUser] = useState(null);
   const [groupRenameOpen, setGroupRenameOpen] = useState(false);
   const [groupRenameId, setGroupRenameId] = useState(null);
   const [groupRenameName, setGroupRenameName] = useState('');
@@ -109,15 +107,11 @@ export default function UsersTab() {
   };
 
   const openUserCreate = () => {
-    setUserModalMode('create');
-    setUserModalUser(null);
-    setUserModalOpen(true);
+    navigate('/users/list?action=new');
   };
 
   const openUserEdit = (u) => {
-    setUserModalMode('edit');
-    setUserModalUser(u);
-    setUserModalOpen(true);
+    navigate('/users/list?action=edit&id=' + u.id);
   };
 
   const toggleUserDisable = async (u) => {
@@ -485,7 +479,6 @@ export default function UsersTab() {
         </div>
       </div>
 
-      <UserModal open={userModalOpen} mode={userModalMode} user={userModalUser} groups={groups} onClose={() => setUserModalOpen(false)} onSuccess={() => { loadUsers(page); loadGroups(); loadAllUsers(true); }} />
       <GroupRenameModal open={groupRenameOpen} groupId={groupRenameId} groupName={groupRenameName} onClose={() => setGroupRenameOpen(false)} onSuccess={() => { loadGroups(); loadUsers(page); }} />
       <UserImportModal open={importModalOpen} onClose={() => setImportModalOpen(false)} onSuccess={() => loadUsers(1)} />
       <ConfirmModal open={confirmOpen} message={confirmConfig.message} confirmText={confirmConfig.confirmText} onConfirm={confirmConfig.onConfirm} onCancel={confirmConfig.onCancel} />

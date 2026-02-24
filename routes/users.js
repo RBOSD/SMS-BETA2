@@ -129,6 +129,39 @@ module.exports = function registerUsersRoutes(app) {
         }
     });
 
+    app.get('/api/users/:id', requireAuth, requireAdmin, async (req, res) => {
+        const id = parseInt(req.params.id, 10);
+        if (!id || !Number.isFinite(id)) return res.status(400).json({ error: 'Invalid user id' });
+        try {
+            const dRes = await pool.query(
+                `SELECT u.id, u.username, u.name, u.role, u.created_at, u.is_disabled,
+                        COALESCE(array_agg(ug.group_id) FILTER (WHERE ug.group_id IS NOT NULL), '{}') AS group_ids,
+                        COALESCE(BOOL_OR(g.is_admin_group = true), false) AS is_admin
+                 FROM users u
+                 LEFT JOIN user_groups ug ON ug.user_id = u.id
+                 LEFT JOIN groups g ON g.id = ug.group_id
+                 WHERE u.id = $1
+                 GROUP BY u.id`,
+                [id]
+            );
+            if (!dRes.rows || dRes.rows.length === 0) return res.status(404).json({ error: '找不到該使用者' });
+            const u = dRes.rows[0];
+            const user = {
+                id: u.id,
+                username: u.username,
+                name: u.name,
+                role: u.role,
+                isAdmin: u.is_admin === true,
+                isDisabled: u.is_disabled === true,
+                created_at: u.created_at,
+                groupIds: Array.isArray(u.group_ids) ? u.group_ids.map(x => parseInt(x, 10)).filter(n => Number.isFinite(n)) : []
+            };
+            res.json({ data: user });
+        } catch (e) {
+            handleApiError(e, req, res, 'Get user error');
+        }
+    });
+
     app.get('/api/users', requireAuth, requireAdmin, async (req, res) => {
         const { page=1, pageSize=20, q, sortField='id', sortDir='asc' } = req.query;
         const limit = parseInt(pageSize);
