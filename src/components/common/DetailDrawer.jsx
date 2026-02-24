@@ -313,13 +313,15 @@ export default function DetailDrawer({ open, issue, onClose, onRefresh, openInEd
                 </div>
               </div>
               <div className="review-right">
-                <div style={{ marginBottom: 24, background: '#f8fafc', padding: 16, borderRadius: 10, border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: 12, color: '#64748b', marginBottom: 10, fontWeight: 600, textTransform: 'uppercase' }}>📋 參考資料</div>
-                  <div style={{ fontSize: 13, color: '#475569', marginBottom: 8, fontWeight: 600 }}>第 {round} 次機構辦理情形</div>
-                  <div style={{ background: '#fff', padding: 12, borderRadius: 8, fontSize: 14, color: currentHandling ? '#047857' : '#94a3b8', border: '1px solid #cbd5e1', minHeight: 80, maxHeight: 200, overflowY: 'auto', whiteSpace: 'pre-wrap' }}>
-                    {currentHandling || '（尚未有機構辦理情形）'}
+                {!roundAlreadyHasReview && (
+                  <div style={{ marginBottom: 24, background: '#f8fafc', padding: 16, borderRadius: 10, border: '1px solid #e2e8f0' }}>
+                    <div style={{ fontSize: 12, color: '#64748b', marginBottom: 10, fontWeight: 600, textTransform: 'uppercase' }}>📋 參考資料</div>
+                    <div style={{ fontSize: 13, color: '#475569', marginBottom: 8, fontWeight: 600 }}>第 {round} 次機構辦理情形</div>
+                    <div style={{ background: '#fff', padding: 12, borderRadius: 8, fontSize: 14, color: currentHandling ? '#047857' : '#94a3b8', border: '1px solid #cbd5e1', minHeight: 80, maxHeight: 200, overflowY: 'auto', whiteSpace: 'pre-wrap' }}>
+                      {currentHandling || '（尚未有機構辦理情形）'}
+                    </div>
                   </div>
-                </div>
+                )}
                 <div style={{ background: '#fff', padding: 20, borderRadius: 12, border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', marginBottom: 20 }}>
                   {roundAlreadyHasReview ? (
                     <div style={{ padding: 20, background: '#f0fdf4', borderRadius: 8, border: '1px solid #bbf7d0', color: '#166534', fontSize: 14, textAlign: 'center' }}>
