@@ -11,13 +11,15 @@ function getStatusBadge(status) {
   return <span className={`badge ${stClass}`}>{status}</span>;
 }
 
-/** 計算當前應編輯的審查輪次（有 handling 的最高輪次） */
+/** 計算當前應編輯的審查輪次（有 handling 但尚未有 review 的最高輪次；若皆已完成審查則回傳 null） */
 function getEditRound(issue) {
   for (let i = 200; i >= 1; i--) {
     const suffix = i === 1 ? '' : i;
-    if (issue['handling' + suffix] && String(issue['handling' + suffix]).trim()) return i;
+    const hasHandling = issue['handling' + suffix] && String(issue['handling' + suffix]).trim();
+    const hasReview = issue['review' + suffix] && String(issue['review' + suffix]).trim();
+    if (hasHandling && !hasReview) return i;
   }
-  return 1;
+  return null;
 }
 
 export default function DetailDrawer({ open, issue, onClose, onRefresh, openInEditMode = false }) {
@@ -39,8 +41,15 @@ export default function DetailDrawer({ open, issue, onClose, onRefresh, openInEd
   useEffect(() => {
     if (issue) {
       const editR = getEditRound(issue);
-      setRound(editR);
-      const suffix = editR === 1 ? '' : editR;
+      const displayRound = editR ?? (() => {
+        for (let i = 200; i >= 1; i--) {
+          const s = i === 1 ? '' : i;
+          if (issue['handling' + s] && String(issue['handling' + s]).trim()) return i;
+        }
+        return 1;
+      })();
+      setRound(displayRound);
+      const suffix = displayRound === 1 ? '' : displayRound;
       setReview(issue['review' + suffix] || '');
       setStatus(issue.status || '持續列管');
       setViewRound('latest');
@@ -63,6 +72,8 @@ export default function DetailDrawer({ open, issue, onClose, onRefresh, openInEd
   const statusBadge = getStatusBadge(issue.status);
   const suffix = round === 1 ? '' : round;
   const currentHandling = issue['handling' + suffix] || '';
+  const currentReview = issue['review' + suffix] || '';
+  const roundAlreadyHasReview = !!(currentReview && currentReview.trim());
 
   const roundsWithData = [];
   for (let i = 200; i >= 1; i--) {
@@ -310,51 +321,59 @@ export default function DetailDrawer({ open, issue, onClose, onRefresh, openInEd
                   </div>
                 </div>
                 <div style={{ background: '#fff', padding: 20, borderRadius: 12, border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', marginBottom: 20 }}>
-                  <div style={{ fontSize: 13, color: '#1e293b', marginBottom: 20, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, paddingBottom: 12, borderBottom: '2px solid #f1f5f9' }}>
-                    ✍️ 審查作業 <span style={{ fontSize: 11, color: '#ef4444', fontWeight: 400 }}>(必填)</span>
-                  </div>
-                  <div style={{ marginBottom: 20 }}>
-                    <div style={{ fontSize: 13, color: '#475569', marginBottom: 6, fontWeight: 600 }}>審查輪次</div>
-                    <span style={{ display: 'inline-block', padding: '10px 14px', background: '#f1f5f9', borderRadius: 8, border: '1px solid #e2e8f0', color: '#334155', fontWeight: 500, fontSize: 13 }}>第 {round} 次</span>
-                  </div>
-                  <div style={{ marginBottom: 20 }}>
-                    <div style={{ fontSize: 13, color: '#475569', marginBottom: 6, fontWeight: 600 }}>審查結果</div>
-                    <select className="filter-select" value={status} onChange={(e) => setStatus(e.target.value)} style={{ width: '100%', padding: 10 }}>
-                      <option value="持續列管">🔴 持續列管</option>
-                      <option value="解除列管">🟢 解除列管</option>
-                      <option value="自行列管">🟠 自行列管</option>
-                    </select>
-                  </div>
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                      <div style={{ fontSize: 13, color: '#475569', fontWeight: 600 }}>審查意見</div>
-                      <button type="button" className="btn btn-ai" style={{ padding: '4px 10px', fontSize: 11 }} onClick={runAi} disabled={aiLoading}>
-                        {aiLoading ? 'AI 分析中...' : '🤖 AI 智能分析'}
-                      </button>
+                  {roundAlreadyHasReview ? (
+                    <div style={{ padding: 20, background: '#f0fdf4', borderRadius: 8, border: '1px solid #bbf7d0', color: '#166534', fontSize: 14, textAlign: 'center' }}>
+                      ✓ 第 {round} 次審查已完成，無需再填寫審查意見
                     </div>
-                    {aiResult && (
-                      <div style={{ background: '#f0f9ff', padding: 16, borderRadius: 8, border: '1px solid #bae6fd', marginBottom: 16 }}>
-                        <div style={{ fontSize: 13, marginBottom: 8, fontWeight: 'bold', color: '#0369a1' }}>💡 AI 分析建議：</div>
-                        <div style={{ background: 'white', padding: 12, border: '1px solid #e0f2fe', borderRadius: 6, fontSize: 14, marginBottom: 12, lineHeight: 1.6, color: '#334155' }}>{aiResult.result}</div>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <span style={{ fontSize: 13 }}>{aiResult.fulfill && (aiResult.fulfill.includes('是') || aiResult.fulfill.includes('Yes')) ? <span className="ai-tag yes">✅ 符合</span> : <span className="ai-tag no">⚠️ 需注意</span>}</span>
-                          <button type="button" className="btn btn-primary" style={{ fontSize: 12, padding: '6px 14px' }} onClick={() => { setReview(aiResult.result); setAiResult(null); }}>
-                            ⬇️ 帶入此意見
+                  ) : (
+                    <>
+                      <div style={{ fontSize: 13, color: '#1e293b', marginBottom: 20, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, paddingBottom: 12, borderBottom: '2px solid #f1f5f9' }}>
+                        ✍️ 審查作業 <span style={{ fontSize: 11, color: '#ef4444', fontWeight: 400 }}>(必填)</span>
+                      </div>
+                      <div style={{ marginBottom: 20 }}>
+                        <div style={{ fontSize: 13, color: '#475569', marginBottom: 6, fontWeight: 600 }}>審查輪次</div>
+                        <span style={{ display: 'inline-block', padding: '10px 14px', background: '#f1f5f9', borderRadius: 8, border: '1px solid #e2e8f0', color: '#334155', fontWeight: 500, fontSize: 13 }}>第 {round} 次</span>
+                      </div>
+                      <div style={{ marginBottom: 20 }}>
+                        <div style={{ fontSize: 13, color: '#475569', marginBottom: 6, fontWeight: 600 }}>審查結果</div>
+                        <select className="filter-select" value={status} onChange={(e) => setStatus(e.target.value)} style={{ width: '100%', padding: 10 }}>
+                          <option value="持續列管">🔴 持續列管</option>
+                          <option value="解除列管">🟢 解除列管</option>
+                          <option value="自行列管">🟠 自行列管</option>
+                        </select>
+                      </div>
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                          <div style={{ fontSize: 13, color: '#475569', fontWeight: 600 }}>審查意見</div>
+                          <button type="button" className="btn btn-ai" style={{ padding: '4px 10px', fontSize: 11 }} onClick={runAi} disabled={aiLoading}>
+                            {aiLoading ? 'AI 分析中...' : '🤖 AI 智能分析'}
                           </button>
                         </div>
+                        {aiResult && (
+                          <div style={{ background: '#f0f9ff', padding: 16, borderRadius: 8, border: '1px solid #bae6fd', marginBottom: 16 }}>
+                            <div style={{ fontSize: 13, marginBottom: 8, fontWeight: 'bold', color: '#0369a1' }}>💡 AI 分析建議：</div>
+                            <div style={{ background: 'white', padding: 12, border: '1px solid #e0f2fe', borderRadius: 6, fontSize: 14, marginBottom: 12, lineHeight: 1.6, color: '#334155' }}>{aiResult.result}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span style={{ fontSize: 13 }}>{aiResult.fulfill && (aiResult.fulfill.includes('是') || aiResult.fulfill.includes('Yes')) ? <span className="ai-tag yes">✅ 符合</span> : <span className="ai-tag no">⚠️ 需注意</span>}</span>
+                              <button type="button" className="btn btn-primary" style={{ fontSize: 12, padding: '6px 14px' }} onClick={() => { setReview(aiResult.result); setAiResult(null); }}>
+                                ⬇️ 帶入此意見
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                        <textarea
+                          value={review}
+                          onChange={(e) => setReview(e.target.value)}
+                          className="filter-input"
+                          style={{ flex: 1, resize: 'vertical', lineHeight: 1.6, minHeight: 200, padding: 12, fontSize: 14 }}
+                          placeholder="請輸入審查意見..."
+                        />
                       </div>
-                    )}
-                    <textarea
-                      value={review}
-                      onChange={(e) => setReview(e.target.value)}
-                      className="filter-input"
-                      style={{ flex: 1, resize: 'vertical', lineHeight: 1.6, minHeight: 200, padding: 12, fontSize: 14 }}
-                      placeholder="請輸入審查意見..."
-                    />
-                  </div>
+                    </>
+                  )}
                 </div>
                 <div style={{ display: 'flex', gap: 12, marginTop: 'auto', paddingTop: 16 }}>
-                  <button className="btn btn-primary" style={{ flex: 1, padding: 12 }} onClick={handleSave} disabled={saveLoading}>
+                  <button className="btn btn-primary" style={{ flex: 1, padding: 12 }} onClick={handleSave} disabled={saveLoading || roundAlreadyHasReview}>
                     {saveLoading ? '儲存中...' : '💾 上傳至資料庫'}
                   </button>
                   <button className="btn btn-outline" style={{ flex: 1, padding: 12 }} onClick={() => setEditMode(false)}>
