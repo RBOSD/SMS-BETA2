@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import ChangePasswordModal from '../common/ChangePasswordModal';
 
 export default function AppHeader({ sidebarOpen, onToggleSidebar }) {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
@@ -49,7 +51,7 @@ export default function AppHeader({ sidebarOpen, onToggleSidebar }) {
               aria-hidden="true"
             />
             <div className="user-dropdown show" id="userDropdown" onClick={(e) => e.stopPropagation()}>
-              <button className="dropdown-item" onClick={() => { setDropdownOpen(false); /* TODO: 個人設定 */ }}>
+              <button className="dropdown-item" onClick={() => { setDropdownOpen(false); setShowPasswordModal(true); }}>
                 ⚙️ 個人設定
               </button>
               <div className="dropdown-divider" />
@@ -64,6 +66,11 @@ export default function AppHeader({ sidebarOpen, onToggleSidebar }) {
           </>
         )}
       </div>
+      <ChangePasswordModal
+        open={showPasswordModal}
+        mode="personal"
+        onSuccess={() => setShowPasswordModal(false)}
+      />
     </header>
   );
 }

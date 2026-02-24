@@ -40,7 +40,7 @@
 
 | 位置 | 內容 |
 |------|------|
-| `src/components/layout/AppHeader.jsx:52` | `/* TODO: 個人設定 */` — 個人設定功能尚未實作 |
+| ~~`src/components/layout/AppHeader.jsx`~~ | ~~個人設定功能尚未實作~~ — **已實作**：點擊「個人設定」可開啟修改密碼視窗 |
 
 ### 3.2 未使用元件
 
