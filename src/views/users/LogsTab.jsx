@@ -120,7 +120,6 @@ export default function LogsTab() {
   return (
     <div className="main-card">
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ margin: '0 0 8px 0', fontWeight: 700, fontSize: 18, color: '#334155' }}>登入紀錄</h3>
         <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>
           查看系統使用者的登入紀錄，包含登入時間、帳號、姓名和 IP 位址。可匯出資料或清理舊紀錄。
         </p>

@@ -44,11 +44,11 @@ export default function AppHeader({ sidebarOpen, onToggleSidebar }) {
         {dropdownOpen && (
           <>
             <div
-              style={{ position: 'fixed', inset: 0, zIndex: 99 }}
+              style={{ position: 'fixed', inset: 0, zIndex: 105 }}
               onClick={() => setDropdownOpen(false)}
               aria-hidden="true"
             />
-            <div className="user-dropdown show" id="userDropdown">
+            <div className="user-dropdown show" id="userDropdown" onClick={(e) => e.stopPropagation()}>
               <button className="dropdown-item" onClick={() => { setDropdownOpen(false); /* TODO: 個人設定 */ }}>
                 ⚙️ 個人設定
               </button>

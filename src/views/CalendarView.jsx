@@ -245,6 +245,9 @@ export default function CalendarView() {
 
   return (
     <div className="view-section active">
+      <div className="content-header">
+        <div className="content-title">檢查行程檢索</div>
+      </div>
       <div className="main-card" style={{ marginBottom: 20 }}>
         <div style={{ marginBottom: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>

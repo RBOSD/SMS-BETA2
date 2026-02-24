@@ -68,11 +68,7 @@
     opacity: 1;
 }
 
-@media (min-width: 1024px) {
-    #filterBackdrop {
-        display: none !important;
-    }
-}
+/* 桌面與手機皆顯示 backdrop，點擊右側內容區可收合側欄 */
 
 .sidebar-header {
     display: flex;

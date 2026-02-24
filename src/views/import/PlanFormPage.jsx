@@ -186,8 +186,6 @@ export default function PlanFormPage() {
     }
   };
 
-  const goBack = () => navigate('/import/manage');
-
   if (loading) {
     return (
       <div className="main-card" style={{ padding: 48, textAlign: 'center', color: '#94a3b8' }}>
@@ -198,13 +196,6 @@ export default function PlanFormPage() {
 
   return (
     <div className="main-card">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h3 style={{ margin: 0 }}>{isCreate ? '新增檢查計畫' : '編輯檢查計畫'}</h3>
-        <button className="btn btn-outline" onClick={goBack}>
-          ← 返回列表
-        </button>
-      </div>
-
       <div style={{ maxWidth: 600 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
           <div className="form-group">
@@ -310,7 +301,7 @@ export default function PlanFormPage() {
           <button className="btn btn-primary" onClick={handleSubmit} disabled={saving}>
             {saving ? '儲存中...' : '儲存'}
           </button>
-          <button className="btn btn-outline" onClick={goBack}>
+          <button className="btn btn-outline" onClick={() => navigate('/import/manage')}>
             取消
           </button>
         </div>

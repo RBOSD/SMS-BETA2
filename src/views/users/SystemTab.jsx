@@ -179,7 +179,6 @@ export default function SystemTab() {
   return (
     <div className="main-card">
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ margin: '0 0 8px 0', fontWeight: 700, fontSize: 18, color: '#334155' }}>系統維護</h3>
         <p style={{ margin: 0, color: '#64748b', fontSize: 13, lineHeight: 1.6 }}>
           提供系統資料匯出、匯入範例檔管理。
         </p>

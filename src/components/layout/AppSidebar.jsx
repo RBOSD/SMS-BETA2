@@ -68,10 +68,10 @@ export default function AppSidebar({ open, onClose }) {
         </button>
       </div>
       <nav className="sidebar-nav">
-        <Link to="/" className={linkClass('/')} onClick={onClose}>
+        <Link to="/" className={linkClass('/')}>
           開立事項檢索
         </Link>
-        <Link to="/calendar" className={linkClass('/calendar')} onClick={onClose}>
+        <Link to="/calendar" className={linkClass('/calendar')}>
           檢查行程檢索
         </Link>
         {canManage && (
@@ -89,7 +89,7 @@ export default function AppSidebar({ open, onClose }) {
             {expanded.import && (
               <div className="sidebar-sub">
                 {IMPORT_ROUTES.map((r) => (
-                  <Link key={r.path} to={r.path} className={subLinkClass(r.path)} onClick={onClose}>
+                  <Link key={r.path} to={r.path} className={subLinkClass(r.path)}>
                     {r.label}
                   </Link>
                 ))}
@@ -112,7 +112,7 @@ export default function AppSidebar({ open, onClose }) {
             {expanded.users && (
               <div className="sidebar-sub">
                 {USERS_ROUTES.map((r) => (
-                  <Link key={r.path} to={r.path} className={subLinkClass(r.path)} onClick={onClose}>
+                  <Link key={r.path} to={r.path} className={subLinkClass(r.path)}>
                     {r.label}
                   </Link>
                 ))}

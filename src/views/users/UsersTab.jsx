@@ -276,7 +276,6 @@ export default function UsersTab() {
     <div className="main-card">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
         <div style={{ flex: 1, minWidth: 200 }}>
-          <h3 style={{ margin: '0 0 8px 0', fontWeight: 800, fontSize: 18, color: '#334155' }}>帳號與群組管理</h3>
           <p style={{ margin: 0, color: '#64748b', fontSize: 13, lineHeight: 1.6 }}>
             在同一頁面完成帳號、權限與群組管理。群組用於資料的「同群組可編輯」控管。
           </p>
