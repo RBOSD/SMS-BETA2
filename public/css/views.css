@@ -212,6 +212,12 @@
             color: var(--primary);
         }
 
+        /* 事項內容展開時：輕微高亮，方便辨識 */
+        tr.content-expanded {
+            background: #f8fafc !important;
+            box-shadow: inset 0 0 0 2px rgba(29, 78, 216, 0.15);
+        }
+
         /* Mobile Optimization */
         @media (max-width: 768px) {
 

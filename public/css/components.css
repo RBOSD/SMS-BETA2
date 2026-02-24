@@ -15,17 +15,24 @@
         }
 
         .filter-advanced-row {
-            display: none;
+            display: flex;
             gap: 16px;
             flex-wrap: wrap;
             align-items: flex-end;
-            padding-top: 12px;
+            padding-top: 0;
             margin-top: 4px;
-            border-top: 1px dashed #e2e8f0;
+            border-top: 1px dashed transparent;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.4s ease-out, opacity 0.3s ease-out, padding-top 0.35s ease-out, border-top-color 0.2s;
         }
 
         .filter-advanced-row.show {
-            display: flex;
+            max-height: 280px;
+            opacity: 1;
+            padding-top: 12px;
+            border-top-color: #e2e8f0;
         }
 
         .control-row-actions {

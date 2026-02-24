@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { apiFetch } from '../api/api';
@@ -48,6 +48,7 @@ export default function SearchView() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({});
   const [selectedIds, setSelectedIds] = useState(new Set());
+  const advancedRowRef = useRef(null);
 
   const canManage = user && (user.isAdmin === true || user.role === 'manager');
   const canEdit = canManage;
@@ -122,6 +123,16 @@ export default function SearchView() {
   useEffect(() => {
     loadIssues(page);
   }, [loadIssues, page]);
+
+  useEffect(() => {
+    if (expandedContentId) {
+      const t = setTimeout(() => {
+        const row = document.querySelector(`tr[data-issue-id="${expandedContentId}"]`);
+        if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 80);
+      return () => clearTimeout(t);
+    }
+  }, [expandedContentId]);
 
   const applyFilters = () => {
     setPage(1);
@@ -313,12 +324,22 @@ export default function SearchView() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-start', paddingTop: 8 }}>
-            <button type="button" className="btn-link" onClick={() => setAdvancedOpen((o) => !o)}>
+            <button type="button" className="btn-link" onClick={() => {
+              const willOpen = !advancedOpen;
+              setAdvancedOpen(willOpen);
+              if (willOpen) {
+                requestAnimationFrame(() => {
+                  setTimeout(() => {
+                    advancedRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                  }, 150);
+                });
+              }
+            }}>
               {advancedOpen ? '⬆️ 收合篩選條件' : '⬇️ 顯示更多篩選條件'}
             </button>
           </div>
 
-          <div className={`filter-advanced-row ${advancedOpen ? 'show' : ''}`}>
+          <div ref={advancedRowRef} className={`filter-advanced-row ${advancedOpen ? 'show' : ''}`}>
             <div className="search-item">
               <label>檢查種類</label>
               <select
@@ -472,6 +493,8 @@ export default function SearchView() {
                 return (
                   <tr
                     key={item.id}
+                    data-issue-id={item.id}
+                    className={expandedContentId === item.id ? 'content-expanded' : ''}
                     onClick={() => setDrawerIssue(item)}
                     style={{ cursor: 'pointer' }}
                   >
@@ -503,11 +526,7 @@ export default function SearchView() {
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const scrollY = window.scrollY;
                                 setExpandedContentId(null);
-                                requestAnimationFrame(() => {
-                                  requestAnimationFrame(() => { window.scrollTo(0, scrollY); });
-                                });
                               }}
                               style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--primary)', fontSize: 'inherit', display: 'inline-block', marginTop: 6, fontFamily: 'inherit' }}
                             >
@@ -518,11 +537,7 @@ export default function SearchView() {
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const scrollY = window.scrollY;
                                 setExpandedContentId(item.id);
-                                requestAnimationFrame(() => {
-                                  requestAnimationFrame(() => { window.scrollTo(0, scrollY); });
-                                });
                               }}
                               style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--primary)', fontSize: 'inherit', fontFamily: 'inherit' }}
                             >
