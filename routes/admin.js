@@ -131,7 +131,7 @@ module.exports = function registerAdminRoutes(app) {
         if (Array.isArray(req.body) && !issues && !plans && !users) {
             issues = req.body;
         }
-        const results = { plans: { success: 0, failed: 0, skipped: 0 }, issues: { success: 0, failed: 0, skipped: 0 }, users: { success: 0, failed: 0 } };
+        const results = { plans: { success: 0, failed: 0, skipped: 0, firstError: null }, issues: { success: 0, failed: 0, skipped: 0, firstError: null }, users: { success: 0, failed: 0 } };
         let client = null;
         try {
             client = await pool.connect();
@@ -168,6 +168,7 @@ module.exports = function registerAdminRoutes(app) {
                         results.plans.success++;
                     } catch (e) {
                         results.plans.failed++;
+                        if (!results.plans.firstError) results.plans.firstError = e.message || String(e);
                     }
                 }
             }
@@ -221,6 +222,7 @@ module.exports = function registerAdminRoutes(app) {
                         results.issues.success++;
                     } catch (e) {
                         results.issues.failed++;
+                        if (!results.issues.firstError) results.issues.firstError = e.message || String(e);
                     }
                 }
             }

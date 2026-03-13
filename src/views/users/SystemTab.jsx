@@ -326,9 +326,26 @@ export default function SystemTab() {
       if (res.ok && j.success) {
         const r = j.results || {};
         const parts = [];
-        if (r.plans?.success > 0) parts.push(`檢查計畫 ${r.plans.success} 筆`);
-        if (r.issues?.success > 0) parts.push(`開立事項 ${r.issues.success} 筆`);
-        showToast('匯入完成：' + (parts.join('、') || '無新增'), 'success');
+        const planStats = [];
+        if (r.plans) {
+          if (r.plans.success > 0) planStats.push(`新增 ${r.plans.success}`);
+          if (r.plans.skipped > 0) planStats.push(`略過 ${r.plans.skipped}`);
+          if (r.plans.failed > 0) planStats.push(`失敗 ${r.plans.failed}`);
+          if (planStats.length > 0) parts.push(`檢查計畫：${planStats.join('、')}`);
+        }
+        const issueStats = [];
+        if (r.issues) {
+          if (r.issues.success > 0) issueStats.push(`新增 ${r.issues.success}`);
+          if (r.issues.skipped > 0) issueStats.push(`略過 ${r.issues.skipped}`);
+          if (r.issues.failed > 0) issueStats.push(`失敗 ${r.issues.failed}`);
+          if (issueStats.length > 0) parts.push(`開立事項：${issueStats.join('、')}`);
+        }
+        let msg = '匯入完成：' + (parts.join('；') || '無資料被處理');
+        const errs = [];
+        if (r.plans?.failed > 0 && r.plans?.firstError) errs.push(r.plans.firstError);
+        if (r.issues?.failed > 0 && r.issues?.firstError) errs.push(r.issues.firstError);
+        if (errs.length > 0) msg += '（錯誤：' + errs.join('；') + '）';
+        showToast(msg, errs.length > 0 ? 'error' : 'success');
         if (input) input.value = '';
       } else {
         showToast(j.error || '匯入失敗', 'error');
