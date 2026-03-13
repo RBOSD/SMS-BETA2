@@ -15,10 +15,9 @@ export default function SystemTab() {
   const showToast = useToast();
   const [exportDataType, setExportDataType] = useState('issues');
   const [exportScope, setExportScope] = useState('latest');
-  const [exportFormat, setExportFormat] = useState('excel');
+  const [exportFormat, setExportFormat] = useState('json');
   const planTemplateRef = useState(null)[0];
   const userTemplateRef = useState(null)[0];
-  const [importUsers, setImportUsers] = useState(false);
   const [importing, setImporting] = useState(false);
 
   const isAdmin = user?.isAdmin === true;
@@ -232,7 +231,6 @@ export default function SystemTab() {
       }
       let issues = data.issues;
       let plans = data.plans;
-      const users = data.users;
       if (Array.isArray(data) && data.length > 0) {
         const first = data[0];
         if (first && 'number' in first) {
@@ -245,8 +243,7 @@ export default function SystemTab() {
       }
       const hasIssues = Array.isArray(issues) && issues.length > 0;
       const hasPlans = Array.isArray(plans) && plans.length > 0;
-      const hasUsers = importUsers && Array.isArray(users) && users.length > 0;
-      if (!hasIssues && !hasPlans && !hasUsers) {
+      if (!hasIssues && !hasPlans) {
         showToast('JSON 中沒有可匯入的資料（需包含 issues 或 plans 陣列）', 'error');
         setImporting(false);
         return;
@@ -256,8 +253,6 @@ export default function SystemTab() {
         body: JSON.stringify({
           issues: hasIssues ? issues : undefined,
           plans: hasPlans ? plans : undefined,
-          users: hasUsers ? users : undefined,
-          importUsers: hasUsers,
         }),
       });
       const j = await res.json().catch(() => ({}));
@@ -266,7 +261,6 @@ export default function SystemTab() {
         const parts = [];
         if (r.plans?.success > 0) parts.push(`檢查計畫 ${r.plans.success} 筆`);
         if (r.issues?.success > 0) parts.push(`開立事項 ${r.issues.success} 筆`);
-        if (r.users?.success > 0) parts.push(`帳號 ${r.users.success} 筆`);
         showToast('匯入完成：' + (parts.join('、') || '無新增'), 'success');
         if (input) input.value = '';
       } else {
@@ -283,7 +277,7 @@ export default function SystemTab() {
     <div className="main-card">
       <div style={{ marginBottom: 24 }}>
         <p style={{ margin: 0, color: '#64748b', fontSize: 13, lineHeight: 1.6 }}>
-          提供系統資料匯出、匯入範例檔管理。
+          AI 審查開關、匯入範例檔管理、系統資料備份與還原。
         </p>
       </div>
 
@@ -335,117 +329,64 @@ export default function SystemTab() {
       </div>
 
       <div className="detail-card" style={{ marginBottom: 30 }}>
-        <div style={{ marginBottom: 16 }}>
-          <h4 style={{ margin: '0 0 8px 0', fontWeight: 600, color: '#334155', fontSize: 16 }}>📤 系統資料匯出</h4>
-          <p style={{ color: '#64748b', fontSize: 13, margin: 0 }}>將系統中的資料匯出為 JSON 格式（適合備份與還原）。</p>
+        <div style={{ marginBottom: 20 }}>
+          <h4 style={{ margin: '0 0 8px 0', fontWeight: 600, color: '#334155', fontSize: 16 }}>📦 系統資料備份與還原</h4>
+          <p style={{ color: '#64748b', fontSize: 13, margin: 0 }}>匯出 JSON 備份檔或上傳先前匯出的備份檔還原開立事項與檢查計畫。</p>
         </div>
-        <div style={{ background: '#f8fafc', padding: 20, borderRadius: 12, marginBottom: 20, border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <div style={{ width: 28, height: 28, background: 'var(--header-bg)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14 }}>1</div>
-            <label style={{ fontWeight: 600, color: '#475569', fontSize: 14, margin: 0 }}>選擇匯出資料類型</label>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginLeft: 36 }}>
-            {[
-              { value: 'issues', label: '僅匯出開立事項', sub: '匯出所有開立事項的資料' },
-              { value: 'plans', label: '僅匯出檢查計畫', sub: '匯出所有檢查計畫的資料' },
-              { value: 'both', label: '匯出開立事項與檢查計畫（合併）', sub: '同時匯出開立事項和檢查計畫' },
-              { value: 'users', label: '僅匯出帳號', sub: '匯出系統帳號（不含密碼）' },
-            ].map((opt) => (
-              <label key={opt.value} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: 12, background: 'white', borderRadius: 8, border: `2px solid ${exportDataType === opt.value ? 'var(--primary)' : '#e2e8f0'}` }}>
-                <input type="radio" name="exportDataType" value={opt.value} checked={exportDataType === opt.value} onChange={() => setExportDataType(opt.value)} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, color: '#334155', fontSize: 14 }}>{opt.label}</div>
-                  <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{opt.sub}</div>
-                </div>
-              </label>
-            ))}
-          </div>
-        </div>
-        {(exportDataType === 'issues' || exportDataType === 'both') && (
-          <div style={{ background: '#f8fafc', padding: 20, borderRadius: 12, marginBottom: 20, border: '1px solid #e2e8f0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-              <div style={{ width: 28, height: 28, background: 'var(--header-bg)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14 }}>2</div>
-              <label style={{ fontWeight: 600, color: '#475569', fontSize: 14, margin: 0 }}>選擇匯出內容（開立事項）</label>
-            </div>
-            <div style={{ display: 'flex', gap: 16, marginLeft: 36, flexWrap: 'wrap' }}>
-              <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: 'white', borderRadius: 8, border: `2px solid ${exportScope === 'latest' ? 'var(--primary)' : '#e2e8f0'}` }}>
-                <input type="radio" name="exportScope" value="latest" checked={exportScope === 'latest'} onChange={() => setExportScope('latest')} />
-                <div style={{ fontWeight: 600, color: '#334155', fontSize: 14 }}>僅匯出最新進度</div>
-              </label>
-              <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: 'white', borderRadius: 8, border: `2px solid ${exportScope === 'full' ? 'var(--primary)' : '#e2e8f0'}` }}>
-                <input type="radio" name="exportScope" value="full" checked={exportScope === 'full'} onChange={() => setExportScope('full')} />
-                <div style={{ fontWeight: 600, color: '#334155', fontSize: 14 }}>匯出完整歷程</div>
-              </label>
-            </div>
-          </div>
-        )}
-        <div style={{ background: '#f8fafc', padding: 20, borderRadius: 12, marginBottom: 24, border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <div style={{ width: 28, height: 28, background: 'var(--header-bg)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14 }}>3</div>
-            <label style={{ fontWeight: 600, color: '#475569', fontSize: 14, margin: 0 }}>選擇檔案格式</label>
-          </div>
-          <div style={{ display: 'flex', gap: 16, marginLeft: 36, flexWrap: 'wrap' }}>
-            <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: 'white', borderRadius: 8, border: `2px solid ${exportFormat === 'excel' ? 'var(--primary)' : '#e2e8f0'}` }}>
-              <input type="radio" name="exportFormat" value="excel" checked={exportFormat === 'excel'} onChange={() => setExportFormat('excel')} />
-              <div>
-                <div style={{ fontWeight: 600, color: '#334155', fontSize: 14 }}>Excel (.xlsx)</div>
-                <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>需使用嵌入版</div>
-              </div>
-            </label>
-            {isAdmin && (
-              <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: 'white', borderRadius: 8, border: `2px solid ${exportFormat === 'json' ? 'var(--primary)' : '#e2e8f0'}` }}>
-                <input type="radio" name="exportFormat" value="json" checked={exportFormat === 'json'} onChange={() => setExportFormat('json')} />
-                <div>
-                  <div style={{ fontWeight: 600, color: '#334155', fontSize: 14 }}>JSON (備份用)</div>
-                  <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>適合系統備份與還原</div>
-                </div>
-              </label>
-            )}
-          </div>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 20, borderTop: '1px solid #e2e8f0' }}>
-          <button className="btn btn-primary" style={{ padding: '12px 32px' }} onClick={handleExport}>
-            📥 執行匯出
-          </button>
-        </div>
-      </div>
-
-      {canManage && (
-        <div className="detail-card" style={{ marginBottom: 30 }}>
-          <div style={{ marginBottom: 16 }}>
-            <h4 style={{ margin: '0 0 8px 0', fontWeight: 600, color: '#334155', fontSize: 16 }}>📥 系統資料匯入</h4>
-            <p style={{ color: '#64748b', fontSize: 13, margin: 0 }}>上傳 JSON 備份檔可還原開立事項與檢查計畫。支援：匯出備份格式（含 issues、plans 物件），或開立事項/檢查計畫的陣列格式。</p>
-          </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, alignItems: 'start' }}>
           <div style={{ background: '#f8fafc', padding: 20, borderRadius: 12, border: '1px solid #e2e8f0' }}>
+            <div style={{ fontWeight: 600, color: '#334155', marginBottom: 16, fontSize: 15 }}>📤 匯出</div>
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontSize: 13, color: '#475569', marginBottom: 8 }}>資料類型</div>
+              <select className="filter-select" value={exportDataType} onChange={(e) => setExportDataType(e.target.value)} style={{ width: '100%' }}>
+                <option value="issues">僅開立事項</option>
+                <option value="plans">僅檢查計畫</option>
+                <option value="both">開立事項＋檢查計畫</option>
+                <option value="users">僅帳號</option>
+              </select>
+            </div>
+            {(exportDataType === 'issues' || exportDataType === 'both') && (
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 13, color: '#475569', marginBottom: 8 }}>開立事項範圍</div>
+                <select className="filter-select" value={exportScope} onChange={(e) => setExportScope(e.target.value)} style={{ width: '100%' }}>
+                  <option value="latest">僅最新進度</option>
+                  <option value="full">完整歷程</option>
+                </select>
+              </div>
+            )}
             <div style={{ marginBottom: 16 }}>
-              <label style={{ fontWeight: 600, color: '#475569', fontSize: 14, margin: 0 }}>選擇 JSON 檔案</label>
+              <div style={{ fontSize: 13, color: '#475569', marginBottom: 8 }}>格式</div>
+              <select className="filter-select" value={exportFormat} onChange={(e) => setExportFormat(e.target.value)} style={{ width: '100%' }}>
+                <option value="json">JSON（備份用）</option>
+                <option value="excel">Excel（需嵌入版）</option>
+              </select>
+            </div>
+            <button className="btn btn-primary" style={{ width: '100%', padding: '10px 16px' }} onClick={handleExport}>
+              📥 執行匯出
+            </button>
+          </div>
+          {canManage && (
+            <div style={{ background: '#f8fafc', padding: 20, borderRadius: 12, border: '1px solid #e2e8f0' }}>
+              <div style={{ fontWeight: 600, color: '#334155', marginBottom: 16, fontSize: 15 }}>📥 匯入</div>
+              <p style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>上傳 JSON 備份檔（含 issues 或 plans）。</p>
               <input
                 type="file"
                 id="systemImportFile"
                 accept=".json"
-                style={{ display: 'block', marginTop: 8, fontSize: 12 }}
-                onChange={() => {}}
+                style={{ display: 'block', marginBottom: 12, fontSize: 12, width: '100%' }}
               />
-            </div>
-            {isAdmin && (
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, cursor: 'pointer' }}>
-                <input type="checkbox" checked={importUsers} onChange={(e) => setImportUsers(e.target.checked)} />
-                <span style={{ fontSize: 13, color: '#475569' }}>一併匯入帳號（JSON 需含 users 陣列）</span>
-              </label>
-            )}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 12 }}>
               <button
-                className="btn btn-primary"
-                style={{ padding: '12px 32px' }}
+                className="btn btn-outline"
+                style={{ width: '100%', padding: '10px 16px' }}
                 onClick={handleImport}
                 disabled={importing}
               >
                 {importing ? '匯入中...' : '📤 執行匯入'}
               </button>
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
