@@ -1,6 +1,6 @@
 const { pool } = require('../config/pool');
-const { isAdminUser } = require('../db/helpers');
-const { requireAuth, requireAdmin } = require('../middleware/auth');
+const { isAdminUser, getPrimaryGroupId } = require('../db/helpers');
+const { requireAuth, requireAdmin, requireAdminOrManager } = require('../middleware/auth');
 const { verifyCsrf } = require('../middleware/csrf');
 const { logAction } = require('../utils/log');
 const { handleApiError } = require('../utils/handleApiError');
@@ -123,6 +123,134 @@ module.exports = function registerAdminRoutes(app) {
             res.json({success:true, deleted: result.rowCount});
         } catch (e) {
             handleApiError(e, req, res, 'Cleanup logs error');
+        }
+    });
+
+    app.post('/api/admin/system-import', requireAuth, requireAdminOrManager, verifyCsrf, async (req, res) => {
+        let { issues, plans, users, importUsers } = req.body;
+        if (Array.isArray(req.body) && !issues && !plans && !users) {
+            issues = req.body;
+        }
+        const results = { plans: { success: 0, failed: 0, skipped: 0 }, issues: { success: 0, failed: 0, skipped: 0 }, users: { success: 0, failed: 0 } };
+        let client = null;
+        try {
+            client = await pool.connect();
+            const ownerGroupId = await getPrimaryGroupId(req.session.user.id, client);
+            if (!ownerGroupId) return res.status(400).json({ error: '請先將帳號加入至少一個資料群組' });
+            const ownerUserId = req.session.user.id;
+
+            if (plans && Array.isArray(plans) && plans.length > 0) {
+                const seen = new Set();
+                for (const row of plans) {
+                    const name = String(row.plan_name || row.name || row.planName || '').trim();
+                    let year = String(row.year || '').replace(/\D/g, '').slice(-3).padStart(3, '0');
+                    const railway = String(row.railway || '').toUpperCase() || 'T';
+                    const inspection_type = String(row.inspection_type || row.inspectionType || '1');
+                    const business = row.business ? String(row.business).toUpperCase() : null;
+                    const planned_count = row.planned_count != null ? parseInt(row.planned_count, 10) : null;
+                    if (!name || !/^\d{3}$/.test(year)) { results.plans.skipped++; continue; }
+                    const key = `${name}|||${year}`;
+                    if (seen.has(key)) { results.plans.skipped++; continue; }
+                    seen.add(key);
+                    try {
+                        const ex = await client.query("SELECT 1 FROM inspection_plan_schedule WHERE plan_name = $1 AND year = $2 LIMIT 1", [name, year]);
+                        if (ex.rows.length > 0) { results.plans.skipped++; continue; }
+                        await client.query(
+                            `INSERT INTO inspection_plan_schedule (start_date, end_date, plan_name, year, railway, inspection_type, business, inspection_seq, plan_number, planned_count, owner_group_id, owner_group_ids, owner_user_id, edit_mode)
+                             VALUES (NULL, NULL, $1, $2, $3, $4, $5, '00', '(手動)', $6, $7, $8, $9, 'GROUP')`,
+                            [name, year, railway, inspection_type, business, planned_count, ownerGroupId, [ownerGroupId], ownerUserId]
+                        );
+                        results.plans.success++;
+                    } catch (e) {
+                        results.plans.failed++;
+                    }
+                }
+            }
+
+            if (issues && Array.isArray(issues) && issues.length > 0) {
+                const issueCols = ['number', 'year', 'unit', 'content', 'status', 'item_kind_code', 'division_name', 'inspection_category_name', 'plan_name', 'issue_date', 'handling', 'review', 'reply_date_r1', 'response_date_r1', 'owner_group_id', 'owner_group_ids', 'owner_user_id', 'edit_mode'];
+                for (let r = 2; r <= 30; r++) {
+                    issueCols.push(`handling${r}`, `review${r}`, `reply_date_r${r}`, `response_date_r${r}`);
+                }
+                for (const row of issues) {
+                    const number = (row.number || '').trim();
+                    if (!number) { results.issues.skipped++; continue; }
+                    const get = (obj, ...keys) => {
+                        for (const k of keys) {
+                            const v = obj[k];
+                            if (v !== undefined && v !== null && v !== '') return v;
+                        }
+                        return null;
+                    };
+                    const vals = [
+                        number,
+                        get(row, 'year') || null,
+                        get(row, 'unit') || null,
+                        get(row, 'content') || '',
+                        get(row, 'status') || '持續列管',
+                        get(row, 'item_kind_code', 'itemKindCode') || null,
+                        get(row, 'division_name', 'divisionName') || null,
+                        get(row, 'inspection_category_name', 'inspectionCategoryName') || null,
+                        get(row, 'plan_name', 'planName') || null,
+                        get(row, 'issue_date', 'issueDate') || null,
+                        get(row, 'handling') || '',
+                        get(row, 'review') || '',
+                        get(row, 'reply_date_r1', 'replyDate') || '',
+                        get(row, 'response_date_r1', 'responseDate') || '',
+                        ownerGroupId,
+                        [ownerGroupId],
+                        ownerUserId,
+                        'GROUP'
+                    ];
+                    for (let rn = 2; rn <= 30; rn++) {
+                        vals.push(get(row, `handling${rn}`) || '', get(row, `review${rn}`) || '', get(row, `reply_date_r${rn}`) || '', get(row, `response_date_r${rn}`) || '');
+                    }
+                    try {
+                        const ex = await client.query("SELECT 1 FROM issues WHERE TRIM(number) = $1 LIMIT 1", [number]);
+                        if (ex.rows.length > 0) { results.issues.skipped++; continue; }
+                        const ph = vals.map((_, i) => `$${i + 1}`).join(', ');
+                        await client.query(
+                            `INSERT INTO issues (${issueCols.join(', ')}) VALUES (${ph})`,
+                            vals
+                        );
+                        results.issues.success++;
+                    } catch (e) {
+                        results.issues.failed++;
+                    }
+                }
+            }
+
+            const isAdmin = await isAdminUser(req.session.user.id, client);
+            if (importUsers === true && isAdmin && users && Array.isArray(users) && users.length > 0) {
+                const bcrypt = require('bcryptjs');
+                const validRoles = ['manager', 'viewer'];
+                for (const row of users) {
+                    const name = String(row.name || '').trim();
+                    const username = String(row.username || '').trim();
+                    const role = String(row.role || 'viewer').toLowerCase();
+                    const safeRole = role === 'admin' ? 'manager' : (validRoles.includes(role) ? role : 'viewer');
+                    if (!name || !username) { results.users.failed++; continue; }
+                    try {
+                        const ex = await client.query("SELECT id FROM users WHERE username = $1", [username]);
+                        const pwd = row.password ? bcrypt.hashSync(row.password, 10) : bcrypt.hashSync('Aa123456', 10);
+                        if (ex.rows.length > 0) {
+                            await client.query("UPDATE users SET name=$1, role=$2, password=$3, must_change_password=$4 WHERE username=$5", [name, safeRole, pwd, true, username]);
+                        } else {
+                            await client.query("INSERT INTO users (name, username, role, password, must_change_password) VALUES ($1, $2, $3, $4, $5)", [name, username, safeRole, pwd, true]);
+                        }
+                        results.users.success++;
+                    } catch (e) {
+                        results.users.failed++;
+                    }
+                }
+            }
+
+            logAction(req.session.user.username, 'SYSTEM_IMPORT', `系統匯入：計畫 ${results.plans.success}，事項 ${results.issues.success}${importUsers ? `，帳號 ${results.users.success}` : ''}`, req);
+            res.json({ success: true, results });
+        } catch (e) {
+            handleApiError(e, req, res, 'System import error');
+        } finally {
+            if (client) try { client.release(); } catch (_) {}
         }
     });
 };

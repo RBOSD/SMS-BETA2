@@ -18,8 +18,11 @@ export default function SystemTab() {
   const [exportFormat, setExportFormat] = useState('excel');
   const planTemplateRef = useState(null)[0];
   const userTemplateRef = useState(null)[0];
+  const [importUsers, setImportUsers] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   const isAdmin = user?.isAdmin === true;
+  const canManage = isAdmin || user?.role === 'manager';
   const { aiEnabled, refreshAuth } = useAuth();
   const [aiEnabledLocal, setAiEnabledLocal] = useState(true);
   const [aiSettingLoading, setAiSettingLoading] = useState(false);
@@ -209,6 +212,73 @@ export default function SystemTab() {
     }
   };
 
+  const handleImport = async () => {
+    const input = document.getElementById('systemImportFile');
+    const file = input?.files?.[0];
+    if (!file) {
+      showToast('請選擇要匯入的 JSON 檔案', 'error');
+      return;
+    }
+    setImporting(true);
+    try {
+      const text = await file.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        showToast('JSON 格式錯誤，請確認檔案內容', 'error');
+        setImporting(false);
+        return;
+      }
+      let issues = data.issues;
+      let plans = data.plans;
+      const users = data.users;
+      if (Array.isArray(data) && data.length > 0) {
+        const first = data[0];
+        if (first && 'number' in first) {
+          issues = data;
+          plans = plans || [];
+        } else if (first && ('plan_name' in first || 'planName' in first)) {
+          plans = data;
+          issues = issues || [];
+        }
+      }
+      const hasIssues = Array.isArray(issues) && issues.length > 0;
+      const hasPlans = Array.isArray(plans) && plans.length > 0;
+      const hasUsers = importUsers && Array.isArray(users) && users.length > 0;
+      if (!hasIssues && !hasPlans && !hasUsers) {
+        showToast('JSON 中沒有可匯入的資料（需包含 issues 或 plans 陣列）', 'error');
+        setImporting(false);
+        return;
+      }
+      const res = await apiFetch('/api/admin/system-import', {
+        method: 'POST',
+        body: JSON.stringify({
+          issues: hasIssues ? issues : undefined,
+          plans: hasPlans ? plans : undefined,
+          users: hasUsers ? users : undefined,
+          importUsers: hasUsers,
+        }),
+      });
+      const j = await res.json().catch(() => ({}));
+      if (res.ok && j.success) {
+        const r = j.results || {};
+        const parts = [];
+        if (r.plans?.success > 0) parts.push(`檢查計畫 ${r.plans.success} 筆`);
+        if (r.issues?.success > 0) parts.push(`開立事項 ${r.issues.success} 筆`);
+        if (r.users?.success > 0) parts.push(`帳號 ${r.users.success} 筆`);
+        showToast('匯入完成：' + (parts.join('、') || '無新增'), 'success');
+        if (input) input.value = '';
+      } else {
+        showToast(j.error || '匯入失敗', 'error');
+      }
+    } catch (e) {
+      showToast('匯入失敗: ' + (e.message || ''), 'error');
+    } finally {
+      setImporting(false);
+    }
+  };
+
   return (
     <div className="main-card">
       <div style={{ marginBottom: 24 }}>
@@ -339,6 +409,43 @@ export default function SystemTab() {
           </button>
         </div>
       </div>
+
+      {canManage && (
+        <div className="detail-card" style={{ marginBottom: 30 }}>
+          <div style={{ marginBottom: 16 }}>
+            <h4 style={{ margin: '0 0 8px 0', fontWeight: 600, color: '#334155', fontSize: 16 }}>📥 系統資料匯入</h4>
+            <p style={{ color: '#64748b', fontSize: 13, margin: 0 }}>上傳 JSON 備份檔可還原開立事項與檢查計畫。支援：匯出備份格式（含 issues、plans 物件），或開立事項/檢查計畫的陣列格式。</p>
+          </div>
+          <div style={{ background: '#f8fafc', padding: 20, borderRadius: 12, border: '1px solid #e2e8f0' }}>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontWeight: 600, color: '#475569', fontSize: 14, margin: 0 }}>選擇 JSON 檔案</label>
+              <input
+                type="file"
+                id="systemImportFile"
+                accept=".json"
+                style={{ display: 'block', marginTop: 8, fontSize: 12 }}
+                onChange={() => {}}
+              />
+            </div>
+            {isAdmin && (
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, cursor: 'pointer' }}>
+                <input type="checkbox" checked={importUsers} onChange={(e) => setImportUsers(e.target.checked)} />
+                <span style={{ fontSize: 13, color: '#475569' }}>一併匯入帳號（JSON 需含 users 陣列）</span>
+              </label>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 12 }}>
+              <button
+                className="btn btn-primary"
+                style={{ padding: '12px 32px' }}
+                onClick={handleImport}
+                disabled={importing}
+              >
+                {importing ? '匯入中...' : '📤 執行匯入'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
