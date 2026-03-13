@@ -162,7 +162,7 @@ module.exports = function registerAdminRoutes(app) {
                         if (ex.rows.length > 0) { results.plans.skipped++; continue; }
                         await client.query(
                             `INSERT INTO inspection_plan_schedule (start_date, end_date, plan_name, year, railway, inspection_type, business, inspection_seq, plan_number, planned_count, plan_type, location, inspector, owner_group_id, owner_group_ids, owner_user_id, edit_mode)
-                             VALUES ($1, $2, $3, $4, $5, $6, $7, '00', '(手動)', $8, $9, $10, $11, $12, $13, $14, $15, 'GROUP')`,
+                             VALUES ($1, $2, $3, $4, $5, $6, $7, '00', '(手動)', $8, $9, $10, $11, $12, $13, $14, 'GROUP')`,
                             [start_date, end_date, name, year, railway, inspection_type, business, planned_count, plan_type, location, inspector, ownerGroupId, [ownerGroupId], ownerUserId]
                         );
                         results.plans.success++;
