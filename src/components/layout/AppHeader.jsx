@@ -13,7 +13,7 @@ export default function AppHeader({ sidebarOpen, onToggleSidebar }) {
     logout();
   }
 
-  const roleLabel = user?.role === 'manager' ? '資料管理者' : user?.role === 'admin' ? '系統管理員' : '檢視人員';
+  const roleLabel = user?.isAdmin === true ? '系統管理員' : user?.role === 'manager' ? '資料管理者' : '檢視人員';
 
   return (
     <header className="app-header">
