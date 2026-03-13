@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { utils, writeFileXLSX } from 'xlsx';
 import { apiFetch } from '../../api/api';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -190,6 +191,8 @@ export default function SystemTab() {
       if (exportDataType === 'plans' && planSchedulesData.length === 0) return showToast('無檢查計畫資料可匯出', 'error');
       if (exportDataType === 'both' && issuesData.length === 0 && planSchedulesData.length === 0) return showToast('無資料可匯出', 'error');
 
+      const dateStr = new Date().toISOString().slice(0, 10);
+
       if (exportFormat === 'json') {
         const exportData = {};
         if (exportDataType === 'issues' || exportDataType === 'both') exportData.issues = issuesData;
@@ -199,12 +202,65 @@ export default function SystemTab() {
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         const label = exportDataType === 'issues' ? 'Issues' : exportDataType === 'plans' ? 'Plans' : exportDataType === 'users' ? 'Users' : 'All';
-        link.download = `SMS_Backup_${label}_${new Date().toISOString().slice(0, 10)}.json`;
+        link.download = `SMS_Backup_${label}_${dateStr}.json`;
         link.click();
         URL.revokeObjectURL(link.href);
         showToast('JSON 匯出完成', 'success');
       } else {
-        showToast('Excel 匯出請改用 JSON 格式，或使用嵌入版', 'info');
+        const wb = utils.book_new();
+        if (exportDataType === 'issues' || exportDataType === 'both') {
+          const rows = issuesData.map((r) => {
+            const base = {
+              編號: r.number,
+              年度: r.year,
+              機構: r.unit,
+              事項內容: r.content,
+              列管狀態: r.status,
+              類型: r.item_kind_code,
+              分組: r.division_name,
+              檢查類別: r.inspection_category_name,
+              檢查計畫: r.plan_name,
+              開立日期: r.issue_date,
+              辦理情形: r.handling,
+              審查意見: r.review,
+              機構回復日期: r.reply_date_r1,
+              機關函復日期: r.response_date_r1,
+            };
+            if (exportScope === 'full') {
+              for (let i = 2; i <= 6; i++) {
+                base[`辦理情形${i}`] = r[`handling${i}`] || '';
+                base[`審查意見${i}`] = r[`review${i}`] || '';
+              }
+            }
+            return base;
+          });
+          const ws = utils.json_to_sheet(rows);
+          utils.book_append_sheet(wb, ws, '開立事項');
+        }
+        if (exportDataType === 'plans' || exportDataType === 'both') {
+          const planRows = planSchedulesData.map((r) => ({
+            計畫名稱: r.plan_name,
+            年度: r.year,
+            鐵路機構: r.railway,
+            檢查類別: r.inspection_type,
+            業務類型: r.business,
+            規劃檢查次數: r.planned_count,
+          }));
+          const planWs = utils.json_to_sheet(planRows);
+          utils.book_append_sheet(wb, planWs, '檢查計畫');
+        }
+        if (exportDataType === 'users') {
+          const userRows = usersData.map((r) => ({
+            姓名: r.name,
+            帳號: r.username,
+            權限: r.role,
+          }));
+          const userWs = utils.json_to_sheet(userRows);
+          utils.book_append_sheet(wb, userWs, '帳號');
+        }
+        const label = exportDataType === 'issues' ? '開立事項' : exportDataType === 'plans' ? '檢查計畫' : exportDataType === 'users' ? '帳號' : '系統備份';
+        writeFileXLSX(wb, `SMS_${label}_${dateStr}.xlsx`);
+        showToast('Excel 匯出完成', 'success');
       }
     } catch (e) {
       showToast('匯出失敗: ' + (e.message || ''), 'error');
@@ -331,7 +387,7 @@ export default function SystemTab() {
       <div className="detail-card" style={{ marginBottom: 30 }}>
         <div style={{ marginBottom: 20 }}>
           <h4 style={{ margin: '0 0 8px 0', fontWeight: 600, color: '#334155', fontSize: 16 }}>📦 系統資料備份與還原</h4>
-          <p style={{ color: '#64748b', fontSize: 13, margin: 0 }}>匯出 JSON 備份檔或上傳先前匯出的備份檔還原開立事項與檢查計畫。</p>
+          <p style={{ color: '#64748b', fontSize: 13, margin: 0 }}>匯出 JSON 或 Excel 備份檔，或上傳 JSON 備份檔還原開立事項與檢查計畫。</p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, alignItems: 'start' }}>
           <div style={{ background: '#f8fafc', padding: 20, borderRadius: 12, border: '1px solid #e2e8f0' }}>
@@ -358,7 +414,7 @@ export default function SystemTab() {
               <div style={{ fontSize: 13, color: '#475569', marginBottom: 8 }}>格式</div>
               <select className="filter-select" value={exportFormat} onChange={(e) => setExportFormat(e.target.value)} style={{ width: '100%' }}>
                 <option value="json">JSON（備份用）</option>
-                <option value="excel">Excel（需嵌入版）</option>
+                <option value="excel">Excel (.xlsx)</option>
               </select>
             </div>
             <button className="btn btn-primary" style={{ width: '100%', padding: '10px 16px' }} onClick={handleExport}>
