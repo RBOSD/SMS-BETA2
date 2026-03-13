@@ -209,6 +209,15 @@ export default function SystemTab() {
       } else {
         const wb = utils.book_new();
         if (exportDataType === 'issues' || exportDataType === 'both') {
+          let maxRound = 1;
+          if (exportScope === 'full') {
+            issuesData.forEach((r) => {
+              for (const k of Object.keys(r || {})) {
+                const m = k.match(/^handling(\d+)$/) || k.match(/^review(\d+)$/);
+                if (m) maxRound = Math.max(maxRound, parseInt(m[1], 10));
+              }
+            });
+          }
           const rows = issuesData.map((r) => {
             const base = {
               編號: r.number,
@@ -226,10 +235,12 @@ export default function SystemTab() {
               機構回復日期: r.reply_date_r1,
               機關函復日期: r.response_date_r1,
             };
-            if (exportScope === 'full') {
-              for (let i = 2; i <= 6; i++) {
-                base[`辦理情形${i}`] = r[`handling${i}`] || '';
-                base[`審查意見${i}`] = r[`review${i}`] || '';
+            if (exportScope === 'full' && maxRound >= 2) {
+              for (let i = 2; i <= maxRound; i++) {
+                base[`辦理情形${i}`] = r[`handling${i}`] ?? '';
+                base[`審查意見${i}`] = r[`review${i}`] ?? '';
+                base[`機構回復日期${i}`] = r[`reply_date_r${i}`] ?? '';
+                base[`機關函復日期${i}`] = r[`response_date_r${i}`] ?? '';
               }
             }
             return base;
