@@ -225,7 +225,19 @@ const INSPECTION_TYPE_MAP = {
   '臨時檢查': '4',
   '調查': '5',
 };
-const BUSINESS_CODES = ['OP', 'CV', 'ME', 'EL', 'SM', 'AD', 'OT', null];
+const BUSINESS_CODES = ['OP', 'CV', 'ME', 'EL', 'SM', 'AD', 'OT'];
+const PLAN_TYPES = ['年度定期', '專案檢查', '複查', '重點檢查', '追蹤查核'];
+const LOCATIONS = ['臺北站', '高雄站', '臺中站', '桃園站', '新竹站', '嘉義站', '花蓮站', '基隆站', '屏東站', '宜蘭站', '全線', '北區', '南區', '東部'];
+const INSPECTORS = ['王大明', '李小華', '張志偉', '陳美玲', '林志豪', '黃雅婷', '吳俊傑', '劉淑芬', '周建國', '鄭雅惠', '孫志明', '朱麗華'];
+
+/** ROC 年度轉 ISO 日期 (YYYY-MM-DD)，供 PostgreSQL DATE 使用 */
+function rocYearToIsoRange(rocYear) {
+  const adYear = 1911 + parseInt(rocYear, 10);
+  return {
+    start_date: `${adYear}-01-01`,
+    end_date: `${adYear}-12-31`,
+  };
+}
 
 function generatePlans(years, totalPlans = 100) {
   const planKeys = new Set();
@@ -239,6 +251,7 @@ function generatePlans(years, totalPlans = 100) {
         const key = `${planName}|||${year}`;
         if (planKeys.has(key)) continue;
         planKeys.add(key);
+        const { start_date, end_date } = rocYearToIsoRange(year);
         plans.push({
           plan_name: planName,
           year: String(year),
@@ -246,6 +259,11 @@ function generatePlans(years, totalPlans = 100) {
           inspection_type: INSPECTION_TYPE_MAP[inspection] || '1',
           business: pick(BUSINESS_CODES),
           planned_count: randomInt(2, 12),
+          start_date,
+          end_date,
+          plan_type: pick(PLAN_TYPES),
+          location: pick(LOCATIONS),
+          inspector: pick(INSPECTORS),
         });
       }
     }
@@ -263,6 +281,7 @@ function generatePlans(years, totalPlans = 100) {
     const key = `${planName}|||${year}`;
     if (planKeys.has(key)) continue;
     planKeys.add(key);
+    const { start_date, end_date } = rocYearToIsoRange(year);
     plans.push({
       plan_name: planName,
       year: String(year),
@@ -270,6 +289,11 @@ function generatePlans(years, totalPlans = 100) {
       inspection_type: INSPECTION_TYPE_MAP[inspection] || '1',
       business: pick(BUSINESS_CODES),
       planned_count: randomInt(1, 8),
+      start_date,
+      end_date,
+      plan_type: pick(PLAN_TYPES),
+      location: pick(LOCATIONS),
+      inspector: pick(INSPECTORS),
     });
     added++;
   }

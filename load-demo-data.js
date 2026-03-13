@@ -62,18 +62,29 @@ async function main() {
           plansSkipped++;
           continue;
         }
+        const startDate = p.start_date || null;
+        const endDate = p.end_date || null;
+        const planType = (p.plan_type || '').trim() || null;
+        const location = (p.location || '').trim() || null;
+        const inspector = (p.inspector || '').trim() || null;
         await client.query(
           `INSERT INTO inspection_plan_schedule (
             start_date, end_date, plan_name, year, railway, inspection_type, business, inspection_seq, plan_number, planned_count,
+            plan_type, location, inspector,
             owner_group_id, owner_group_ids, owner_user_id, edit_mode
-          ) VALUES (NULL, NULL, $1, $2, $3, $4, $5, '00', '(手動)', $6, $7, $8, $9, $10)`,
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, '00', '(手動)', $8, $9, $10, $11, $12, $13, $14, $15)`,
           [
+            startDate,
+            endDate,
             planName,
             year,
             String(p.railway || 'T').toUpperCase(),
             String(p.inspection_type || '1'),
             p.business || null,
             p.planned_count != null ? parseInt(p.planned_count, 10) : null,
+            planType,
+            location,
+            inspector,
             ownerGroupId,
             [ownerGroupId],
             ownerUserId,

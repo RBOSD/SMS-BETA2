@@ -4,24 +4,39 @@
     "year": "112",
     "railway": "T",
     "inspection_type": "1",
-    "business": "EL",
-    "planned_count": 8
+    "business": "SM",
+    "planned_count": 4,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "重點檢查",
+    "location": "基隆站",
+    "inspector": "黃雅婷"
   },
   {
     "plan_name": "112年度臺鐵例行性檢查計畫",
     "year": "112",
     "railway": "T",
     "inspection_type": "3",
-    "business": null,
-    "planned_count": 3
+    "business": "EL",
+    "planned_count": 12,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "年度定期",
+    "location": "新竹站",
+    "inspector": "吳俊傑"
   },
   {
     "plan_name": "112年度臺鐵特別檢查計畫",
     "year": "112",
     "railway": "T",
     "inspection_type": "2",
-    "business": "CV",
-    "planned_count": 8
+    "business": "ME",
+    "planned_count": 12,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "複查",
+    "location": "屏東站",
+    "inspector": "張志偉"
   },
   {
     "plan_name": "112年度臺鐵臨時檢查計畫",
@@ -29,15 +44,25 @@
     "railway": "T",
     "inspection_type": "4",
     "business": "ME",
-    "planned_count": 11
+    "planned_count": 4,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "追蹤查核",
+    "location": "北區",
+    "inspector": "李小華"
   },
   {
     "plan_name": "112年度臺鐵調查計畫",
     "year": "112",
     "railway": "T",
     "inspection_type": "5",
-    "business": "OP",
-    "planned_count": 3
+    "business": "SM",
+    "planned_count": 6,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "複查",
+    "location": "花蓮站",
+    "inspector": "林志豪"
   },
   {
     "plan_name": "112年度高鐵定期檢查計畫",
@@ -45,47 +70,77 @@
     "railway": "H",
     "inspection_type": "1",
     "business": "EL",
-    "planned_count": 8
+    "planned_count": 5,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "年度定期",
+    "location": "基隆站",
+    "inspector": "朱麗華"
   },
   {
     "plan_name": "112年度高鐵例行性檢查計畫",
     "year": "112",
     "railway": "H",
     "inspection_type": "3",
-    "business": "ME",
-    "planned_count": 5
+    "business": "OP",
+    "planned_count": 10,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "重點檢查",
+    "location": "東部",
+    "inspector": "李小華"
   },
   {
     "plan_name": "112年度高鐵特別檢查計畫",
     "year": "112",
     "railway": "H",
     "inspection_type": "2",
-    "business": "EL",
-    "planned_count": 3
+    "business": "ME",
+    "planned_count": 3,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "重點檢查",
+    "location": "南區",
+    "inspector": "林志豪"
   },
   {
     "plan_name": "112年度高鐵臨時檢查計畫",
     "year": "112",
     "railway": "H",
     "inspection_type": "4",
-    "business": null,
-    "planned_count": 2
+    "business": "SM",
+    "planned_count": 12,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "複查",
+    "location": "花蓮站",
+    "inspector": "劉淑芬"
   },
   {
     "plan_name": "112年度高鐵調查計畫",
     "year": "112",
     "railway": "H",
     "inspection_type": "5",
-    "business": null,
-    "planned_count": 4
+    "business": "AD",
+    "planned_count": 4,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "重點檢查",
+    "location": "全線",
+    "inspector": "林志豪"
   },
   {
     "plan_name": "112年度林鐵定期檢查計畫",
     "year": "112",
     "railway": "A",
     "inspection_type": "1",
-    "business": "EL",
-    "planned_count": 4
+    "business": "ME",
+    "planned_count": 2,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "重點檢查",
+    "location": "花蓮站",
+    "inspector": "吳俊傑"
   },
   {
     "plan_name": "112年度林鐵例行性檢查計畫",
@@ -93,95 +148,155 @@
     "railway": "A",
     "inspection_type": "3",
     "business": "OT",
-    "planned_count": 7
+    "planned_count": 7,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "專案檢查",
+    "location": "北區",
+    "inspector": "陳美玲"
   },
   {
     "plan_name": "112年度林鐵特別檢查計畫",
     "year": "112",
     "railway": "A",
     "inspection_type": "2",
-    "business": null,
-    "planned_count": 2
+    "business": "AD",
+    "planned_count": 7,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "年度定期",
+    "location": "高雄站",
+    "inspector": "周建國"
   },
   {
     "plan_name": "112年度林鐵臨時檢查計畫",
     "year": "112",
     "railway": "A",
     "inspection_type": "4",
-    "business": "CV",
-    "planned_count": 4
+    "business": "AD",
+    "planned_count": 7,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "重點檢查",
+    "location": "高雄站",
+    "inspector": "黃雅婷"
   },
   {
     "plan_name": "112年度林鐵調查計畫",
     "year": "112",
     "railway": "A",
     "inspection_type": "5",
-    "business": "CV",
-    "planned_count": 12
+    "business": "ME",
+    "planned_count": 9,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "年度定期",
+    "location": "基隆站",
+    "inspector": "黃雅婷"
   },
   {
     "plan_name": "112年度糖鐵定期檢查計畫",
     "year": "112",
     "railway": "S",
     "inspection_type": "1",
-    "business": "AD",
-    "planned_count": 12
+    "business": "EL",
+    "planned_count": 6,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "年度定期",
+    "location": "宜蘭站",
+    "inspector": "陳美玲"
   },
   {
     "plan_name": "112年度糖鐵例行性檢查計畫",
     "year": "112",
     "railway": "S",
     "inspection_type": "3",
-    "business": null,
-    "planned_count": 5
+    "business": "SM",
+    "planned_count": 9,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "複查",
+    "location": "宜蘭站",
+    "inspector": "周建國"
   },
   {
     "plan_name": "112年度糖鐵特別檢查計畫",
     "year": "112",
     "railway": "S",
     "inspection_type": "2",
-    "business": null,
-    "planned_count": 2
+    "business": "SM",
+    "planned_count": 7,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "重點檢查",
+    "location": "基隆站",
+    "inspector": "李小華"
   },
   {
     "plan_name": "112年度糖鐵臨時檢查計畫",
     "year": "112",
     "railway": "S",
     "inspection_type": "4",
-    "business": "OT",
-    "planned_count": 12
+    "business": "CV",
+    "planned_count": 9,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "年度定期",
+    "location": "全線",
+    "inspector": "張志偉"
   },
   {
     "plan_name": "112年度糖鐵調查計畫",
     "year": "112",
     "railway": "S",
     "inspection_type": "5",
-    "business": "EL",
-    "planned_count": 5
+    "business": "ME",
+    "planned_count": 2,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "追蹤查核",
+    "location": "北區",
+    "inspector": "鄭雅惠"
   },
   {
     "plan_name": "113年度臺鐵定期檢查計畫",
     "year": "113",
     "railway": "T",
     "inspection_type": "1",
-    "business": "ME",
-    "planned_count": 8
+    "business": "OP",
+    "planned_count": 9,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "追蹤查核",
+    "location": "嘉義站",
+    "inspector": "林志豪"
   },
   {
     "plan_name": "113年度臺鐵例行性檢查計畫",
     "year": "113",
     "railway": "T",
     "inspection_type": "3",
-    "business": null,
-    "planned_count": 11
+    "business": "SM",
+    "planned_count": 3,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "複查",
+    "location": "臺中站",
+    "inspector": "吳俊傑"
   },
   {
     "plan_name": "113年度臺鐵特別檢查計畫",
     "year": "113",
     "railway": "T",
     "inspection_type": "2",
-    "business": "CV",
-    "planned_count": 6
+    "business": "OT",
+    "planned_count": 4,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "重點檢查",
+    "location": "臺北站",
+    "inspector": "李小華"
   },
   {
     "plan_name": "113年度臺鐵臨時檢查計畫",
@@ -189,15 +304,25 @@
     "railway": "T",
     "inspection_type": "4",
     "business": "OP",
-    "planned_count": 6
+    "planned_count": 9,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "複查",
+    "location": "花蓮站",
+    "inspector": "鄭雅惠"
   },
   {
     "plan_name": "113年度臺鐵調查計畫",
     "year": "113",
     "railway": "T",
     "inspection_type": "5",
-    "business": "AD",
-    "planned_count": 8
+    "business": "SM",
+    "planned_count": 2,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "追蹤查核",
+    "location": "臺北站",
+    "inspector": "孫志明"
   },
   {
     "plan_name": "113年度高鐵定期檢查計畫",
@@ -205,119 +330,194 @@
     "railway": "H",
     "inspection_type": "1",
     "business": "ME",
-    "planned_count": 10
+    "planned_count": 4,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "年度定期",
+    "location": "基隆站",
+    "inspector": "吳俊傑"
   },
   {
     "plan_name": "113年度高鐵例行性檢查計畫",
     "year": "113",
     "railway": "H",
     "inspection_type": "3",
-    "business": "EL",
-    "planned_count": 8
+    "business": "OT",
+    "planned_count": 6,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "年度定期",
+    "location": "高雄站",
+    "inspector": "周建國"
   },
   {
     "plan_name": "113年度高鐵特別檢查計畫",
     "year": "113",
     "railway": "H",
     "inspection_type": "2",
-    "business": "EL",
-    "planned_count": 5
+    "business": "OP",
+    "planned_count": 11,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "複查",
+    "location": "嘉義站",
+    "inspector": "李小華"
   },
   {
     "plan_name": "113年度高鐵臨時檢查計畫",
     "year": "113",
     "railway": "H",
     "inspection_type": "4",
-    "business": "OT",
-    "planned_count": 8
+    "business": "SM",
+    "planned_count": 8,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "專案檢查",
+    "location": "嘉義站",
+    "inspector": "林志豪"
   },
   {
     "plan_name": "113年度高鐵調查計畫",
     "year": "113",
     "railway": "H",
     "inspection_type": "5",
-    "business": "EL",
-    "planned_count": 4
+    "business": "SM",
+    "planned_count": 12,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "年度定期",
+    "location": "嘉義站",
+    "inspector": "陳美玲"
   },
   {
     "plan_name": "113年度林鐵定期檢查計畫",
     "year": "113",
     "railway": "A",
     "inspection_type": "1",
-    "business": "CV",
-    "planned_count": 3
+    "business": "AD",
+    "planned_count": 9,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "追蹤查核",
+    "location": "屏東站",
+    "inspector": "鄭雅惠"
   },
   {
     "plan_name": "113年度林鐵例行性檢查計畫",
     "year": "113",
     "railway": "A",
     "inspection_type": "3",
-    "business": "SM",
-    "planned_count": 4
+    "business": "CV",
+    "planned_count": 10,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "追蹤查核",
+    "location": "花蓮站",
+    "inspector": "吳俊傑"
   },
   {
     "plan_name": "113年度林鐵特別檢查計畫",
     "year": "113",
     "railway": "A",
     "inspection_type": "2",
-    "business": "CV",
-    "planned_count": 2
+    "business": "OT",
+    "planned_count": 7,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "年度定期",
+    "location": "臺北站",
+    "inspector": "張志偉"
   },
   {
     "plan_name": "113年度林鐵臨時檢查計畫",
     "year": "113",
     "railway": "A",
     "inspection_type": "4",
-    "business": "CV",
-    "planned_count": 7
+    "business": "OT",
+    "planned_count": 8,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "專案檢查",
+    "location": "新竹站",
+    "inspector": "王大明"
   },
   {
     "plan_name": "113年度林鐵調查計畫",
     "year": "113",
     "railway": "A",
     "inspection_type": "5",
-    "business": "OP",
-    "planned_count": 10
+    "business": "CV",
+    "planned_count": 11,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "年度定期",
+    "location": "北區",
+    "inspector": "林志豪"
   },
   {
     "plan_name": "113年度糖鐵定期檢查計畫",
     "year": "113",
     "railway": "S",
     "inspection_type": "1",
-    "business": "EL",
-    "planned_count": 10
+    "business": "OT",
+    "planned_count": 9,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "專案檢查",
+    "location": "屏東站",
+    "inspector": "孫志明"
   },
   {
     "plan_name": "113年度糖鐵例行性檢查計畫",
     "year": "113",
     "railway": "S",
     "inspection_type": "3",
-    "business": "SM",
-    "planned_count": 3
+    "business": "OP",
+    "planned_count": 2,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "年度定期",
+    "location": "高雄站",
+    "inspector": "朱麗華"
   },
   {
     "plan_name": "113年度糖鐵特別檢查計畫",
     "year": "113",
     "railway": "S",
     "inspection_type": "2",
-    "business": "AD",
-    "planned_count": 3
+    "business": "CV",
+    "planned_count": 8,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "複查",
+    "location": "基隆站",
+    "inspector": "周建國"
   },
   {
     "plan_name": "113年度糖鐵臨時檢查計畫",
     "year": "113",
     "railway": "S",
     "inspection_type": "4",
-    "business": null,
-    "planned_count": 12
+    "business": "AD",
+    "planned_count": 2,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "專案檢查",
+    "location": "新竹站",
+    "inspector": "林志豪"
   },
   {
     "plan_name": "113年度糖鐵調查計畫",
     "year": "113",
     "railway": "S",
     "inspection_type": "5",
-    "business": "CV",
-    "planned_count": 9
+    "business": "SM",
+    "planned_count": 4,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "年度定期",
+    "location": "宜蘭站",
+    "inspector": "劉淑芬"
   },
   {
     "plan_name": "114年度臺鐵定期檢查計畫",
@@ -325,7 +525,12 @@
     "railway": "T",
     "inspection_type": "1",
     "business": "CV",
-    "planned_count": 9
+    "planned_count": 9,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "重點檢查",
+    "location": "宜蘭站",
+    "inspector": "周建國"
   },
   {
     "plan_name": "114年度臺鐵例行性檢查計畫",
@@ -333,47 +538,77 @@
     "railway": "T",
     "inspection_type": "3",
     "business": "SM",
-    "planned_count": 9
+    "planned_count": 7,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "追蹤查核",
+    "location": "屏東站",
+    "inspector": "周建國"
   },
   {
     "plan_name": "114年度臺鐵特別檢查計畫",
     "year": "114",
     "railway": "T",
     "inspection_type": "2",
-    "business": "OP",
-    "planned_count": 12
+    "business": "CV",
+    "planned_count": 2,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "複查",
+    "location": "臺中站",
+    "inspector": "朱麗華"
   },
   {
     "plan_name": "114年度臺鐵臨時檢查計畫",
     "year": "114",
     "railway": "T",
     "inspection_type": "4",
-    "business": "SM",
-    "planned_count": 7
+    "business": "AD",
+    "planned_count": 5,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "追蹤查核",
+    "location": "北區",
+    "inspector": "周建國"
   },
   {
     "plan_name": "114年度臺鐵調查計畫",
     "year": "114",
     "railway": "T",
     "inspection_type": "5",
-    "business": "CV",
-    "planned_count": 6
+    "business": "EL",
+    "planned_count": 4,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "年度定期",
+    "location": "臺北站",
+    "inspector": "黃雅婷"
   },
   {
     "plan_name": "114年度高鐵定期檢查計畫",
     "year": "114",
     "railway": "H",
     "inspection_type": "1",
-    "business": "ME",
-    "planned_count": 7
+    "business": "SM",
+    "planned_count": 3,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "專案檢查",
+    "location": "桃園站",
+    "inspector": "鄭雅惠"
   },
   {
     "plan_name": "114年度高鐵例行性檢查計畫",
     "year": "114",
     "railway": "H",
     "inspection_type": "3",
-    "business": "EL",
-    "planned_count": 2
+    "business": "CV",
+    "planned_count": 4,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "重點檢查",
+    "location": "基隆站",
+    "inspector": "黃雅婷"
   },
   {
     "plan_name": "114年度高鐵特別檢查計畫",
@@ -381,71 +616,116 @@
     "railway": "H",
     "inspection_type": "2",
     "business": "ME",
-    "planned_count": 2
+    "planned_count": 11,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "複查",
+    "location": "桃園站",
+    "inspector": "陳美玲"
   },
   {
     "plan_name": "114年度高鐵臨時檢查計畫",
     "year": "114",
     "railway": "H",
     "inspection_type": "4",
-    "business": "OP",
-    "planned_count": 2
+    "business": "AD",
+    "planned_count": 4,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "追蹤查核",
+    "location": "屏東站",
+    "inspector": "朱麗華"
   },
   {
     "plan_name": "114年度高鐵調查計畫",
     "year": "114",
     "railway": "H",
     "inspection_type": "5",
-    "business": "OT",
-    "planned_count": 12
+    "business": "AD",
+    "planned_count": 6,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "專案檢查",
+    "location": "花蓮站",
+    "inspector": "黃雅婷"
   },
   {
     "plan_name": "114年度林鐵定期檢查計畫",
     "year": "114",
     "railway": "A",
     "inspection_type": "1",
-    "business": "OT",
-    "planned_count": 8
+    "business": "AD",
+    "planned_count": 10,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "年度定期",
+    "location": "基隆站",
+    "inspector": "李小華"
   },
   {
     "plan_name": "114年度林鐵例行性檢查計畫",
     "year": "114",
     "railway": "A",
     "inspection_type": "3",
-    "business": "ME",
-    "planned_count": 11
+    "business": "OP",
+    "planned_count": 3,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "年度定期",
+    "location": "臺北站",
+    "inspector": "張志偉"
   },
   {
     "plan_name": "114年度林鐵特別檢查計畫",
     "year": "114",
     "railway": "A",
     "inspection_type": "2",
-    "business": null,
-    "planned_count": 2
+    "business": "ME",
+    "planned_count": 2,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "年度定期",
+    "location": "新竹站",
+    "inspector": "張志偉"
   },
   {
     "plan_name": "114年度林鐵臨時檢查計畫",
     "year": "114",
     "railway": "A",
     "inspection_type": "4",
-    "business": "EL",
-    "planned_count": 6
+    "business": "CV",
+    "planned_count": 7,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "重點檢查",
+    "location": "嘉義站",
+    "inspector": "鄭雅惠"
   },
   {
     "plan_name": "114年度林鐵調查計畫",
     "year": "114",
     "railway": "A",
     "inspection_type": "5",
-    "business": null,
-    "planned_count": 5
+    "business": "OP",
+    "planned_count": 10,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "專案檢查",
+    "location": "桃園站",
+    "inspector": "王大明"
   },
   {
     "plan_name": "114年度糖鐵定期檢查計畫",
     "year": "114",
     "railway": "S",
     "inspection_type": "1",
-    "business": "AD",
-    "planned_count": 11
+    "business": "OT",
+    "planned_count": 5,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "年度定期",
+    "location": "全線",
+    "inspector": "吳俊傑"
   },
   {
     "plan_name": "114年度糖鐵例行性檢查計畫",
@@ -453,15 +733,25 @@
     "railway": "S",
     "inspection_type": "3",
     "business": "ME",
-    "planned_count": 6
+    "planned_count": 10,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "專案檢查",
+    "location": "北區",
+    "inspector": "鄭雅惠"
   },
   {
     "plan_name": "114年度糖鐵特別檢查計畫",
     "year": "114",
     "railway": "S",
     "inspection_type": "2",
-    "business": null,
-    "planned_count": 7
+    "business": "SM",
+    "planned_count": 5,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "專案檢查",
+    "location": "南區",
+    "inspector": "林志豪"
   },
   {
     "plan_name": "114年度糖鐵臨時檢查計畫",
@@ -469,334 +759,544 @@
     "railway": "S",
     "inspection_type": "4",
     "business": "ME",
-    "planned_count": 12
+    "planned_count": 8,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "年度定期",
+    "location": "屏東站",
+    "inspector": "劉淑芬"
   },
   {
     "plan_name": "114年度糖鐵調查計畫",
     "year": "114",
     "railway": "S",
     "inspection_type": "5",
-    "business": "CV",
-    "planned_count": 4
+    "business": "SM",
+    "planned_count": 11,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "重點檢查",
+    "location": "宜蘭站",
+    "inspector": "鄭雅惠"
   },
   {
-    "plan_name": "113年度糖鐵定期檢查重點檢查計畫",
-    "year": "113",
-    "railway": "S",
-    "inspection_type": "1",
-    "business": "CV",
-    "planned_count": 8
+    "plan_name": "114年度林鐵特別檢查專案檢查計畫",
+    "year": "114",
+    "railway": "A",
+    "inspection_type": "2",
+    "business": "EL",
+    "planned_count": 3,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "專案檢查",
+    "location": "屏東站",
+    "inspector": "王大明"
   },
   {
-    "plan_name": "112年度高鐵定期檢查重點檢查計畫",
-    "year": "112",
-    "railway": "H",
-    "inspection_type": "1",
-    "business": "OT",
-    "planned_count": 2
-  },
-  {
-    "plan_name": "114年度臺鐵特別檢查複查計畫",
+    "plan_name": "114年度臺鐵臨時檢查專案檢查計畫",
     "year": "114",
     "railway": "T",
-    "inspection_type": "2",
-    "business": "CV",
-    "planned_count": 4
+    "inspection_type": "4",
+    "business": "SM",
+    "planned_count": 4,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "追蹤查核",
+    "location": "宜蘭站",
+    "inspector": "李小華"
   },
   {
-    "plan_name": "113年度林鐵調查複查計畫",
-    "year": "113",
-    "railway": "A",
+    "plan_name": "114年度糖鐵調查補充查核計畫",
+    "year": "114",
+    "railway": "S",
     "inspection_type": "5",
     "business": "AD",
-    "planned_count": 2
+    "planned_count": 3,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "專案檢查",
+    "location": "基隆站",
+    "inspector": "林志豪"
   },
   {
-    "plan_name": "113年度臺鐵調查專案檢查計畫",
-    "year": "113",
-    "railway": "T",
-    "inspection_type": "5",
-    "business": "SM",
-    "planned_count": 5
-  },
-  {
-    "plan_name": "112年度糖鐵定期檢查專案檢查計畫",
+    "plan_name": "112年度林鐵例行性檢查追蹤查核計畫",
     "year": "112",
-    "railway": "S",
-    "inspection_type": "1",
-    "business": "EL",
-    "planned_count": 4
-  },
-  {
-    "plan_name": "113年度林鐵臨時檢查追蹤查核計畫",
-    "year": "113",
     "railway": "A",
-    "inspection_type": "4",
-    "business": null,
-    "planned_count": 5
+    "inspection_type": "3",
+    "business": "AD",
+    "planned_count": 4,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "專案檢查",
+    "location": "高雄站",
+    "inspector": "黃雅婷"
   },
   {
-    "plan_name": "113年度臺鐵臨時檢查追蹤查核計畫",
-    "year": "113",
+    "plan_name": "114年度臺鐵臨時檢查補充查核計畫",
+    "year": "114",
     "railway": "T",
     "inspection_type": "4",
     "business": "SM",
-    "planned_count": 6
+    "planned_count": 5,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "年度定期",
+    "location": "臺中站",
+    "inspector": "吳俊傑"
   },
   {
-    "plan_name": "113年度糖鐵定期檢查補充查核計畫",
-    "year": "113",
+    "plan_name": "112年度糖鐵定期檢查追蹤查核計畫",
+    "year": "112",
     "railway": "S",
     "inspection_type": "1",
-    "business": "SM",
-    "planned_count": 4
-  },
-  {
-    "plan_name": "113年度高鐵例行性檢查專案檢查計畫",
-    "year": "113",
-    "railway": "H",
-    "inspection_type": "3",
-    "business": "CV",
-    "planned_count": 2
-  },
-  {
-    "plan_name": "112年度高鐵臨時檢查追蹤查核計畫",
-    "year": "112",
-    "railway": "H",
-    "inspection_type": "4",
-    "business": "ME",
-    "planned_count": 6
+    "business": "OP",
+    "planned_count": 8,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "追蹤查核",
+    "location": "臺北站",
+    "inspector": "林志豪"
   },
   {
     "plan_name": "112年度糖鐵臨時檢查重點檢查計畫",
     "year": "112",
     "railway": "S",
     "inspection_type": "4",
-    "business": "OP",
-    "planned_count": 3
+    "business": "ME",
+    "planned_count": 8,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "追蹤查核",
+    "location": "桃園站",
+    "inspector": "林志豪"
   },
   {
-    "plan_name": "114年度臺鐵調查專案檢查計畫",
-    "year": "114",
+    "plan_name": "113年度臺鐵定期檢查複查計畫",
+    "year": "113",
     "railway": "T",
-    "inspection_type": "5",
-    "business": "OP",
-    "planned_count": 2
-  },
-  {
-    "plan_name": "113年度糖鐵臨時檢查專案檢查計畫",
-    "year": "113",
-    "railway": "S",
-    "inspection_type": "4",
-    "business": "CV",
-    "planned_count": 4
-  },
-  {
-    "plan_name": "114年度高鐵特別檢查補充查核計畫",
-    "year": "114",
-    "railway": "H",
-    "inspection_type": "2",
-    "business": null,
-    "planned_count": 1
-  },
-  {
-    "plan_name": "113年度高鐵定期檢查專案檢查計畫",
-    "year": "113",
-    "railway": "H",
     "inspection_type": "1",
-    "business": "AD",
-    "planned_count": 1
+    "business": "CV",
+    "planned_count": 5,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "專案檢查",
+    "location": "花蓮站",
+    "inspector": "黃雅婷"
   },
   {
-    "plan_name": "114年度臺鐵調查複查計畫",
+    "plan_name": "114年度高鐵調查補充查核計畫",
     "year": "114",
-    "railway": "T",
+    "railway": "H",
     "inspection_type": "5",
-    "business": "ME",
-    "planned_count": 2
-  },
-  {
-    "plan_name": "114年度林鐵特別檢查重點檢查計畫",
-    "year": "114",
-    "railway": "A",
-    "inspection_type": "2",
-    "business": "SM",
-    "planned_count": 6
-  },
-  {
-    "plan_name": "113年度林鐵例行性檢查專案檢查計畫",
-    "year": "113",
-    "railway": "A",
-    "inspection_type": "3",
-    "business": "ME",
-    "planned_count": 6
-  },
-  {
-    "plan_name": "112年度糖鐵例行性檢查重點檢查計畫",
-    "year": "112",
-    "railway": "S",
-    "inspection_type": "3",
-    "business": "SM",
-    "planned_count": 4
-  },
-  {
-    "plan_name": "113年度林鐵特別檢查追蹤查核計畫",
-    "year": "113",
-    "railway": "A",
-    "inspection_type": "2",
     "business": "OT",
-    "planned_count": 7
+    "planned_count": 6,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "複查",
+    "location": "桃園站",
+    "inspector": "周建國"
   },
   {
-    "plan_name": "114年度糖鐵調查追蹤查核計畫",
-    "year": "114",
-    "railway": "S",
+    "plan_name": "113年度臺鐵調查重點檢查計畫",
+    "year": "113",
+    "railway": "T",
     "inspection_type": "5",
     "business": "AD",
-    "planned_count": 5
+    "planned_count": 6,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "年度定期",
+    "location": "高雄站",
+    "inspector": "劉淑芬"
   },
   {
-    "plan_name": "112年度糖鐵調查補充查核計畫",
-    "year": "112",
-    "railway": "S",
-    "inspection_type": "5",
-    "business": "EL",
-    "planned_count": 4
-  },
-  {
-    "plan_name": "114年度林鐵例行性檢查複查計畫",
-    "year": "114",
-    "railway": "A",
-    "inspection_type": "3",
-    "business": null,
-    "planned_count": 5
-  },
-  {
-    "plan_name": "112年度林鐵定期檢查追蹤查核計畫",
-    "year": "112",
-    "railway": "A",
-    "inspection_type": "1",
-    "business": "AD",
-    "planned_count": 2
-  },
-  {
-    "plan_name": "114年度林鐵臨時檢查追蹤查核計畫",
-    "year": "114",
+    "plan_name": "113年度林鐵臨時檢查補充查核計畫",
+    "year": "113",
     "railway": "A",
     "inspection_type": "4",
-    "business": "OP",
-    "planned_count": 8
-  },
-  {
-    "plan_name": "112年度高鐵臨時檢查複查計畫",
-    "year": "112",
-    "railway": "H",
-    "inspection_type": "4",
-    "business": null,
-    "planned_count": 5
-  },
-  {
-    "plan_name": "114年度林鐵調查補充查核計畫",
-    "year": "114",
-    "railway": "A",
-    "inspection_type": "5",
-    "business": null,
-    "planned_count": 4
-  },
-  {
-    "plan_name": "114年度糖鐵定期檢查追蹤查核計畫",
-    "year": "114",
-    "railway": "S",
-    "inspection_type": "1",
     "business": "SM",
-    "planned_count": 3
+    "planned_count": 1,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "專案檢查",
+    "location": "北區",
+    "inspector": "林志豪"
   },
   {
-    "plan_name": "114年度高鐵例行性檢查追蹤查核計畫",
-    "year": "114",
-    "railway": "H",
-    "inspection_type": "3",
-    "business": "ME",
-    "planned_count": 4
+    "plan_name": "112年度林鐵臨時檢查專案檢查計畫",
+    "year": "112",
+    "railway": "A",
+    "inspection_type": "4",
+    "business": "AD",
+    "planned_count": 4,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "追蹤查核",
+    "location": "東部",
+    "inspector": "朱麗華"
   },
   {
-    "plan_name": "112年度糖鐵特別檢查複查計畫",
+    "plan_name": "112年度糖鐵臨時檢查追蹤查核計畫",
     "year": "112",
     "railway": "S",
-    "inspection_type": "2",
-    "business": "CV",
-    "planned_count": 8
-  },
-  {
-    "plan_name": "113年度臺鐵特別檢查補充查核計畫",
-    "year": "113",
-    "railway": "T",
-    "inspection_type": "2",
-    "business": "ME",
-    "planned_count": 6
-  },
-  {
-    "plan_name": "112年度林鐵定期檢查複查計畫",
-    "year": "112",
-    "railway": "A",
-    "inspection_type": "1",
-    "business": "ME",
-    "planned_count": 1
-  },
-  {
-    "plan_name": "113年度林鐵調查追蹤查核計畫",
-    "year": "113",
-    "railway": "A",
-    "inspection_type": "5",
-    "business": null,
-    "planned_count": 6
-  },
-  {
-    "plan_name": "112年度臺鐵特別檢查專案檢查計畫",
-    "year": "112",
-    "railway": "T",
-    "inspection_type": "2",
-    "business": "ME",
-    "planned_count": 7
-  },
-  {
-    "plan_name": "112年度高鐵特別檢查重點檢查計畫",
-    "year": "112",
-    "railway": "H",
-    "inspection_type": "2",
-    "business": "EL",
-    "planned_count": 4
-  },
-  {
-    "plan_name": "113年度高鐵調查追蹤查核計畫",
-    "year": "113",
-    "railway": "H",
-    "inspection_type": "5",
-    "business": "ME",
-    "planned_count": 5
+    "inspection_type": "4",
+    "business": "OT",
+    "planned_count": 3,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "重點檢查",
+    "location": "南區",
+    "inspector": "朱麗華"
   },
   {
     "plan_name": "113年度林鐵調查重點檢查計畫",
     "year": "113",
     "railway": "A",
     "inspection_type": "5",
-    "business": null,
-    "planned_count": 6
+    "business": "OT",
+    "planned_count": 6,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "重點檢查",
+    "location": "桃園站",
+    "inspector": "吳俊傑"
   },
   {
-    "plan_name": "114年度臺鐵特別檢查重點檢查計畫",
-    "year": "114",
-    "railway": "T",
+    "plan_name": "112年度林鐵特別檢查補充查核計畫",
+    "year": "112",
+    "railway": "A",
     "inspection_type": "2",
-    "business": "CV",
-    "planned_count": 5
+    "business": "EL",
+    "planned_count": 2,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "年度定期",
+    "location": "宜蘭站",
+    "inspector": "吳俊傑"
   },
   {
-    "plan_name": "112年度糖鐵定期檢查補充查核計畫",
+    "plan_name": "112年度林鐵調查複查計畫",
+    "year": "112",
+    "railway": "A",
+    "inspection_type": "5",
+    "business": "SM",
+    "planned_count": 4,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "追蹤查核",
+    "location": "基隆站",
+    "inspector": "林志豪"
+  },
+  {
+    "plan_name": "112年度高鐵定期檢查追蹤查核計畫",
+    "year": "112",
+    "railway": "H",
+    "inspection_type": "1",
+    "business": "OT",
+    "planned_count": 8,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "複查",
+    "location": "全線",
+    "inspector": "劉淑芬"
+  },
+  {
+    "plan_name": "112年度臺鐵臨時檢查複查計畫",
+    "year": "112",
+    "railway": "T",
+    "inspection_type": "4",
+    "business": "CV",
+    "planned_count": 5,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "追蹤查核",
+    "location": "嘉義站",
+    "inspector": "林志豪"
+  },
+  {
+    "plan_name": "112年度糖鐵定期檢查複查計畫",
     "year": "112",
     "railway": "S",
     "inspection_type": "1",
     "business": "CV",
-    "planned_count": 4
+    "planned_count": 1,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "年度定期",
+    "location": "南區",
+    "inspector": "劉淑芬"
+  },
+  {
+    "plan_name": "114年度高鐵例行性檢查重點檢查計畫",
+    "year": "114",
+    "railway": "H",
+    "inspection_type": "3",
+    "business": "CV",
+    "planned_count": 1,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "追蹤查核",
+    "location": "南區",
+    "inspector": "黃雅婷"
+  },
+  {
+    "plan_name": "114年度高鐵調查追蹤查核計畫",
+    "year": "114",
+    "railway": "H",
+    "inspection_type": "5",
+    "business": "EL",
+    "planned_count": 3,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "年度定期",
+    "location": "臺中站",
+    "inspector": "張志偉"
+  },
+  {
+    "plan_name": "113年度臺鐵調查補充查核計畫",
+    "year": "113",
+    "railway": "T",
+    "inspection_type": "5",
+    "business": "ME",
+    "planned_count": 4,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "專案檢查",
+    "location": "東部",
+    "inspector": "陳美玲"
+  },
+  {
+    "plan_name": "113年度臺鐵臨時檢查複查計畫",
+    "year": "113",
+    "railway": "T",
+    "inspection_type": "4",
+    "business": "EL",
+    "planned_count": 1,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "複查",
+    "location": "高雄站",
+    "inspector": "孫志明"
+  },
+  {
+    "plan_name": "114年度高鐵臨時檢查專案檢查計畫",
+    "year": "114",
+    "railway": "H",
+    "inspection_type": "4",
+    "business": "SM",
+    "planned_count": 1,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "年度定期",
+    "location": "新竹站",
+    "inspector": "朱麗華"
+  },
+  {
+    "plan_name": "113年度臺鐵調查複查計畫",
+    "year": "113",
+    "railway": "T",
+    "inspection_type": "5",
+    "business": "EL",
+    "planned_count": 2,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "複查",
+    "location": "東部",
+    "inspector": "李小華"
+  },
+  {
+    "plan_name": "114年度高鐵定期檢查專案檢查計畫",
+    "year": "114",
+    "railway": "H",
+    "inspection_type": "1",
+    "business": "EL",
+    "planned_count": 8,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "專案檢查",
+    "location": "嘉義站",
+    "inspector": "孫志明"
+  },
+  {
+    "plan_name": "114年度林鐵調查重點檢查計畫",
+    "year": "114",
+    "railway": "A",
+    "inspection_type": "5",
+    "business": "EL",
+    "planned_count": 8,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "年度定期",
+    "location": "北區",
+    "inspector": "鄭雅惠"
+  },
+  {
+    "plan_name": "113年度臺鐵特別檢查複查計畫",
+    "year": "113",
+    "railway": "T",
+    "inspection_type": "2",
+    "business": "EL",
+    "planned_count": 4,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "專案檢查",
+    "location": "臺北站",
+    "inspector": "鄭雅惠"
+  },
+  {
+    "plan_name": "112年度糖鐵調查重點檢查計畫",
+    "year": "112",
+    "railway": "S",
+    "inspection_type": "5",
+    "business": "EL",
+    "planned_count": 7,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "年度定期",
+    "location": "東部",
+    "inspector": "孫志明"
+  },
+  {
+    "plan_name": "113年度糖鐵特別檢查複查計畫",
+    "year": "113",
+    "railway": "S",
+    "inspection_type": "2",
+    "business": "OP",
+    "planned_count": 8,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "追蹤查核",
+    "location": "高雄站",
+    "inspector": "周建國"
+  },
+  {
+    "plan_name": "113年度高鐵特別檢查專案檢查計畫",
+    "year": "113",
+    "railway": "H",
+    "inspection_type": "2",
+    "business": "ME",
+    "planned_count": 8,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "重點檢查",
+    "location": "臺中站",
+    "inspector": "李小華"
+  },
+  {
+    "plan_name": "113年度糖鐵調查專案檢查計畫",
+    "year": "113",
+    "railway": "S",
+    "inspection_type": "5",
+    "business": "OT",
+    "planned_count": 8,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "年度定期",
+    "location": "嘉義站",
+    "inspector": "王大明"
+  },
+  {
+    "plan_name": "114年度林鐵例行性檢查複查計畫",
+    "year": "114",
+    "railway": "A",
+    "inspection_type": "3",
+    "business": "OT",
+    "planned_count": 3,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "專案檢查",
+    "location": "全線",
+    "inspector": "孫志明"
+  },
+  {
+    "plan_name": "113年度糖鐵調查追蹤查核計畫",
+    "year": "113",
+    "railway": "S",
+    "inspection_type": "5",
+    "business": "OP",
+    "planned_count": 2,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "年度定期",
+    "location": "高雄站",
+    "inspector": "孫志明"
+  },
+  {
+    "plan_name": "113年度高鐵定期檢查專案檢查計畫",
+    "year": "113",
+    "railway": "H",
+    "inspection_type": "1",
+    "business": "OT",
+    "planned_count": 2,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "複查",
+    "location": "臺中站",
+    "inspector": "劉淑芬"
+  },
+  {
+    "plan_name": "113年度臺鐵例行性檢查專案檢查計畫",
+    "year": "113",
+    "railway": "T",
+    "inspection_type": "3",
+    "business": "ME",
+    "planned_count": 8,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "重點檢查",
+    "location": "桃園站",
+    "inspector": "王大明"
+  },
+  {
+    "plan_name": "113年度糖鐵臨時檢查追蹤查核計畫",
+    "year": "113",
+    "railway": "S",
+    "inspection_type": "4",
+    "business": "OP",
+    "planned_count": 2,
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "plan_type": "重點檢查",
+    "location": "全線",
+    "inspector": "黃雅婷"
+  },
+  {
+    "plan_name": "112年度糖鐵臨時檢查補充查核計畫",
+    "year": "112",
+    "railway": "S",
+    "inspection_type": "4",
+    "business": "SM",
+    "planned_count": 7,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "複查",
+    "location": "北區",
+    "inspector": "林志豪"
+  },
+  {
+    "plan_name": "112年度臺鐵調查追蹤查核計畫",
+    "year": "112",
+    "railway": "T",
+    "inspection_type": "5",
+    "business": "OT",
+    "planned_count": 8,
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31",
+    "plan_type": "複查",
+    "location": "高雄站",
+    "inspector": "鄭雅惠"
+  },
+  {
+    "plan_name": "114年度高鐵定期檢查補充查核計畫",
+    "year": "114",
+    "railway": "H",
+    "inspection_type": "1",
+    "business": "EL",
+    "planned_count": 5,
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "plan_type": "重點檢查",
+    "location": "桃園站",
+    "inspector": "吳俊傑"
   }
 ]
