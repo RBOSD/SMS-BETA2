@@ -71,7 +71,7 @@ module.exports = function registerIssuesRoutes(app) {
 
     app.put('/api/issues/:id', requireAuth, verifyCsrf, async (req, res) => {
         const { status, round, handling, review, replyDate, responseDate, content, issueDate, 
-                number, year, unit, divisionName, inspectionCategoryName, itemKindCode, category, planName } = req.body;
+                number, year, unit, divisionName, inspectionCategoryName, itemKindCode, planName } = req.body;
         const id = req.params.id;
         const r = parseInt(round) || 1;
         const hField = r === 1 ? 'handling' : `handling${r}`;
@@ -131,7 +131,6 @@ module.exports = function registerIssuesRoutes(app) {
             if (divisionName !== undefined) { updateFields.push(`division_name=$${paramIdx}`); params.push(divisionName); paramIdx++; }
             if (inspectionCategoryName !== undefined) { updateFields.push(`inspection_category_name=$${paramIdx}`); params.push(inspectionCategoryName); paramIdx++; }
             if (itemKindCode !== undefined) { updateFields.push(`item_kind_code=$${paramIdx}`); params.push(itemKindCode); paramIdx++; }
-            if (category !== undefined) { updateFields.push(`category=$${paramIdx}`); params.push(category); paramIdx++; }
             if (planName !== undefined) { updateFields.push(`plan_name=$${paramIdx}`); params.push(planName); paramIdx++; }
             
             params.push(id);
@@ -422,13 +421,13 @@ module.exports = function registerIssuesRoutes(app) {
                     const itemReplyDate = item.replyDate || replyDate || '';
                     await client.query(
                         `INSERT INTO issues (
-                            number, year, unit, content, status, item_kind_code, category, division_name, inspection_category_name,
+                            number, year, unit, content, status, item_kind_code, division_name, inspection_category_name,
                             handling, review, plan_name, issue_date, response_date_r1, reply_date_r1,
                             owner_group_id, owner_group_ids, owner_user_id, edit_mode
-                        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
+                        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`,
                         [
                             trimmedNumber, item.year, item.unit, item.content, item.status||'持續列管',
-                            item.itemKindCode, item.category, item.divisionName, item.inspectionCategoryName,
+                            item.itemKindCode, item.divisionName, item.inspectionCategoryName,
                             item.handling||'', item.review||'', item.planName || null, item.issueDate || null, 
                             reviewDate || '', itemReplyDate,
                             ownerGroupId, ownerGroupIds, ownerUserId, 'GROUP'

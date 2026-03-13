@@ -148,6 +148,11 @@ module.exports = function registerAdminRoutes(app) {
                     const inspection_type = String(row.inspection_type || row.inspectionType || '1');
                     const business = row.business ? String(row.business).toUpperCase() : null;
                     const planned_count = row.planned_count != null ? parseInt(row.planned_count, 10) : null;
+                    const start_date = (row.start_date || '').trim() || null;
+                    const end_date = (row.end_date || '').trim() || null;
+                    const plan_type = (row.plan_type || '').trim() || null;
+                    const location = (row.location || '').trim() || null;
+                    const inspector = (row.inspector || '').trim() || null;
                     if (!name || !/^\d{3}$/.test(year)) { results.plans.skipped++; continue; }
                     const key = `${name}|||${year}`;
                     if (seen.has(key)) { results.plans.skipped++; continue; }
@@ -156,9 +161,9 @@ module.exports = function registerAdminRoutes(app) {
                         const ex = await client.query("SELECT 1 FROM inspection_plan_schedule WHERE plan_name = $1 AND year = $2 LIMIT 1", [name, year]);
                         if (ex.rows.length > 0) { results.plans.skipped++; continue; }
                         await client.query(
-                            `INSERT INTO inspection_plan_schedule (start_date, end_date, plan_name, year, railway, inspection_type, business, inspection_seq, plan_number, planned_count, owner_group_id, owner_group_ids, owner_user_id, edit_mode)
-                             VALUES (NULL, NULL, $1, $2, $3, $4, $5, '00', '(手動)', $6, $7, $8, $9, 'GROUP')`,
-                            [name, year, railway, inspection_type, business, planned_count, ownerGroupId, [ownerGroupId], ownerUserId]
+                            `INSERT INTO inspection_plan_schedule (start_date, end_date, plan_name, year, railway, inspection_type, business, inspection_seq, plan_number, planned_count, plan_type, location, inspector, owner_group_id, owner_group_ids, owner_user_id, edit_mode)
+                             VALUES ($1, $2, $3, $4, $5, $6, $7, '00', '(手動)', $8, $9, $10, $11, $12, $13, $14, $15, 'GROUP')`,
+                            [start_date, end_date, name, year, railway, inspection_type, business, planned_count, plan_type, location, inspector, ownerGroupId, [ownerGroupId], ownerUserId]
                         );
                         results.plans.success++;
                     } catch (e) {

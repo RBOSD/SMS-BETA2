@@ -247,13 +247,20 @@ export default function PlansManageTab() {
             {plans.map((p) => {
               const schedules = planSchedules[p.id] || [];
               const codes = schedules.map((s) => s.plan_number || '-');
-              const dates = schedules.map((s) => {
+              let dates = schedules.map((s) => {
                 const start = (s.start_date || '').slice(0, 10);
                 const end = (s.end_date || '').slice(0, 10);
                 return end && end !== start ? start + ' ~ ' + end : start;
               });
-              const locations = schedules.map((s) => s.location || '-');
-              const inspectors = schedules.map((s) => s.inspector || '-');
+              let locations = schedules.map((s) => s.location || '-');
+              let inspectors = schedules.map((s) => s.inspector || '-');
+              if (dates.length === 0 && (p.start_date || p.end_date)) {
+                const start = (p.start_date || '').slice(0, 10);
+                const end = (p.end_date || '').slice(0, 10);
+                dates = [end && end !== start ? start + ' ~ ' + end : start];
+              }
+              if (locations.length === 0 && p.location) locations = [p.location];
+              if (inspectors.length === 0 && p.inspector) inspectors = [p.inspector];
               const inspectionType = schedules[0]?.inspection_type || p.inspection_type;
               return (
                 <tr key={p.id}>

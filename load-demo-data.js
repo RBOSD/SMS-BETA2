@@ -117,7 +117,7 @@ async function main() {
       }
 
       const cols = [
-        'number', 'year', 'unit', 'content', 'status', 'item_kind_code', 'category',
+        'number', 'year', 'unit', 'content', 'status', 'item_kind_code',
         'division_name', 'inspection_category_name', 'handling', 'review',
         'plan_name', 'issue_date', 'reply_date_r1', 'response_date_r1',
         'owner_group_id', 'owner_group_ids', 'owner_user_id', 'edit_mode'
@@ -129,7 +129,6 @@ async function main() {
         item.content || '',
         item.status || '持續列管',
         item.itemKindCode || item.item_kind_code || null,
-        item.category || null,
         item.divisionName || item.division_name || null,
         item.inspectionCategoryName || item.inspection_category_name || null,
         item.handling || '',

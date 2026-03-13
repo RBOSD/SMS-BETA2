@@ -35,7 +35,6 @@ async function initDB() {
                     item_kind_code TEXT,
                     division_name TEXT,
                     inspection_category_name TEXT,
-                    category TEXT,
                     handling TEXT,
                     review TEXT,
                     plan_name TEXT,
@@ -219,6 +218,7 @@ async function initDB() {
                     } catch (e) { }
                 }
 
+                try { await client.query(`ALTER TABLE issues DROP COLUMN IF EXISTS category`); } catch (e) {}
                 try { await client.query(`ALTER TABLE issues ADD COLUMN IF NOT EXISTS owner_group_id INTEGER`); } catch (e) {}
                 try { await client.query(`ALTER TABLE issues ADD COLUMN IF NOT EXISTS owner_group_ids INTEGER[]`); } catch (e) {}
                 try { await client.query(`ALTER TABLE issues ADD COLUMN IF NOT EXISTS owner_user_id INTEGER`); } catch (e) {}

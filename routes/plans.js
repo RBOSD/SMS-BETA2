@@ -35,7 +35,7 @@ module.exports = function registerPlansRoutes(app) {
                     GROUP BY plan_name, year
                 ),
                 header AS (
-                    SELECT plan_name, year, planned_count, business, railway, inspection_type
+                    SELECT plan_name, year, planned_count, business, railway, inspection_type, start_date, end_date, location, inspector
                     FROM inspection_plan_schedule WHERE inspection_seq = '00'
                 ),
                 schedule_counts AS (
@@ -43,12 +43,13 @@ module.exports = function registerPlansRoutes(app) {
                 )
                 SELECT g.min_id AS id, g.name, g.year, g.created_at, g.updated_at,
                        COALESCE(COUNT(DISTINCT i.id), 0) AS issue_count,
-                       h.planned_count, h.business, h.railway, h.inspection_type, COALESCE(sc.cnt, 0) AS schedule_count
+                       h.planned_count, h.business, h.railway, h.inspection_type, COALESCE(sc.cnt, 0) AS schedule_count,
+                       h.start_date, h.end_date, h.location, h.inspector
                 FROM g
                 LEFT JOIN issues i ON i.plan_name = g.name AND i.year = g.year
                 LEFT JOIN header h ON h.plan_name = g.name AND h.year = g.year
                 LEFT JOIN schedule_counts sc ON sc.plan_name = g.name AND sc.year = g.year
-                GROUP BY g.min_id, g.name, g.year, g.created_at, g.updated_at, h.planned_count, h.business, h.railway, h.inspection_type, sc.cnt
+                GROUP BY g.min_id, g.name, g.year, g.created_at, g.updated_at, h.planned_count, h.business, h.railway, h.inspection_type, sc.cnt, h.start_date, h.end_date, h.location, h.inspector
                 ORDER BY ${order}
                 LIMIT $${idx} OFFSET $${idx+1}
             `;
@@ -65,7 +66,11 @@ module.exports = function registerPlansRoutes(app) {
                 business: row.business || null,
                 railway: row.railway && String(row.railway).trim() !== '-' ? String(row.railway).trim() : null,
                 inspection_type: row.inspection_type && String(row.inspection_type).trim() !== '-' ? String(row.inspection_type).trim() : null,
-                schedule_count: parseInt(row.schedule_count) || 0
+                schedule_count: parseInt(row.schedule_count) || 0,
+                start_date: row.start_date || null,
+                end_date: row.end_date || null,
+                location: row.location || null,
+                inspector: row.inspector || null
             }));
 
             res.json({data: plansWithCounts, total, page: parseInt(page), pages: Math.ceil(total/limit)});
