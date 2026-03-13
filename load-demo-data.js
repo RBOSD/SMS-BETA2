@@ -138,8 +138,8 @@ async function main() {
       for (let r = 2; r <= 30; r++) {
         const h = item[`handling${r}`] ?? item.rounds?.[r - 1]?.handling;
         const rev = item[`review${r}`] ?? item.rounds?.[r - 1]?.review;
-        const rd = item[`replyDate_r${r}`] ?? item.rounds?.[r - 1]?.replyDate;
-        const resp = item[`responseDate_r${r}`] ?? item.rounds?.[r - 1]?.responseDate;
+        const rd = item[`reply_date_r${r}`] ?? item.rounds?.[r - 1]?.replyDate ?? '';
+        const resp = item[`response_date_r${r}`] ?? item.rounds?.[r - 1]?.responseDate ?? '';
         if (h || rev || rd || resp) {
           extraCols.push(`handling${r}`, `review${r}`, `reply_date_r${r}`, `response_date_r${r}`);
           extraVals.push(h || '', rev || '', rd || '', resp || '');

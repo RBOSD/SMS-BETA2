@@ -4,16 +4,16 @@
     "year": "112",
     "railway": "T",
     "inspection_type": "1",
-    "business": "AD",
-    "planned_count": 2
+    "business": "EL",
+    "planned_count": 8
   },
   {
     "plan_name": "112年度臺鐵例行性檢查計畫",
     "year": "112",
     "railway": "T",
     "inspection_type": "3",
-    "business": "OP",
-    "planned_count": 12
+    "business": null,
+    "planned_count": 3
   },
   {
     "plan_name": "112年度臺鐵特別檢查計畫",
@@ -21,14 +21,14 @@
     "railway": "T",
     "inspection_type": "2",
     "business": "CV",
-    "planned_count": 12
+    "planned_count": 8
   },
   {
     "plan_name": "112年度臺鐵臨時檢查計畫",
     "year": "112",
     "railway": "T",
     "inspection_type": "4",
-    "business": "SM",
+    "business": "ME",
     "planned_count": 11
   },
   {
@@ -36,15 +36,15 @@
     "year": "112",
     "railway": "T",
     "inspection_type": "5",
-    "business": "ME",
-    "planned_count": 6
+    "business": "OP",
+    "planned_count": 3
   },
   {
     "plan_name": "112年度高鐵定期檢查計畫",
     "year": "112",
     "railway": "H",
     "inspection_type": "1",
-    "business": null,
+    "business": "EL",
     "planned_count": 8
   },
   {
@@ -52,8 +52,8 @@
     "year": "112",
     "railway": "H",
     "inspection_type": "3",
-    "business": "SM",
-    "planned_count": 7
+    "business": "ME",
+    "planned_count": 5
   },
   {
     "plan_name": "112年度高鐵特別檢查計畫",
@@ -61,15 +61,15 @@
     "railway": "H",
     "inspection_type": "2",
     "business": "EL",
-    "planned_count": 4
+    "planned_count": 3
   },
   {
     "plan_name": "112年度高鐵臨時檢查計畫",
     "year": "112",
     "railway": "H",
     "inspection_type": "4",
-    "business": "ME",
-    "planned_count": 9
+    "business": null,
+    "planned_count": 2
   },
   {
     "plan_name": "112年度高鐵調查計畫",
@@ -77,47 +77,47 @@
     "railway": "H",
     "inspection_type": "5",
     "business": null,
-    "planned_count": 11
+    "planned_count": 4
   },
   {
     "plan_name": "112年度林鐵定期檢查計畫",
     "year": "112",
     "railway": "A",
     "inspection_type": "1",
-    "business": "OP",
-    "planned_count": 10
+    "business": "EL",
+    "planned_count": 4
   },
   {
     "plan_name": "112年度林鐵例行性檢查計畫",
     "year": "112",
     "railway": "A",
     "inspection_type": "3",
-    "business": "CV",
-    "planned_count": 4
+    "business": "OT",
+    "planned_count": 7
   },
   {
     "plan_name": "112年度林鐵特別檢查計畫",
     "year": "112",
     "railway": "A",
     "inspection_type": "2",
-    "business": "SM",
-    "planned_count": 5
+    "business": null,
+    "planned_count": 2
   },
   {
     "plan_name": "112年度林鐵臨時檢查計畫",
     "year": "112",
     "railway": "A",
     "inspection_type": "4",
-    "business": "SM",
-    "planned_count": 8
+    "business": "CV",
+    "planned_count": 4
   },
   {
     "plan_name": "112年度林鐵調查計畫",
     "year": "112",
     "railway": "A",
     "inspection_type": "5",
-    "business": "SM",
-    "planned_count": 4
+    "business": "CV",
+    "planned_count": 12
   },
   {
     "plan_name": "112年度糖鐵定期檢查計畫",
@@ -125,23 +125,23 @@
     "railway": "S",
     "inspection_type": "1",
     "business": "AD",
-    "planned_count": 8
+    "planned_count": 12
   },
   {
     "plan_name": "112年度糖鐵例行性檢查計畫",
     "year": "112",
     "railway": "S",
     "inspection_type": "3",
-    "business": "ME",
-    "planned_count": 6
+    "business": null,
+    "planned_count": 5
   },
   {
     "plan_name": "112年度糖鐵特別檢查計畫",
     "year": "112",
     "railway": "S",
     "inspection_type": "2",
-    "business": "AD",
-    "planned_count": 12
+    "business": null,
+    "planned_count": 2
   },
   {
     "plan_name": "112年度糖鐵臨時檢查計畫",
@@ -149,7 +149,7 @@
     "railway": "S",
     "inspection_type": "4",
     "business": "OT",
-    "planned_count": 7
+    "planned_count": 12
   },
   {
     "plan_name": "112年度糖鐵調查計畫",
@@ -157,30 +157,30 @@
     "railway": "S",
     "inspection_type": "5",
     "business": "EL",
-    "planned_count": 4
+    "planned_count": 5
   },
   {
     "plan_name": "113年度臺鐵定期檢查計畫",
     "year": "113",
     "railway": "T",
     "inspection_type": "1",
-    "business": "OT",
-    "planned_count": 4
+    "business": "ME",
+    "planned_count": 8
   },
   {
     "plan_name": "113年度臺鐵例行性檢查計畫",
     "year": "113",
     "railway": "T",
     "inspection_type": "3",
-    "business": "CV",
-    "planned_count": 2
+    "business": null,
+    "planned_count": 11
   },
   {
     "plan_name": "113年度臺鐵特別檢查計畫",
     "year": "113",
     "railway": "T",
     "inspection_type": "2",
-    "business": "AD",
+    "business": "CV",
     "planned_count": 6
   },
   {
@@ -188,31 +188,31 @@
     "year": "113",
     "railway": "T",
     "inspection_type": "4",
-    "business": "CV",
-    "planned_count": 8
+    "business": "OP",
+    "planned_count": 6
   },
   {
     "plan_name": "113年度臺鐵調查計畫",
     "year": "113",
     "railway": "T",
     "inspection_type": "5",
-    "business": null,
-    "planned_count": 5
+    "business": "AD",
+    "planned_count": 8
   },
   {
     "plan_name": "113年度高鐵定期檢查計畫",
     "year": "113",
     "railway": "H",
     "inspection_type": "1",
-    "business": null,
-    "planned_count": 7
+    "business": "ME",
+    "planned_count": 10
   },
   {
     "plan_name": "113年度高鐵例行性檢查計畫",
     "year": "113",
     "railway": "H",
     "inspection_type": "3",
-    "business": null,
+    "business": "EL",
     "planned_count": 8
   },
   {
@@ -220,112 +220,112 @@
     "year": "113",
     "railway": "H",
     "inspection_type": "2",
-    "business": "OP",
-    "planned_count": 10
+    "business": "EL",
+    "planned_count": 5
   },
   {
     "plan_name": "113年度高鐵臨時檢查計畫",
     "year": "113",
     "railway": "H",
     "inspection_type": "4",
-    "business": "AD",
-    "planned_count": 10
+    "business": "OT",
+    "planned_count": 8
   },
   {
     "plan_name": "113年度高鐵調查計畫",
     "year": "113",
     "railway": "H",
     "inspection_type": "5",
-    "business": "SM",
-    "planned_count": 3
+    "business": "EL",
+    "planned_count": 4
   },
   {
     "plan_name": "113年度林鐵定期檢查計畫",
     "year": "113",
     "railway": "A",
     "inspection_type": "1",
-    "business": "AD",
-    "planned_count": 6
+    "business": "CV",
+    "planned_count": 3
   },
   {
     "plan_name": "113年度林鐵例行性檢查計畫",
     "year": "113",
     "railway": "A",
     "inspection_type": "3",
-    "business": "EL",
-    "planned_count": 12
+    "business": "SM",
+    "planned_count": 4
   },
   {
     "plan_name": "113年度林鐵特別檢查計畫",
     "year": "113",
     "railway": "A",
     "inspection_type": "2",
-    "business": "EL",
-    "planned_count": 9
+    "business": "CV",
+    "planned_count": 2
   },
   {
     "plan_name": "113年度林鐵臨時檢查計畫",
     "year": "113",
     "railway": "A",
     "inspection_type": "4",
-    "business": "OT",
-    "planned_count": 12
+    "business": "CV",
+    "planned_count": 7
   },
   {
     "plan_name": "113年度林鐵調查計畫",
     "year": "113",
     "railway": "A",
     "inspection_type": "5",
-    "business": "EL",
-    "planned_count": 8
+    "business": "OP",
+    "planned_count": 10
   },
   {
     "plan_name": "113年度糖鐵定期檢查計畫",
     "year": "113",
     "railway": "S",
     "inspection_type": "1",
-    "business": "OP",
-    "planned_count": 6
+    "business": "EL",
+    "planned_count": 10
   },
   {
     "plan_name": "113年度糖鐵例行性檢查計畫",
     "year": "113",
     "railway": "S",
     "inspection_type": "3",
-    "business": "OP",
-    "planned_count": 8
+    "business": "SM",
+    "planned_count": 3
   },
   {
     "plan_name": "113年度糖鐵特別檢查計畫",
     "year": "113",
     "railway": "S",
     "inspection_type": "2",
-    "business": "ME",
-    "planned_count": 8
+    "business": "AD",
+    "planned_count": 3
   },
   {
     "plan_name": "113年度糖鐵臨時檢查計畫",
     "year": "113",
     "railway": "S",
     "inspection_type": "4",
-    "business": "ME",
-    "planned_count": 3
+    "business": null,
+    "planned_count": 12
   },
   {
     "plan_name": "113年度糖鐵調查計畫",
     "year": "113",
     "railway": "S",
     "inspection_type": "5",
-    "business": "SM",
-    "planned_count": 8
+    "business": "CV",
+    "planned_count": 9
   },
   {
     "plan_name": "114年度臺鐵定期檢查計畫",
     "year": "114",
     "railway": "T",
     "inspection_type": "1",
-    "business": "OT",
-    "planned_count": 4
+    "business": "CV",
+    "planned_count": 9
   },
   {
     "plan_name": "114年度臺鐵例行性檢查計畫",
@@ -340,87 +340,87 @@
     "year": "114",
     "railway": "T",
     "inspection_type": "2",
-    "business": "EL",
-    "planned_count": 5
+    "business": "OP",
+    "planned_count": 12
   },
   {
     "plan_name": "114年度臺鐵臨時檢查計畫",
     "year": "114",
     "railway": "T",
     "inspection_type": "4",
-    "business": "CV",
-    "planned_count": 5
+    "business": "SM",
+    "planned_count": 7
   },
   {
     "plan_name": "114年度臺鐵調查計畫",
     "year": "114",
     "railway": "T",
     "inspection_type": "5",
-    "business": "EL",
-    "planned_count": 5
+    "business": "CV",
+    "planned_count": 6
   },
   {
     "plan_name": "114年度高鐵定期檢查計畫",
     "year": "114",
     "railway": "H",
     "inspection_type": "1",
-    "business": "AD",
-    "planned_count": 8
+    "business": "ME",
+    "planned_count": 7
   },
   {
     "plan_name": "114年度高鐵例行性檢查計畫",
     "year": "114",
     "railway": "H",
     "inspection_type": "3",
-    "business": "OT",
-    "planned_count": 6
+    "business": "EL",
+    "planned_count": 2
   },
   {
     "plan_name": "114年度高鐵特別檢查計畫",
     "year": "114",
     "railway": "H",
     "inspection_type": "2",
-    "business": null,
-    "planned_count": 8
+    "business": "ME",
+    "planned_count": 2
   },
   {
     "plan_name": "114年度高鐵臨時檢查計畫",
     "year": "114",
     "railway": "H",
     "inspection_type": "4",
-    "business": "OT",
-    "planned_count": 11
+    "business": "OP",
+    "planned_count": 2
   },
   {
     "plan_name": "114年度高鐵調查計畫",
     "year": "114",
     "railway": "H",
     "inspection_type": "5",
-    "business": "SM",
-    "planned_count": 7
+    "business": "OT",
+    "planned_count": 12
   },
   {
     "plan_name": "114年度林鐵定期檢查計畫",
     "year": "114",
     "railway": "A",
     "inspection_type": "1",
-    "business": "SM",
-    "planned_count": 10
+    "business": "OT",
+    "planned_count": 8
   },
   {
     "plan_name": "114年度林鐵例行性檢查計畫",
     "year": "114",
     "railway": "A",
     "inspection_type": "3",
-    "business": null,
-    "planned_count": 6
+    "business": "ME",
+    "planned_count": 11
   },
   {
     "plan_name": "114年度林鐵特別檢查計畫",
     "year": "114",
     "railway": "A",
     "inspection_type": "2",
-    "business": "CV",
+    "business": null,
     "planned_count": 2
   },
   {
@@ -428,23 +428,23 @@
     "year": "114",
     "railway": "A",
     "inspection_type": "4",
-    "business": "ME",
-    "planned_count": 5
+    "business": "EL",
+    "planned_count": 6
   },
   {
     "plan_name": "114年度林鐵調查計畫",
     "year": "114",
     "railway": "A",
     "inspection_type": "5",
-    "business": "EL",
-    "planned_count": 3
+    "business": null,
+    "planned_count": 5
   },
   {
     "plan_name": "114年度糖鐵定期檢查計畫",
     "year": "114",
     "railway": "S",
     "inspection_type": "1",
-    "business": "SM",
+    "business": "AD",
     "planned_count": 11
   },
   {
@@ -452,127 +452,215 @@
     "year": "114",
     "railway": "S",
     "inspection_type": "3",
-    "business": "AD",
-    "planned_count": 7
+    "business": "ME",
+    "planned_count": 6
   },
   {
     "plan_name": "114年度糖鐵特別檢查計畫",
     "year": "114",
     "railway": "S",
     "inspection_type": "2",
-    "business": "OP",
-    "planned_count": 4
+    "business": null,
+    "planned_count": 7
   },
   {
     "plan_name": "114年度糖鐵臨時檢查計畫",
     "year": "114",
     "railway": "S",
     "inspection_type": "4",
-    "business": "OP",
-    "planned_count": 8
+    "business": "ME",
+    "planned_count": 12
   },
   {
     "plan_name": "114年度糖鐵調查計畫",
     "year": "114",
     "railway": "S",
     "inspection_type": "5",
-    "business": "OP",
-    "planned_count": 11
-  },
-  {
-    "plan_name": "112年度林鐵臨時檢查追蹤查核計畫",
-    "year": "112",
-    "railway": "A",
-    "inspection_type": "4",
-    "business": "EL",
-    "planned_count": 1
-  },
-  {
-    "plan_name": "113年度糖鐵特別檢查追蹤查核計畫",
-    "year": "113",
-    "railway": "S",
-    "inspection_type": "2",
     "business": "CV",
-    "planned_count": 6
-  },
-  {
-    "plan_name": "114年度糖鐵調查追蹤查核計畫",
-    "year": "114",
-    "railway": "S",
-    "inspection_type": "5",
-    "business": "ME",
-    "planned_count": 8
-  },
-  {
-    "plan_name": "113年度臺鐵例行性檢查專案檢查計畫",
-    "year": "113",
-    "railway": "T",
-    "inspection_type": "3",
-    "business": "CV",
-    "planned_count": 8
-  },
-  {
-    "plan_name": "112年度高鐵臨時檢查重點檢查計畫",
-    "year": "112",
-    "railway": "H",
-    "inspection_type": "4",
-    "business": "EL",
-    "planned_count": 5
-  },
-  {
-    "plan_name": "113年度糖鐵臨時檢查重點檢查計畫",
-    "year": "113",
-    "railway": "S",
-    "inspection_type": "4",
-    "business": "CV",
-    "planned_count": 8
-  },
-  {
-    "plan_name": "113年度林鐵例行性檢查複查計畫",
-    "year": "113",
-    "railway": "A",
-    "inspection_type": "3",
-    "business": null,
     "planned_count": 4
   },
   {
-    "plan_name": "114年度糖鐵臨時檢查追蹤查核計畫",
-    "year": "114",
+    "plan_name": "113年度糖鐵定期檢查重點檢查計畫",
+    "year": "113",
     "railway": "S",
+    "inspection_type": "1",
+    "business": "CV",
+    "planned_count": 8
+  },
+  {
+    "plan_name": "112年度高鐵定期檢查重點檢查計畫",
+    "year": "112",
+    "railway": "H",
+    "inspection_type": "1",
+    "business": "OT",
+    "planned_count": 2
+  },
+  {
+    "plan_name": "114年度臺鐵特別檢查複查計畫",
+    "year": "114",
+    "railway": "T",
+    "inspection_type": "2",
+    "business": "CV",
+    "planned_count": 4
+  },
+  {
+    "plan_name": "113年度林鐵調查複查計畫",
+    "year": "113",
+    "railway": "A",
+    "inspection_type": "5",
+    "business": "AD",
+    "planned_count": 2
+  },
+  {
+    "plan_name": "113年度臺鐵調查專案檢查計畫",
+    "year": "113",
+    "railway": "T",
+    "inspection_type": "5",
+    "business": "SM",
+    "planned_count": 5
+  },
+  {
+    "plan_name": "112年度糖鐵定期檢查專案檢查計畫",
+    "year": "112",
+    "railway": "S",
+    "inspection_type": "1",
+    "business": "EL",
+    "planned_count": 4
+  },
+  {
+    "plan_name": "113年度林鐵臨時檢查追蹤查核計畫",
+    "year": "113",
+    "railway": "A",
+    "inspection_type": "4",
+    "business": null,
+    "planned_count": 5
+  },
+  {
+    "plan_name": "113年度臺鐵臨時檢查追蹤查核計畫",
+    "year": "113",
+    "railway": "T",
     "inspection_type": "4",
     "business": "SM",
+    "planned_count": 6
+  },
+  {
+    "plan_name": "113年度糖鐵定期檢查補充查核計畫",
+    "year": "113",
+    "railway": "S",
+    "inspection_type": "1",
+    "business": "SM",
+    "planned_count": 4
+  },
+  {
+    "plan_name": "113年度高鐵例行性檢查專案檢查計畫",
+    "year": "113",
+    "railway": "H",
+    "inspection_type": "3",
+    "business": "CV",
+    "planned_count": 2
+  },
+  {
+    "plan_name": "112年度高鐵臨時檢查追蹤查核計畫",
+    "year": "112",
+    "railway": "H",
+    "inspection_type": "4",
+    "business": "ME",
+    "planned_count": 6
+  },
+  {
+    "plan_name": "112年度糖鐵臨時檢查重點檢查計畫",
+    "year": "112",
+    "railway": "S",
+    "inspection_type": "4",
+    "business": "OP",
     "planned_count": 3
   },
   {
-    "plan_name": "114年度高鐵臨時檢查追蹤查核計畫",
+    "plan_name": "114年度臺鐵調查專案檢查計畫",
     "year": "114",
-    "railway": "H",
-    "inspection_type": "4",
-    "business": "AD",
-    "planned_count": 7
+    "railway": "T",
+    "inspection_type": "5",
+    "business": "OP",
+    "planned_count": 2
   },
   {
-    "plan_name": "114年度糖鐵臨時檢查專案檢查計畫",
-    "year": "114",
+    "plan_name": "113年度糖鐵臨時檢查專案檢查計畫",
+    "year": "113",
     "railway": "S",
     "inspection_type": "4",
     "business": "CV",
-    "planned_count": 2
+    "planned_count": 4
   },
   {
     "plan_name": "114年度高鐵特別檢查補充查核計畫",
     "year": "114",
     "railway": "H",
     "inspection_type": "2",
-    "business": "EL",
+    "business": null,
+    "planned_count": 1
+  },
+  {
+    "plan_name": "113年度高鐵定期檢查專案檢查計畫",
+    "year": "113",
+    "railway": "H",
+    "inspection_type": "1",
+    "business": "AD",
+    "planned_count": 1
+  },
+  {
+    "plan_name": "114年度臺鐵調查複查計畫",
+    "year": "114",
+    "railway": "T",
+    "inspection_type": "5",
+    "business": "ME",
+    "planned_count": 2
+  },
+  {
+    "plan_name": "114年度林鐵特別檢查重點檢查計畫",
+    "year": "114",
+    "railway": "A",
+    "inspection_type": "2",
+    "business": "SM",
+    "planned_count": 6
+  },
+  {
+    "plan_name": "113年度林鐵例行性檢查專案檢查計畫",
+    "year": "113",
+    "railway": "A",
+    "inspection_type": "3",
+    "business": "ME",
+    "planned_count": 6
+  },
+  {
+    "plan_name": "112年度糖鐵例行性檢查重點檢查計畫",
+    "year": "112",
+    "railway": "S",
+    "inspection_type": "3",
+    "business": "SM",
+    "planned_count": 4
+  },
+  {
+    "plan_name": "113年度林鐵特別檢查追蹤查核計畫",
+    "year": "113",
+    "railway": "A",
+    "inspection_type": "2",
+    "business": "OT",
     "planned_count": 7
   },
   {
-    "plan_name": "112年度高鐵定期檢查專案檢查計畫",
+    "plan_name": "114年度糖鐵調查追蹤查核計畫",
+    "year": "114",
+    "railway": "S",
+    "inspection_type": "5",
+    "business": "AD",
+    "planned_count": 5
+  },
+  {
+    "plan_name": "112年度糖鐵調查補充查核計畫",
     "year": "112",
-    "railway": "H",
-    "inspection_type": "1",
-    "business": "ME",
+    "railway": "S",
+    "inspection_type": "5",
+    "business": "EL",
     "planned_count": 4
   },
   {
@@ -580,223 +668,135 @@
     "year": "114",
     "railway": "A",
     "inspection_type": "3",
+    "business": null,
+    "planned_count": 5
+  },
+  {
+    "plan_name": "112年度林鐵定期檢查追蹤查核計畫",
+    "year": "112",
+    "railway": "A",
+    "inspection_type": "1",
     "business": "AD",
     "planned_count": 2
   },
   {
-    "plan_name": "112年度糖鐵定期檢查重點檢查計畫",
-    "year": "112",
-    "railway": "S",
-    "inspection_type": "1",
-    "business": "OT",
-    "planned_count": 4
-  },
-  {
-    "plan_name": "112年度臺鐵例行性檢查補充查核計畫",
-    "year": "112",
-    "railway": "T",
-    "inspection_type": "3",
-    "business": "EL",
+    "plan_name": "114年度林鐵臨時檢查追蹤查核計畫",
+    "year": "114",
+    "railway": "A",
+    "inspection_type": "4",
+    "business": "OP",
     "planned_count": 8
   },
   {
-    "plan_name": "114年度臺鐵特別檢查補充查核計畫",
-    "year": "114",
-    "railway": "T",
-    "inspection_type": "2",
-    "business": "CV",
-    "planned_count": 2
-  },
-  {
-    "plan_name": "113年度糖鐵定期檢查追蹤查核計畫",
-    "year": "113",
-    "railway": "S",
-    "inspection_type": "1",
-    "business": "CV",
-    "planned_count": 4
-  },
-  {
-    "plan_name": "113年度高鐵調查專案檢查計畫",
-    "year": "113",
+    "plan_name": "112年度高鐵臨時檢查複查計畫",
+    "year": "112",
     "railway": "H",
-    "inspection_type": "5",
-    "business": "SM",
-    "planned_count": 3
+    "inspection_type": "4",
+    "business": null,
+    "planned_count": 5
   },
   {
-    "plan_name": "114年度糖鐵臨時檢查複查計畫",
+    "plan_name": "114年度林鐵調查補充查核計畫",
     "year": "114",
-    "railway": "S",
-    "inspection_type": "4",
+    "railway": "A",
+    "inspection_type": "5",
     "business": null,
     "planned_count": 4
   },
   {
-    "plan_name": "112年度糖鐵調查補充查核計畫",
+    "plan_name": "114年度糖鐵定期檢查追蹤查核計畫",
+    "year": "114",
+    "railway": "S",
+    "inspection_type": "1",
+    "business": "SM",
+    "planned_count": 3
+  },
+  {
+    "plan_name": "114年度高鐵例行性檢查追蹤查核計畫",
+    "year": "114",
+    "railway": "H",
+    "inspection_type": "3",
+    "business": "ME",
+    "planned_count": 4
+  },
+  {
+    "plan_name": "112年度糖鐵特別檢查複查計畫",
     "year": "112",
     "railway": "S",
-    "inspection_type": "5",
+    "inspection_type": "2",
     "business": "CV",
     "planned_count": 8
   },
   {
-    "plan_name": "112年度林鐵特別檢查追蹤查核計畫",
+    "plan_name": "113年度臺鐵特別檢查補充查核計畫",
+    "year": "113",
+    "railway": "T",
+    "inspection_type": "2",
+    "business": "ME",
+    "planned_count": 6
+  },
+  {
+    "plan_name": "112年度林鐵定期檢查複查計畫",
     "year": "112",
     "railway": "A",
-    "inspection_type": "2",
-    "business": "EL",
-    "planned_count": 8
+    "inspection_type": "1",
+    "business": "ME",
+    "planned_count": 1
   },
   {
-    "plan_name": "113年度高鐵例行性檢查專案檢查計畫",
+    "plan_name": "113年度林鐵調查追蹤查核計畫",
     "year": "113",
-    "railway": "H",
-    "inspection_type": "3",
-    "business": "OT",
-    "planned_count": 5
+    "railway": "A",
+    "inspection_type": "5",
+    "business": null,
+    "planned_count": 6
   },
   {
-    "plan_name": "112年度臺鐵調查專案檢查計畫",
+    "plan_name": "112年度臺鐵特別檢查專案檢查計畫",
     "year": "112",
     "railway": "T",
-    "inspection_type": "5",
-    "business": "OP",
-    "planned_count": 5
+    "inspection_type": "2",
+    "business": "ME",
+    "planned_count": 7
+  },
+  {
+    "plan_name": "112年度高鐵特別檢查重點檢查計畫",
+    "year": "112",
+    "railway": "H",
+    "inspection_type": "2",
+    "business": "EL",
+    "planned_count": 4
   },
   {
     "plan_name": "113年度高鐵調查追蹤查核計畫",
     "year": "113",
     "railway": "H",
     "inspection_type": "5",
-    "business": null,
-    "planned_count": 3
+    "business": "ME",
+    "planned_count": 5
   },
   {
-    "plan_name": "112年度高鐵定期檢查補充查核計畫",
-    "year": "112",
-    "railway": "H",
-    "inspection_type": "1",
-    "business": "CV",
-    "planned_count": 2
-  },
-  {
-    "plan_name": "113年度臺鐵特別檢查追蹤查核計畫",
+    "plan_name": "113年度林鐵調查重點檢查計畫",
     "year": "113",
+    "railway": "A",
+    "inspection_type": "5",
+    "business": null,
+    "planned_count": 6
+  },
+  {
+    "plan_name": "114年度臺鐵特別檢查重點檢查計畫",
+    "year": "114",
     "railway": "T",
     "inspection_type": "2",
-    "business": "EL",
-    "planned_count": 2
-  },
-  {
-    "plan_name": "113年度糖鐵調查專案檢查計畫",
-    "year": "113",
-    "railway": "S",
-    "inspection_type": "5",
     "business": "CV",
     "planned_count": 5
   },
   {
-    "plan_name": "113年度糖鐵定期檢查複查計畫",
-    "year": "113",
+    "plan_name": "112年度糖鐵定期檢查補充查核計畫",
+    "year": "112",
     "railway": "S",
     "inspection_type": "1",
-    "business": "ME",
-    "planned_count": 6
-  },
-  {
-    "plan_name": "114年度高鐵調查複查計畫",
-    "year": "114",
-    "railway": "H",
-    "inspection_type": "5",
-    "business": "OP",
-    "planned_count": 4
-  },
-  {
-    "plan_name": "113年度臺鐵調查專案檢查計畫",
-    "year": "113",
-    "railway": "T",
-    "inspection_type": "5",
-    "business": "ME",
-    "planned_count": 4
-  },
-  {
-    "plan_name": "114年度高鐵特別檢查專案檢查計畫",
-    "year": "114",
-    "railway": "H",
-    "inspection_type": "2",
-    "business": "CV",
-    "planned_count": 2
-  },
-  {
-    "plan_name": "112年度臺鐵特別檢查追蹤查核計畫",
-    "year": "112",
-    "railway": "T",
-    "inspection_type": "2",
-    "business": "CV",
-    "planned_count": 1
-  },
-  {
-    "plan_name": "114年度糖鐵特別檢查補充查核計畫",
-    "year": "114",
-    "railway": "S",
-    "inspection_type": "2",
     "business": "CV",
     "planned_count": 4
-  },
-  {
-    "plan_name": "113年度臺鐵定期檢查重點檢查計畫",
-    "year": "113",
-    "railway": "T",
-    "inspection_type": "1",
-    "business": "ME",
-    "planned_count": 4
-  },
-  {
-    "plan_name": "114年度林鐵例行性檢查重點檢查計畫",
-    "year": "114",
-    "railway": "A",
-    "inspection_type": "3",
-    "business": "OP",
-    "planned_count": 4
-  },
-  {
-    "plan_name": "114年度高鐵臨時檢查重點檢查計畫",
-    "year": "114",
-    "railway": "H",
-    "inspection_type": "4",
-    "business": "AD",
-    "planned_count": 1
-  },
-  {
-    "plan_name": "113年度高鐵特別檢查重點檢查計畫",
-    "year": "113",
-    "railway": "H",
-    "inspection_type": "2",
-    "business": "OP",
-    "planned_count": 5
-  },
-  {
-    "plan_name": "113年度林鐵例行性檢查重點檢查計畫",
-    "year": "113",
-    "railway": "A",
-    "inspection_type": "3",
-    "business": "AD",
-    "planned_count": 1
-  },
-  {
-    "plan_name": "114年度林鐵調查專案檢查計畫",
-    "year": "114",
-    "railway": "A",
-    "inspection_type": "5",
-    "business": "CV",
-    "planned_count": 6
-  },
-  {
-    "plan_name": "112年度林鐵例行性檢查複查計畫",
-    "year": "112",
-    "railway": "A",
-    "inspection_type": "3",
-    "business": null,
-    "planned_count": 7
   }
 ]

@@ -189,25 +189,26 @@ function generateItem(index, year, usedNumbers) {
     unit,
     content,
     status,
-    itemKindCode: kind || undefined,
-    divisionName: division,
-    inspectionCategoryName: inspection,
-    planName,
-    issueDate,
+    item_kind_code: kind || undefined,
+    division_name: division,
+    inspection_category_name: inspection,
+    plan_name: planName,
+    issue_date: issueDate,
     handling: first.handling,
     review: first.review,
-    replyDate: first.replyDate,
-    responseDate: first.responseDate,
+    reply_date_r1: first.replyDate,
+    response_date_r1: first.responseDate,
   };
-  if (!item.itemKindCode) delete item.itemKindCode;
+  if (!item.item_kind_code) delete item.item_kind_code;
 
   if (rounds.length > 1) {
     item.rounds = rounds;
     for (let i = 1; i < rounds.length; i++) {
-      item[`handling${i + 1}`] = rounds[i].handling;
-      item[`review${i + 1}`] = rounds[i].review;
-      item[`replyDate_r${i + 1}`] = rounds[i].replyDate;
-      item[`responseDate_r${i + 1}`] = rounds[i].responseDate;
+      const n = i + 1;
+      item[`handling${n}`] = rounds[i].handling;
+      item[`review${n}`] = rounds[i].review;
+      item[`reply_date_r${n}`] = rounds[i].replyDate;
+      item[`response_date_r${n}`] = rounds[i].responseDate;
     }
   }
 
